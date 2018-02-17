@@ -12,15 +12,7 @@ type Term struct {
 func NewTerm() *Term {
 	tui.SetLogger(log)
 
-	server := NewServer()
-	client := NewClient()
-
-	serverWidget := server.Widget()
-	clientWidget := client.Widget()
-
-	_ = serverWidget
-
-	box := tui.NewVBox(tui.NewHBox(clientWidget, clientWidget))
+	box := tui.NewHBox()
 	box.SetTitle("micro18")
 	box.SetBorder(true)
 
@@ -28,9 +20,21 @@ func NewTerm() *Term {
 	if err != nil {
 		panic(err)
 	}
-	defer func() {
-		go ui.Update(func() {})
-	}()
+
+	theme := getTheme()
+	ui.SetTheme(theme)
+
+	server := NewServer(ui)
+	client := NewClient(ui)
+
+	serverWidget := server.Widget()
+	clientWidget := client.Widget()
+
+	_ = serverWidget
+
+	box.Append(clientWidget)
+
+	tui.DefaultFocusChain.Set(serverWidget, clientWidget)
 
 	ui.SetKeybinding("Left", func() {
 		client.IsSelected(true)
@@ -47,11 +51,6 @@ func NewTerm() *Term {
 	ui.SetKeybinding("Esc", func() { ui.Quit() })
 	ui.SetKeybinding("q", func() { ui.Quit() })
 	ui.SetKeybinding("Ctrl+C", func() { ui.Quit() })
-
-	theme := getTheme()
-	ui.SetTheme(theme)
-
-	tui.DefaultFocusChain.Set(serverWidget, clientWidget)
 
 	return &Term{
 		ui:     ui,

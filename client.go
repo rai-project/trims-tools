@@ -1,9 +1,12 @@
 package micro
 
 import (
+	"time"
+
 	"github.com/dc0d/dirwatch"
 	"github.com/drhodes/golorem"
 	"github.com/fsnotify/fsnotify"
+	tui "github.com/marcusolsson/tui-go"
 )
 
 type Client struct {
@@ -15,15 +18,23 @@ type Client struct {
 	isSelected bool
 }
 
-func NewClient() *Client {
-	widget := NewOutputWidget("client")
-	text := ""
-	for ii := 0; ii < 100; ii++ {
-		text += lorem.Sentence(89, 120) + "\n"
-	}
-	widget.SetText(text)
+func NewClient(ui tui.UI) *Client {
+	widget := NewOutputWidget("client", ui)
+	go func() {
+		ticker := time.Tick(time.Second)
+		for {
+			select {
+			case <-ticker:
+				text := ""
+				for ii := 0; ii < 10; ii++ {
+					text += lorem.Sentence(89, 120) + "\n"
+				}
+				widget.SetText(text)
+			}
+		}
+	}()
 	return &Client{
-		content: text,
+		content: "",
 		widget:  widget,
 		builder: &Builder{},
 	}

@@ -1,6 +1,8 @@
 package micro
 
 import (
+	"os"
+
 	"github.com/rai-project/config"
 	"github.com/rai-project/logger"
 )
@@ -11,6 +13,9 @@ var (
 
 func init() {
 	config.AfterInit(func() {
-		log = logger.New().WithField("pkg", "micro")
+		lg := logger.New()
+		f, _ := os.Create("debug.log")
+		lg.Out = f
+		log = lg.WithField("pkg", "micro")
 	})
 }

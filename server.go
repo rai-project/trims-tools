@@ -5,7 +5,7 @@ import tui "github.com/marcusolsson/tui-go"
 type Server struct {
 }
 
-func NewServer() *Server {
+func NewServer(ui tui.UI) *Server {
 	return &Server{}
 }
 

@@ -4,17 +4,19 @@ import (
 	"fmt"
 	"image"
 
+	"github.com/k0kubun/pp"
 	"github.com/marcusolsson/tui-go"
 )
 
 type OutputWidget struct {
-	content    *tui.Label
-	scrollArea *tui.ScrollArea
-	status     *tui.StatusBar
-	box        *tui.Box
-
+	content     *tui.Label
+	scrollArea  *tui.ScrollArea
+	status      *tui.StatusBar
+	box         *tui.Box
 	contentText string
 	statusText  string
+
+	ui tui.UI
 
 	tui.WidgetBase
 }
@@ -23,29 +25,27 @@ var (
 	divider = tui.NewLabel("-------------------")
 )
 
-func NewOutputWidget(title string) *OutputWidget {
+func NewOutputWidget(title string, ui tui.UI) *OutputWidget {
 
 	contentText := ""
 	statusText := fmt.Sprintf("Build status : %s", "?")
 
 	content := tui.NewLabel(contentText)
-	scrollArea := tui.NewScrollArea(content)
-	statusBar := tui.NewStatusBar("Status")
-	statusBar.SetText(statusText)
-	statusBox := tui.NewVBox(statusBar)
-	statusBox.SetTitle("Status")
-	statusBox.SetBorder(true)
-	statusBar.SetText(statusText)
+	content.SetWordWrap(true)
 
-	box := tui.NewHBox(
+	scrollArea := tui.NewScrollArea(content)
+	statusBar := tui.NewStatusBar(statusText)
+	statusBox := tui.NewHBox(statusBar)
+	statusBox.SetTitle("Status: ")
+	statusBox.SetBorder(true)
+
+	box := tui.NewVBox(
 		scrollArea,
 		divider,
 		statusBox,
 	)
 	box.SetBorder(true)
 	box.SetTitle(title)
-
-	box.SetSizePolicy(tui.Expanding, tui.Expanding)
 
 	return &OutputWidget{
 		content:     content,
@@ -54,22 +54,26 @@ func NewOutputWidget(title string) *OutputWidget {
 		box:         box,
 		contentText: contentText,
 		statusText:  statusText,
+		ui:          ui,
 	}
 }
 
 func (w *OutputWidget) Scroll(dx, dy int) {
 	w.scrollArea.Scroll(dx, dy)
+	go w.ui.Update(func() {})
 }
 
 func (w *OutputWidget) SetText(s string) {
 	w.contentText = s
 	w.content.SetText(s)
+	go w.ui.Update(func() {})
 }
 
 func (w *OutputWidget) Draw(p *tui.Painter) {
+	log.Info(pp.Sprint(w.box))
 	w.box.Draw(p)
 }
 
 func (w *OutputWidget) SizeHint() image.Point {
-	return image.Pt(len(w.contentText), 1)
+	return w.box.SizeHint()
 }
