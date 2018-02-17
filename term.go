@@ -31,13 +31,14 @@ func NewTerm() *Term {
 	clientWidget := client.Widget()
 
 	_ = serverWidget
+	_ = clientWidget
 
 	box.Append(clientWidget)
 
 	tui.DefaultFocusChain.Set(serverWidget, clientWidget)
 
 	ui.SetKeybinding("Left", func() {
-		client.IsSelected(true)
+		clientWidget.SetFocused(true)
 
 		ui.SetKeybinding("Up", func() { clientWidget.Scroll(0, -1) })
 		ui.SetKeybinding("Down", func() { clientWidget.Scroll(0, 1) })

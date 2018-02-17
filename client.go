@@ -10,12 +10,11 @@ import (
 )
 
 type Client struct {
-	path       string
-	content    string
-	builder    *Builder
-	watcher    *dirwatch.Watch
-	widget     *OutputWidget
-	isSelected bool
+	path    string
+	content string
+	builder *Builder
+	watcher *dirwatch.Watch
+	widget  *OutputWidget
 }
 
 func NewClient(ui tui.UI) *Client {
@@ -42,10 +41,6 @@ func NewClient(ui tui.UI) *Client {
 
 func (c *Client) Widget() *OutputWidget {
 	return c.widget
-}
-
-func (c *Client) IsSelected(b bool) {
-	c.isSelected = b
 }
 
 func (c *Client) notify(ev fsnotify.Event) {

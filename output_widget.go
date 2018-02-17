@@ -17,7 +17,6 @@ type OutputWidget struct {
 	statusText  string
 
 	ui tui.UI
-
 	tui.WidgetBase
 }
 
@@ -76,4 +75,14 @@ func (w *OutputWidget) Draw(p *tui.Painter) {
 
 func (w *OutputWidget) SizeHint() image.Point {
 	return w.box.SizeHint()
+}
+
+// MinSizeHint returns the size below which the widget cannot shrink.
+func (w *OutputWidget) MinSizeHint() image.Point {
+	return w.box.MinSizeHint()
+}
+
+// Size returns the current size of the widget.
+func (w *OutputWidget) Size() image.Point {
+	return w.box.Size()
 }
