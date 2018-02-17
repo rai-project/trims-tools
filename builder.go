@@ -18,7 +18,7 @@ type Builder struct {
 	state BuildState
 }
 
-func (b *Builder) Widget() tui.Widget {
+func (b *Builder) Widget(ui tui.UI) tui.Widget {
 	state := map[BuildState]string{
 		BuildStateFailed:   "∅",
 		BuildStateBuilding: "…",

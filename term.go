@@ -20,18 +20,29 @@ func NewTerm() *Term {
 
 	_ = serverWidget
 
-	box := tui.NewVBox(
-		tui.NewHBox(clientWidget, clientWidget),
-	)
+	box := tui.NewVBox(tui.NewHBox(clientWidget, clientWidget))
 	box.SetTitle("micro18")
 	box.SetBorder(true)
-
-	tui.DefaultFocusChain.Set(serverWidget, clientWidget)
 
 	ui, err := tui.New(box)
 	if err != nil {
 		panic(err)
 	}
+	defer func() {
+		go ui.Update(func() {})
+	}()
+
+	ui.SetKeybinding("Left", func() {
+		client.IsSelected(true)
+
+		ui.SetKeybinding("Up", func() { clientWidget.Scroll(0, -1) })
+		ui.SetKeybinding("Down", func() { clientWidget.Scroll(0, 1) })
+		ui.SetKeybinding("Left", func() { clientWidget.Scroll(-1, 0) })
+		ui.SetKeybinding("Right", func() { clientWidget.Scroll(1, 0) })
+	})
+	ui.SetKeybinding("Right", func() {
+		// server.IsSelected()
+	})
 
 	ui.SetKeybinding("Esc", func() { ui.Quit() })
 	ui.SetKeybinding("q", func() { ui.Quit() })
@@ -39,6 +50,8 @@ func NewTerm() *Term {
 
 	theme := getTheme()
 	ui.SetTheme(theme)
+
+	tui.DefaultFocusChain.Set(serverWidget, clientWidget)
 
 	return &Term{
 		ui:     ui,
