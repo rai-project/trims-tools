@@ -1,6 +1,11 @@
 package micro
 
-import "github.com/marcusolsson/tui-go"
+import (
+	"fmt"
+	"os"
+
+	"github.com/marcusolsson/tui-go"
+)
 
 type Term struct {
 	ui     tui.UI
@@ -34,6 +39,7 @@ func NewTerm() *Term {
 	_ = clientWidget
 
 	box.Append(clientWidget)
+	box.Append(clientWidget)
 
 	tui.DefaultFocusChain.Set(serverWidget, clientWidget)
 
@@ -49,9 +55,9 @@ func NewTerm() *Term {
 		// server.IsSelected()
 	})
 
-	ui.SetKeybinding("Esc", func() { ui.Quit() })
-	ui.SetKeybinding("q", func() { ui.Quit() })
-	ui.SetKeybinding("Ctrl+C", func() { ui.Quit() })
+	ui.SetKeybinding("Esc", func() { quit(ui) })
+	ui.SetKeybinding("q", func() { quit(ui) })
+	ui.SetKeybinding("Ctrl+C", func() { quit(ui) })
 
 	return &Term{
 		ui:     ui,
@@ -59,6 +65,12 @@ func NewTerm() *Term {
 		server: server,
 		client: client,
 	}
+}
+
+func quit(ui tui.UI) {
+	ui.Quit()
+	fmt.Println("exit")
+	os.Exit(0)
 }
 
 func getTheme() *tui.Theme {
@@ -73,4 +85,20 @@ func (t *Term) Run() {
 	if err := t.ui.Run(); err != nil {
 		panic(err)
 	}
+}
+
+var (
+	VerticalDivider   *tui.Label
+	HorizontalDivider *tui.Label
+)
+
+func init() {
+	vline := ""
+	hline := ""
+	for ii := 0; ii < 10; ii++ {
+		vline += VerticalLine.String()
+		hline += HorizontalLine.String()
+	}
+	VerticalDivider = tui.NewLabel(vline)
+	HorizontalDivider = tui.NewLabel(hline)
 }

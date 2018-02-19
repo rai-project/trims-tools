@@ -1,7 +1,5 @@
 package micro
 
-import "image"
-
 type LineType int
 
 func (l LineType) Rune() rune {
@@ -14,6 +12,10 @@ func (l LineType) Rune() rune {
 		log.Panic("bug")
 		panic("bug")
 	}
+}
+
+func (l LineType) String() string {
+	return string(l.Rune())
 }
 
 type LineTermination int
@@ -39,12 +41,3 @@ const (
 	LineTerminationHighlight
 	LineTerminationNone
 )
-
-type Line struct {
-	Start     image.Point
-	Length    int
-	Type      LineType
-	StartDeco LineTermination
-	EndDeco   LineTermination
-	StyleName string
-}

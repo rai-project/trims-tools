@@ -1,6 +1,7 @@
 package micro
 
 import (
+	"fmt"
 	"time"
 
 	"github.com/dc0d/dirwatch"
@@ -18,15 +19,15 @@ type Client struct {
 }
 
 func NewClient(ui tui.UI) *Client {
-	widget := NewOutputWidget("client", ui)
+	widget := NewOutputWidget("Client", ui)
 	go func() {
 		ticker := time.Tick(time.Second)
 		for {
 			select {
 			case <-ticker:
 				text := ""
-				for ii := 0; ii < 10; ii++ {
-					text += lorem.Sentence(89, 120) + "\n"
+				for ii := 0; ii < 100; ii++ {
+					text += fmt.Sprintf("%d", ii) + lorem.Sentence(89, 120) + "\n"
 				}
 				widget.SetText(text)
 			}
