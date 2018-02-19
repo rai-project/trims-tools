@@ -59,13 +59,11 @@ func NewOutputWidget(title string, ui tui.UI) *OutputWidget {
 
 func (w *OutputWidget) Scroll(dx, dy int) {
 	w.scrollArea.Scroll(dx, dy)
-	go w.ui.Update(func() {})
 }
 
 func (w *OutputWidget) SetText(s string) {
 	w.contentText = s
 	w.content.SetText(s)
-	go w.ui.Update(func() {})
 }
 
 func (w *OutputWidget) Draw(p *tui.Painter) {
