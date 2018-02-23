@@ -15,7 +15,7 @@ type Client struct {
 	ctx     context.Context
 	path    string
 	output  io.Reader
-	content string
+	content bytes.Buffer
 	builder *Builder
 	watcher *watcher
 	widget  *OutputWidget
@@ -30,9 +30,15 @@ func NewClient(ctx context.Context, ui tui.UI) *Client {
 
 	client := &Client{
 		output:  outputReader,
-		content: "",
+		content: bytes.Buffer{},
 		widget:  widget,
-		builder: NewBuilder(ctx, outputWriter, outputWriter, Config.ClientPath, "make"),
+		builder: &Builder{
+			ctx:      context.WithValue(ctx, "name", "client-builder"),
+			stderr:   outputWriter,
+			stdout:   outputWriter,
+			baseDir:  Config.ClientPath,
+			buildCmd: Config.ClientBuildCmd,
+		},
 	}
 	defer func() {
 		go client.listen()
@@ -77,11 +83,11 @@ func (c *Client) listen() (err error) {
 		}
 		nChunks++
 		nBytes += int64(len(buf))
-		c.content += string(buf)
+		c.content.Write(buf)
 		if err != nil && err != io.EOF {
 			log.Fatal(err)
 		}
-		c.widget.SetText(c.content)
+		c.widget.SetText(c.content.String())
 	}
 	return
 }

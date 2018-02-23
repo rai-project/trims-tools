@@ -43,16 +43,6 @@ type Builder struct {
 	cmd      *cmd.Cmd
 }
 
-func NewBuilder(ctx context.Context, stderr io.Writer, stdout io.Writer, baseDir string, buildCmd string) *Builder {
-	return &Builder{
-		ctx:      context.WithValue(ctx, "name", "builder"),
-		stderr:   stderr,
-		stdout:   stdout,
-		baseDir:  baseDir,
-		buildCmd: buildCmd,
-	}
-}
-
 func (b *Builder) Rebuild(ctx context.Context) error {
 	b.state = BuildStateBuilding
 	args, err := shellwords.Parse(b.buildCmd)
