@@ -6,6 +6,7 @@ fmt: ## Formats code
 install-deps: ## Install dependencies
 	go get golang.org/x/tools/cmd/goimports
 	go get -u github.com/knq/xo
+	go get github.com/erning/gorun
 
 glide-install: ## Performs glide install
 	glide install -v --force

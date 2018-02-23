@@ -1,11 +1,16 @@
 package micro
 
-import tui "github.com/marcusolsson/tui-go"
+import (
+	"context"
+
+	tui "github.com/marcusolsson/tui-go"
+)
 
 type Server struct {
+	ctx context.Context
 }
 
-func NewServer(ui tui.UI) *Server {
+func NewServer(ctx context.Context, ui tui.UI) *Server {
 	return &Server{}
 }
 

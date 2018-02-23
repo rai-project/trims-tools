@@ -1,6 +1,7 @@
 package micro
 
 import (
+	"fmt"
 	"path/filepath"
 
 	"github.com/Unknwon/com"
@@ -9,10 +10,21 @@ import (
 	"github.com/rai-project/vipertags"
 )
 
+var (
+	DefaultPath               = "Automatic"
+	DefaultServerRelativePath = filepath.Join("bin", "uprd")
+	DefaultClientRelativePath = filepath.Join("example", "image-classification", "predict-cpp")
+)
+
 type microConfig struct {
-	PollingInterval int           `json:"polling_interval" config:"micro18.polling_interval" default:100`
-	Path            string        `json:"path" config:"micro18.path"`
-	done            chan struct{} `json:"-" config:"-"`
+	BuildTimeoutSeconds int64         `json:"build_timeout" config:"micro18.build_timeout" default:600`
+	PollingInterval     int           `json:"polling_interval" config:"micro18.polling_interval" default:100`
+	BasePath            string        `json:"path" config:"micro18.path"`
+	ServerRelativePath  string        `json:"server_relative_path" config:"micro18.server_relative_path"`
+	ServerPath          string        `json:"server_path" config:"-"`
+	ClientRelativePath  string        `json:"client_relative_path" config:"micro18.client_relative_path"`
+	ClientPath          string        `json:"client_path" config:"-"`
+	done                chan struct{} `json:"-" config:"-"`
 }
 
 var (
@@ -32,9 +44,37 @@ func (a *microConfig) SetDefaults() {
 func (a *microConfig) Read() {
 	defer close(a.done)
 	vipertags.Fill(a)
-	if a.Path == "" {
-		gopath := com.GetGOPATHs()[0]
-		a.Path = filepath.Join(gopath, "src", "github.com", "rai-project", "mxnet-mirror")
+	if a.BasePath == "" {
+		if DefaultPath == "Automatic" {
+			gopath := com.GetGOPATHs()[0]
+			a.BasePath = filepath.Join(gopath, "src", "github.com", "rai-project", "mxnet-mirror")
+		} else {
+			a.BasePath = DefaultPath
+		}
+	}
+	if !com.IsDir(a.BasePath) {
+		panic(
+			fmt.Sprintf("the directory %s does not exist. make sure that micro18.path is set correctly", a.BasePath))
+	}
+	if a.ServerRelativePath == "" {
+		a.ServerRelativePath = DefaultServerRelativePath
+	}
+	if a.ClientRelativePath == "" {
+		a.ClientRelativePath = DefaultClientRelativePath
+	}
+	a.ClientPath = filepath.Join(a.BasePath, a.ClientRelativePath)
+	if !com.IsDir(a.ClientPath) {
+		panic(
+			fmt.Sprintf("the directory %s does not exist. make sure that micro18.path"+
+				"and micro18.client_relative_path are set correctly", a.ClientPath,
+			))
+	}
+	a.ServerPath = filepath.Join(a.BasePath, a.ServerRelativePath)
+	if !com.IsDir(a.ServerPath) {
+		panic(
+			fmt.Sprintf("the directory %s does not exist. make sure that micro18.path"+
+				"and micro18.server_relative_path are set correctly", a.ServerPath,
+			))
 	}
 }
 

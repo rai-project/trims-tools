@@ -1,6 +1,7 @@
 package micro
 
 import (
+	"context"
 	"fmt"
 	"os"
 
@@ -8,13 +9,14 @@ import (
 )
 
 type Term struct {
+	ctx    context.Context
 	ui     tui.UI
 	theme  *tui.Theme
 	server *Server
 	client *Client
 }
 
-func NewTerm() *Term {
+func NewTerm(ctx context.Context) *Term {
 	tui.SetLogger(log)
 
 	box := tui.NewHBox()
@@ -29,8 +31,8 @@ func NewTerm() *Term {
 	theme := getTheme()
 	ui.SetTheme(theme)
 
-	server := NewServer(ui)
-	client := NewClient(ui)
+	server := NewServer(ctx, ui)
+	client := NewClient(ctx, ui)
 
 	serverWidget := server.Widget()
 	clientWidget := client.Widget()

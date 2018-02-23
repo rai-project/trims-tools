@@ -3,6 +3,8 @@ package micro
 import (
 	"os"
 
+	"github.com/dc0d/dirwatch"
+
 	"github.com/rai-project/config"
 	"github.com/rai-project/logger"
 )
@@ -17,5 +19,6 @@ func init() {
 		f, _ := os.Create("debug.log")
 		lg.Out = f
 		log = lg.WithField("pkg", "micro")
+		dirwatch.SetLogger(log.Info)
 	})
 }
