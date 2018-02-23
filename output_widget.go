@@ -57,7 +57,8 @@ func (w *OutputWidget) Scroll(dx, dy int) {
 }
 
 func (w *OutputWidget) SetBuildStatus(s BuildState) {
-	w.statusText.SetText(s.String())
+	w.status.SetText(s.String())
+	w.statusText = s.String()
 }
 
 func (w *OutputWidget) SetText(s string) {

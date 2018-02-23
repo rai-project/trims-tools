@@ -20,7 +20,7 @@ const (
 	BuildStateFailed   BuildState = 2
 )
 
-func (b BuildState) String() {
+func (b BuildState) String() string {
 	state := map[BuildState]string{
 		BuildStateFailed:   "∅",
 		BuildStateBuilding: "…",
