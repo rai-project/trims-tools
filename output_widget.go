@@ -56,6 +56,10 @@ func (w *OutputWidget) Scroll(dx, dy int) {
 	go w.ui.Update(func() {})
 }
 
+func (w *OutputWidget) SetBuildStatus(s BuildState) {
+	w.statusText.SetText(s.String())
+}
+
 func (w *OutputWidget) SetText(s string) {
 	lineCount := len(strings.Split(s, "\n"))
 	toScroll := lineCount - w.scrollArea.Size().Y + 2

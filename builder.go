@@ -8,7 +8,7 @@ import (
 	"os/exec"
 	"time"
 
-	tui "github.com/marcusolsson/tui-go"
+	"github.com/github/hub/cmd"
 	shellwords "github.com/mattn/go-shellwords"
 )
 
@@ -20,6 +20,19 @@ const (
 	BuildStateFailed   BuildState = 2
 )
 
+func (b BuildState) String() {
+	state := map[BuildState]string{
+		BuildStateFailed:   "∅",
+		BuildStateBuilding: "…",
+		BuildStateSuccess:  "✓",
+	}
+	val, ok := state[b]
+	if !ok {
+		return "?"
+	}
+	return val
+}
+
 type Builder struct {
 	ctx      context.Context
 	state    BuildState
@@ -27,6 +40,7 @@ type Builder struct {
 	buildCmd string
 	stderr   io.Writer
 	stdout   io.Writer
+	cmd      *cmd.Cmd
 }
 
 func NewBuilder(ctx context.Context, stderr io.Writer, stdout io.Writer, baseDir string, buildCmd string) *Builder {
@@ -39,15 +53,17 @@ func NewBuilder(ctx context.Context, stderr io.Writer, stdout io.Writer, baseDir
 	}
 }
 
-func (b *Builder) Rebuild() error {
+func (b *Builder) Rebuild(ctx context.Context) error {
 	b.state = BuildStateBuilding
 	args, err := shellwords.Parse(b.buildCmd)
 	if err != nil {
 		log.WithError(err).WithField("cmd", b.buildCmd).Error("failed to parse shell command")
 		return err
 	}
-
-	ctx, cancel := context.WithTimeout(b.ctx, time.Duration(Config.BuildTimeoutSeconds)*time.Second)
+	if ctx == nil {
+		ctx = b.ctx
+	}
+	ctx, cancel := context.WithTimeout(ctx, time.Duration(Config.BuildTimeoutSeconds)*time.Second)
 	defer cancel()
 
 	cmd := exec.CommandContext(ctx, args[0], args[1:]...)
@@ -73,26 +89,4 @@ func (b *Builder) Rebuild() error {
 
 	b.state = BuildStateSuccess
 	return nil
-}
-
-func (b *Builder) Widget(ui tui.UI) tui.Widget {
-	state := map[BuildState]string{
-		BuildStateFailed:   "∅",
-		BuildStateBuilding: "…",
-		BuildStateSuccess:  "✓",
-	}
-
-	label, ok := state[b.state]
-	if !ok {
-		label = "?"
-	}
-
-	statusBar := tui.NewStatusBar("")
-	statusBox := tui.NewVBox(statusBar)
-	statusBox.SetTitle("Status")
-	statusBox.SetBorder(true)
-
-	statusBar.SetText(fmt.Sprintf("Build status : %s", label))
-
-	return statusBar
 }

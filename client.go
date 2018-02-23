@@ -5,6 +5,7 @@ import (
 	"bytes"
 	"context"
 	"io"
+	"time"
 
 	"github.com/fsnotify/fsnotify"
 	tui "github.com/marcusolsson/tui-go"
@@ -39,7 +40,7 @@ func NewClient(ctx context.Context, ui tui.UI) *Client {
 	client.watcher = NewWatcher(
 		client.Notify,
 		Config.ClientPath,
-		Config.ServerPath,
+		Config.ServerPath, // changes to the server should trigger the client to rerun
 	)
 	return client
 }
@@ -89,9 +90,35 @@ func (c *Client) Widget() *OutputWidget {
 	return c.widget
 }
 
-func (c *Client) Notify(ev fsnotify.Event) {
-	err := c.builder.Rebuild()
-	if err != nil {
+func (c *Client) build(ev fsnotify.Event) error {
+	builderCtx, cancel := context.WithCancel(c.builder.ctx)
+	done := make(chan struct{})
+	defer func() {
+		close(done)
+	}()
+	go func() {
+		ticker := time.Tick(time.Second)
+		for {
+			select {
+			case <-ticker:
+				c.widget.SetBuildStatus(c.builder.state)
+			case <-done:
+				cancel()
+				return
+			}
+		}
+	}()
+	err := c.builder.Rebuild(builderCtx)
+	return err
+}
 
+func (c *Client) run(ev fsnotify.Event) error {
+	// rerun the client
+	return nil
+}
+
+func (c *Client) Notify(ev fsnotify.Event) {
+	if err := c.build(ev); err != nil {
+		return
 	}
 }
