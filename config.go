@@ -1,17 +1,20 @@
 package micro
 
 import (
-	"fmt"
+	"os"
 	"path/filepath"
 
 	"github.com/Unknwon/com"
 	"github.com/k0kubun/pp"
+	homedir "github.com/mitchellh/go-homedir"
 	"github.com/rai-project/config"
 	"github.com/rai-project/vipertags"
 )
 
 var (
-	DefaultPath               = "Automatic"
+	HomeDir, _                = homedir.Dir()
+	DefaultSrcPath            = "Automatic"
+	DefaultBasePath           = getEnvOr("UPR_BASE_DIR", filepath.Join(HomeDir, "carml", "data", "mxnet"))
 	DefaultServerRelativePath = filepath.Join("bin", "uprd")
 	DefaultServerBuildCmd     = "make"
 	DefaultServerRunCmd       = filepath.Join("bin", "uprd")
@@ -23,7 +26,8 @@ var (
 type microConfig struct {
 	BuildTimeoutSeconds int64         `json:"build_timeout" config:"micro18.build_timeout" default:600`
 	PollingInterval     int           `json:"polling_interval" config:"micro18.polling_interval" default:100`
-	BasePath            string        `json:"path" config:"micro18.path"`
+	BaseSrcPath         string        `json:"src_path" config:"micro18.src_path"`
+	BasePath            string        `json:"base_path" config:"micro18.base_path"`
 	ServerRelativePath  string        `json:"server_relative_path" config:"micro18.server_relative_path"`
 	ServerPath          string        `json:"server_path" config:"-"`
 	ServerBuildCmd      string        `json:"server_build_cmd" config:"micro18.server_build_cmd"`
@@ -53,16 +57,24 @@ func (a *microConfig) Read() {
 	defer close(a.done)
 	vipertags.Fill(a)
 	if a.BasePath == "" {
-		if DefaultPath == "Automatic" {
-			gopath := com.GetGOPATHs()[0]
-			a.BasePath = filepath.Join(gopath, "src", "github.com", "rai-project", "mxnet-mirror")
-		} else {
-			a.BasePath = DefaultPath
+		a.BasePath = DefaultBasePath
+		if !com.IsDir(a.BasePath) {
+			err := os.MkdirAll(a.BasePath, os.ModePerm)
+			if err != nil {
+				log.WithError(err).WithField("base_path", a.BasePath).Panic("failed to create base path directory")
+			}
 		}
 	}
-	if !com.IsDir(a.BasePath) {
-		panic(
-			fmt.Sprintf("the directory %s does not exist. make sure that micro18.path is set correctly", a.BasePath))
+	if a.BaseSrcPath == "" {
+		if DefaultSrcPath == "Automatic" {
+			gopath := com.GetGOPATHs()[0]
+			a.BaseSrcPath = filepath.Join(gopath, "src", "github.com", "rai-project", "mxnet-mirror")
+		} else {
+			a.BaseSrcPath = DefaultSrcPath
+		}
+	}
+	if !com.IsDir(a.BaseSrcPath) {
+		log.Panicf("the directory %s does not exist. make sure that micro18.path is set correctly", a.BaseSrcPath)
 	}
 	if a.ServerRelativePath == "" {
 		a.ServerRelativePath = DefaultServerRelativePath
@@ -70,12 +82,11 @@ func (a *microConfig) Read() {
 	if a.ClientRelativePath == "" {
 		a.ClientRelativePath = DefaultClientRelativePath
 	}
-	a.ClientPath = filepath.Join(a.BasePath, a.ClientRelativePath)
+	a.ClientPath = filepath.Join(a.BaseSrcPath, a.ClientRelativePath)
 	if !com.IsDir(a.ClientPath) {
-		panic(
-			fmt.Sprintf("the directory %s does not exist. make sure that micro18.path"+
-				"and micro18.client_relative_path are set correctly", a.ClientPath,
-			))
+		log.Panicf("the directory %s does not exist. make sure that micro18.path"+
+			"and micro18.client_relative_path are set correctly", a.ClientPath,
+		)
 	}
 	if a.ClientBuildCmd == "" {
 		a.ClientBuildCmd = DefaultClientBuildCmd
@@ -83,12 +94,11 @@ func (a *microConfig) Read() {
 	if a.ClientRunCmd == "" {
 		a.ClientRunCmd = DefaultClientRunCmd
 	}
-	a.ServerPath = filepath.Join(a.BasePath, a.ServerRelativePath)
+	a.ServerPath = filepath.Join(a.BaseSrcPath, a.ServerRelativePath)
 	if !com.IsDir(a.ServerPath) {
-		panic(
-			fmt.Sprintf("the directory %s does not exist. make sure that micro18.path"+
-				"and micro18.server_relative_path are set correctly", a.ServerPath,
-			))
+		log.Panicf("the directory %s does not exist. make sure that micro18.path"+
+			"and micro18.server_relative_path are set correctly", a.ServerPath,
+		)
 	}
 	if a.ServerBuildCmd == "" {
 		a.ServerBuildCmd = DefaultServerBuildCmd

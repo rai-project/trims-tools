@@ -5,7 +5,7 @@ import (
 
 	"github.com/rai-project/config"
 	"gopkg.in/mgo.v2/bson"
-	git "srcd.works/go-git.v4"
+	git "gopkg.in/src-d/go-git.v4"
 )
 
 type Version struct {
@@ -32,7 +32,7 @@ type Experiment struct {
 }
 
 func getVersion() {
-	r, err := git.PlainOpen(Config.BasePath)
+	r, err := git.PlainOpen(Config.BaseSrcPath)
 	if err != nil {
 		panic(err)
 	}
@@ -41,7 +41,7 @@ func getVersion() {
 	if err != nil {
 		panic(err)
 	}
-	commit, err := r.Commit(h.Hash())
+	commit, err := r.CommitObject(h.Hash())
 	if err != nil {
 		panic(err)
 	}

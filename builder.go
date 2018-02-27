@@ -8,7 +8,6 @@ import (
 	"os/exec"
 	"time"
 
-	"github.com/github/hub/cmd"
 	shellwords "github.com/mattn/go-shellwords"
 )
 
@@ -40,7 +39,7 @@ type Builder struct {
 	buildCmd string
 	stderr   io.Writer
 	stdout   io.Writer
-	cmd      *cmd.Cmd
+	cmd      *exec.Cmd
 }
 
 func (b *Builder) Rebuild(ctx context.Context) error {
