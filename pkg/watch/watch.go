@@ -1,4 +1,4 @@
-package micro
+package watch
 
 import (
 	"github.com/dc0d/dirwatch"
@@ -12,7 +12,7 @@ type watcher struct {
 	notify notifyFunc
 }
 
-func NewWatcher(notify notifyFunc, rootDirectories ...string) *watcher {
+func New(notify notifyFunc, rootDirectories ...string) *watcher {
 	watch := dirwatch.New(notify, rootDirectories...)
 	return &watcher{
 		Watch:  watch,

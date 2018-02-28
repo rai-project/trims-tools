@@ -1,4 +1,4 @@
-package micro
+package config
 
 import (
 	"os"
