@@ -1,4 +1,4 @@
-package micro
+package ui
 
 import (
 	"context"
@@ -6,14 +6,15 @@ import (
 	"os"
 
 	"github.com/marcusolsson/tui-go"
+	experiment "github.com/rai-project/micro18-tools/pkg/experiment"
 )
 
 type Term struct {
 	ctx    context.Context
 	ui     tui.UI
 	theme  *tui.Theme
-	server *Server
-	client *Client
+	server *experiment.Server
+	client *experiment.Client
 }
 
 func NewTerm(ctx context.Context) *Term {
@@ -31,8 +32,8 @@ func NewTerm(ctx context.Context) *Term {
 	theme := getTheme()
 	ui.SetTheme(theme)
 
-	server := NewServer(ctx, ui)
-	client := NewClient(ctx, ui)
+	server := experiment.NewServer(ctx, ui)
+	client := experiment.NewClient(ctx, ui)
 
 	serverWidget := server.Widget()
 	clientWidget := client.Widget()

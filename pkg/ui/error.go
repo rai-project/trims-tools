@@ -1,4 +1,4 @@
-package micro
+package ui
 
 import tui "github.com/marcusolsson/tui-go"
 

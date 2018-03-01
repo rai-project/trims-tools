@@ -1,4 +1,4 @@
-package micro
+package experiment
 
 import (
 	"bufio"
@@ -9,6 +9,8 @@ import (
 
 	"github.com/fsnotify/fsnotify"
 	tui "github.com/marcusolsson/tui-go"
+	builder "github.com/rai-project/micro18-tools/pkg/builder"
+	watcher "github.com/rai-project/micro18-tools/pkg/watcher"
 )
 
 type Client struct {
@@ -16,8 +18,8 @@ type Client struct {
 	path    string
 	output  io.Reader
 	content bytes.Buffer
-	builder *Builder
-	watcher *watcher
+	builder *builder.Builder
+	watcher *watcher.Watcher
 	widget  *OutputWidget
 }
 
@@ -32,18 +34,18 @@ func NewClient(ctx context.Context, ui tui.UI) *Client {
 		output:  outputReader,
 		content: bytes.Buffer{},
 		widget:  widget,
-		builder: &Builder{
-			ctx:      context.WithValue(ctx, "name", "client-builder"),
-			stderr:   outputWriter,
-			stdout:   outputWriter,
-			baseDir:  Config.ClientPath,
-			buildCmd: Config.ClientBuildCmd,
+		builder: &builder.Builder{
+			Ctx:      context.WithValue(ctx, "name", "client-builder"),
+			Stderr:   outputWriter,
+			Stdout:   outputWriter,
+			BaseDir:  Config.ClientPath,
+			BuildCmd: Config.ClientBuildCmd,
 		},
 	}
 	defer func() {
 		go client.listen()
 	}()
-	client.watcher = NewWatcher(
+	client.watcher = watcher.New(
 		client.Notify,
 		Config.ClientPath,
 		Config.ServerPath, // changes to the server should trigger the client to rerun
@@ -97,7 +99,7 @@ func (c *Client) Widget() *OutputWidget {
 }
 
 func (c *Client) build(ev fsnotify.Event) error {
-	builderCtx, cancel := context.WithCancel(c.builder.ctx)
+	builderCtx, cancel := context.WithCancel(c.builder.Ctx)
 	done := make(chan struct{})
 	defer func() {
 		close(done)
@@ -107,7 +109,7 @@ func (c *Client) build(ev fsnotify.Event) error {
 		for {
 			select {
 			case <-ticker:
-				c.widget.SetBuildStatus(c.builder.state)
+				c.widget.SetBuildStatus(c.builder.State)
 			case <-done:
 				cancel()
 				return

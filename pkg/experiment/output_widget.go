@@ -1,4 +1,4 @@
-package micro
+package experiment
 
 import (
 	"fmt"
@@ -6,6 +6,7 @@ import (
 	"strings"
 
 	"github.com/marcusolsson/tui-go"
+	"github.com/rai-project/micro18-tools/pkg/builder"
 )
 
 type OutputWidget struct {
@@ -56,7 +57,7 @@ func (w *OutputWidget) Scroll(dx, dy int) {
 	go w.ui.Update(func() {})
 }
 
-func (w *OutputWidget) SetBuildStatus(s BuildState) {
+func (w *OutputWidget) SetBuildStatus(s builder.BuildState) {
 	w.status.SetText(s.String())
 	w.statusText = s.String()
 }

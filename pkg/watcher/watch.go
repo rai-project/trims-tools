@@ -1,4 +1,4 @@
-package watch
+package watcher
 
 import (
 	"github.com/dc0d/dirwatch"
@@ -6,15 +6,15 @@ import (
 )
 
 type notifyFunc func(fsnotify.Event)
-type watcher struct {
+type Watcher struct {
 	*dirwatch.Watch
 	roots  []string
 	notify notifyFunc
 }
 
-func New(notify notifyFunc, rootDirectories ...string) *watcher {
+func New(notify notifyFunc, rootDirectories ...string) *Watcher {
 	watch := dirwatch.New(notify, rootDirectories...)
-	return &watcher{
+	return &Watcher{
 		Watch:  watch,
 		roots:  rootDirectories,
 		notify: notify,

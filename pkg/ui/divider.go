@@ -1,4 +1,4 @@
-package micro
+package ui
 
 type LineType int
 

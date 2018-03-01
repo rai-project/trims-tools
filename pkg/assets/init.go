@@ -1,4 +1,4 @@
-package config
+package assets
 
 import (
 	"github.com/rai-project/config"
@@ -6,11 +6,11 @@ import (
 )
 
 var (
-	log = logger.New().WithField("pkg", "micro/config")
+	log = logger.New().WithField("pkg", "micro/assets")
 )
 
 func init() {
 	config.AfterInit(func() {
-		log = logger.New().WithField("pkg", "micro/config")
+		log = logger.New().WithField("pkg", "micro/assets")
 	})
 }

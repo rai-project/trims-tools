@@ -1,4 +1,4 @@
-package micro
+package assets
 
 import (
 	"context"

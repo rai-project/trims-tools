@@ -1,12 +1,11 @@
-package micro
+package utils
 
 import "os"
 
-func getEnvOr(envVar, defaultValue string) string {
+func GetEnvOr(envVar, defaultValue string) string {
 	val, ok := os.LookupEnv(envVar)
 	if ok {
 		return val
 	}
-
 	return defaultValue
 }

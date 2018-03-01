@@ -22,10 +22,10 @@ generate-nvprof-models: ## Generates Models for NVPRof
 	xo 'file:./_fixtures/profile.timeline.nvprof?loc=auto' -o nvprof/models
 
 generate-assets:
-	go-bindata -nomemcopy -pkg micro -o builtin_assets_static.go -ignore=.DS_Store -ignore=README.md builtin_models/... builtin_features/...
+	go-bindata -nomemcopy -pkg assets -o pkg/assets/static.go -ignore=.DS_Store -ignore=README.md pkg/assets/builtin_models/... pkg/assets/builtin_features/...
 
 clean-assets:
-	rm -fr builtin_assets_static.go
+	rm -fr pkg/assets/static.go
 
 generate: generate-assets
 

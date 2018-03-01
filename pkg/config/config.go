@@ -8,13 +8,14 @@ import (
 	"github.com/k0kubun/pp"
 	homedir "github.com/mitchellh/go-homedir"
 	"github.com/rai-project/config"
+	"github.com/rai-project/micro18-tools/pkg/utils"
 	"github.com/rai-project/vipertags"
 )
 
 var (
 	HomeDir, _                = homedir.Dir()
 	DefaultSrcPath            = "Automatic"
-	DefaultBasePath           = getEnvOr("UPR_BASE_DIR", filepath.Join(HomeDir, "carml", "data", "mxnet"))
+	DefaultBasePath           = utils.GetEnvOr("UPR_BASE_DIR", filepath.Join(HomeDir, "carml", "data", "mxnet"))
 	DefaultServerRelativePath = filepath.Join("bin", "uprd")
 	DefaultServerBuildCmd     = "make"
 	DefaultServerRunCmd       = filepath.Join("bin", "uprd")

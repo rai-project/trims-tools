@@ -10,7 +10,7 @@ import (
 	"github.com/fatih/color"
 	"github.com/rai-project/config"
 	"github.com/rai-project/logger"
-	micro "github.com/rai-project/micro18-tools"
+	ui "github.com/rai-project/micro18-tools/pkg/ui"
 )
 
 func main() {
@@ -30,6 +30,6 @@ func main() {
 
 	config.Init(opts...)
 
-	ui := micro.NewTerm(context.Background())
+	ui := ui.NewTerm(context.Background())
 	ui.Run()
 }
