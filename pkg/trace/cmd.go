@@ -6,8 +6,6 @@ import (
 	"os"
 	"os/exec"
 	"strings"
-
-	"github.com/magefile/mage/mg"
 )
 
 // Exec executes the command, piping its stderr to mage's stderr and
@@ -39,7 +37,7 @@ func execCmd(cwd string, env map[string]string, stdout, stderr io.Writer, cmd st
 		return true, nil
 	}
 	if ran {
-		return ran, mg.Fatalf(code, `running "%s %s" failed with exit code %d`, cmd, strings.Join(args, " "), code)
+		return ran, fmt.Errorf(`running "%s %s" failed with exit code %d`, cmd, strings.Join(args, " "), code)
 	}
 	return ran, fmt.Errorf(`failed to run "%s %s: %v"`, cmd, strings.Join(args, " "), err)
 }
