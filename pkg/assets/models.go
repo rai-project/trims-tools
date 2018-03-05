@@ -23,21 +23,32 @@ type ModelAssets struct {
 	GraphChecksum   string `protobuf:"bytes,6,opt,name=graph_checksum,json=graphChecksum,proto3" json:"graph_checksum,omitempty" yaml:"graph_checksum,omitempty"`
 }
 
+type ModelManifest_Type_Parameter struct {
+	Value string `protobuf:"bytes,1,opt,name=value,proto3" json:"value,omitempty" yaml:",inline"`
+}
+
+type ModelManifest_Type struct {
+	Type        string                                   `protobuf:"bytes,1,opt,name=type,proto3" json:"type,omitempty" yaml:"type,omitempty"`
+	Description string                                   `protobuf:"bytes,2,opt,name=description,proto3" json:"description,omitempty" yaml:"description,omitempty"`
+	Parameters  map[string]*ModelManifest_Type_Parameter `protobuf:"bytes,3,rep,name=parameters" json:"parameters,omitempty" yaml:"parameters,omitempty" protobuf_key:"bytes,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value"`
+}
+
 type ModelManifest struct {
-	Name              string            `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty" yaml:"name,omitempty"`
-	Version           string            `protobuf:"bytes,2,opt,name=version,proto3" json:"version,omitempty" yaml:"version,omitempty"`
-	Description       string            `protobuf:"bytes,5,opt,name=description,proto3" json:"description,omitempty" yaml:"description,omitempty"`
-	Reference         []string          `protobuf:"bytes,6,rep,name=reference" json:"reference,omitempty" yaml:"references,omitempty"`
-	License           string            `protobuf:"bytes,7,opt,name=license,proto3" json:"license,omitempty" yaml:"license,omitempty"`
-	BeforePreprocess  string            `protobuf:"bytes,10,opt,name=before_preprocess,json=beforePreprocess,proto3" json:"before_preprocess,omitempty" yaml:"before_preprocess,omitempty"`
-	Preprocess        string            `protobuf:"bytes,11,opt,name=preprocess,proto3" json:"preprocess,omitempty" yaml:"preprocess,omitempty"`
-	AfterPreprocess   string            `protobuf:"bytes,12,opt,name=after_preprocess,json=afterPreprocess,proto3" json:"after_preprocess,omitempty" yaml:"after_preprocess,omitempty"`
-	BeforePostprocess string            `protobuf:"bytes,13,opt,name=before_postprocess,json=beforePostprocess,proto3" json:"before_postprocess,omitempty" yaml:"before_postprocess,omitempty"`
-	Postprocess       string            `protobuf:"bytes,14,opt,name=postprocess,proto3" json:"postprocess,omitempty" yaml:"postprocess,omitempty"`
-	AfterPostprocess  string            `protobuf:"bytes,15,opt,name=after_postprocess,json=afterPostprocess,proto3" json:"after_postprocess,omitempty" yaml:"after_postprocess,omitempty"`
-	Model             ModelAssets       `protobuf:"bytes,16,opt,name=model" json:"model,omitempty" yaml:"model,omitempty"`
-	Attributes        map[string]string `protobuf:"bytes,17,rep,name=attributes" json:"attributes,omitempty" yaml:"attributes,omitempty" protobuf_key:"bytes,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value,proto3"`
-	Hidden            bool              `protobuf:"varint,18,opt,name=hidden,proto3" json:"hidden,omitempty" yaml:"hidden,omitempty"`
+	Name              string              `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty" yaml:"name,omitempty"`
+	Version           string              `protobuf:"bytes,2,opt,name=version,proto3" json:"version,omitempty" yaml:"version,omitempty"`
+	Description       string              `protobuf:"bytes,5,opt,name=description,proto3" json:"description,omitempty" yaml:"description,omitempty"`
+	Reference         []string            `protobuf:"bytes,6,rep,name=reference" json:"reference,omitempty" yaml:"references,omitempty"`
+	License           string              `protobuf:"bytes,7,opt,name=license,proto3" json:"license,omitempty" yaml:"license,omitempty"`
+	Output            *ModelManifest_Type `protobuf:"bytes,9,opt,name=output" json:"output,omitempty" yaml:"output,omitempty"`
+	BeforePreprocess  string              `protobuf:"bytes,10,opt,name=before_preprocess,json=beforePreprocess,proto3" json:"before_preprocess,omitempty" yaml:"before_preprocess,omitempty"`
+	Preprocess        string              `protobuf:"bytes,11,opt,name=preprocess,proto3" json:"preprocess,omitempty" yaml:"preprocess,omitempty"`
+	AfterPreprocess   string              `protobuf:"bytes,12,opt,name=after_preprocess,json=afterPreprocess,proto3" json:"after_preprocess,omitempty" yaml:"after_preprocess,omitempty"`
+	BeforePostprocess string              `protobuf:"bytes,13,opt,name=before_postprocess,json=beforePostprocess,proto3" json:"before_postprocess,omitempty" yaml:"before_postprocess,omitempty"`
+	Postprocess       string              `protobuf:"bytes,14,opt,name=postprocess,proto3" json:"postprocess,omitempty" yaml:"postprocess,omitempty"`
+	AfterPostprocess  string              `protobuf:"bytes,15,opt,name=after_postprocess,json=afterPostprocess,proto3" json:"after_postprocess,omitempty" yaml:"after_postprocess,omitempty"`
+	Model             ModelAssets         `protobuf:"bytes,16,opt,name=model" json:"model,omitempty" yaml:"model,omitempty"`
+	Attributes        map[string]string   `protobuf:"bytes,17,rep,name=attributes" json:"attributes,omitempty" yaml:"attributes,omitempty" protobuf_key:"bytes,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value,proto3"`
+	Hidden            bool                `protobuf:"varint,18,opt,name=hidden,proto3" json:"hidden,omitempty" yaml:"hidden,omitempty"`
 }
 
 type ModelManifests []ModelManifest
@@ -75,6 +86,11 @@ func (model ModelManifest) GetWeightsPath() string {
 	return filepath.Join(baseDir, "model.params")
 }
 
+func (model ModelManifest) GetFeaturesPath() string {
+	baseDir := model.WorkDir()
+	return filepath.Join(baseDir, "features.txt")
+}
+
 func (model ModelManifest) GetWeightsUrl() string {
 	if model.Model.IsArchive {
 		return model.Model.BaseUrl
@@ -87,6 +103,18 @@ func (model ModelManifest) GetGraphUrl() string {
 		return model.Model.BaseUrl
 	}
 	return model.baseURL() + model.Model.GraphPath
+}
+
+func (model ModelManifest) GetFeaturesUrl() string {
+	if model.Output == nil {
+		return ""
+	}
+	params := model.Output.Parameters
+	pfeats, ok := params["features_url"]
+	if !ok {
+		return ""
+	}
+	return pfeats.Value
 }
 
 func (model ModelManifest) Download(ctx context.Context) (err error) {
@@ -121,6 +149,11 @@ func (model ModelManifest) Download(ctx context.Context) (err error) {
 	}
 	if _, err = downloadmanager.DownloadFile(model.GetWeightsUrl(), model.GetWeightsPath(), downloadmanager.MD5Sum(checksum)); err != nil {
 		return
+	}
+	if featuresURL := model.GetFeaturesUrl(); featuresURL != "" {
+		if _, err = downloadmanager.DownloadFile(featuresURL, model.GetFeaturesPath()); err != nil {
+			return
+		}
 	}
 
 	return
