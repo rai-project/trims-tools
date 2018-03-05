@@ -16,9 +16,8 @@ import (
 )
 
 var (
-	IsDebug   bool
-	IsVerbose bool
-	AppSecret string
+	IsDebug   bool = true
+	IsVerbose bool = true
 	CfgFile   string
 	log       *logrus.Entry = logrus.New().WithField("pkg", "micro/cmd")
 )
@@ -80,9 +79,6 @@ func initConfig() {
 		opts = append(opts, config.ConfigFileAbsolutePath(CfgFile))
 	}
 
-	if AppSecret != "" {
-		opts = append(opts, config.AppSecret(AppSecret))
-	}
 	config.Init(opts...)
 
 }

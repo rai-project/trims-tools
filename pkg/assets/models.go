@@ -8,7 +8,6 @@ import (
 
 	"github.com/Unknwon/com"
 	"github.com/pkg/errors"
-	"golang.org/x/sync/errgroup"
 
 	"github.com/rai-project/downloadmanager"
 	"github.com/rai-project/micro18-tools/pkg/config"
@@ -55,7 +54,8 @@ func (model ModelManifest) baseURL() string {
 }
 
 func (model ModelManifest) WorkDir() string {
-	baseDir := filepath.Join(config.Config.BasePath, model.Name)
+	modelName := strings.ToLower(model.Name)
+	baseDir := filepath.Join(config.Config.BasePath, modelName)
 	if !com.IsDir(baseDir) {
 		err := os.MkdirAll(baseDir, os.ModePerm)
 		if err != nil {
@@ -127,16 +127,11 @@ func (model ModelManifest) Download(ctx context.Context) (err error) {
 }
 
 func (ms ModelManifests) Download(ctx context.Context) error {
-	g, ctx := errgroup.WithContext(ctx)
 	for _, model := range ms {
-		g.Go(func() error {
-			return model.Download(ctx)
-		})
-	}
-	// Wait for all downloads to complete.
-	err := g.Wait()
-	if err != nil {
-		return err
+		log.WithField("name", model.Name).Info("downloading model")
+		if err := model.Download(ctx); err != nil {
+			log.WithError(err).WithField("name", model.Name).Info("failed to download model")
+		}
 	}
 	log.Info("Successfully downloaded all models.")
 	return nil
