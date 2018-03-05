@@ -16,7 +16,7 @@ var (
 	HomeDir, _                = homedir.Dir()
 	DefaultSrcPath            = "Automatic"
 	DefaultBasePath           = utils.GetEnvOr("UPR_BASE_DIR", filepath.Join(HomeDir, "carml", "data", "mxnet"))
-	DefaultServerRelativePath = filepath.Join("bin", "uprd")
+	DefaultServerRelativePath = "bin"
 	DefaultServerBuildCmd     = "make"
 	DefaultServerRunCmd       = filepath.Join("bin", "uprd")
 	DefaultClientRelativePath = filepath.Join("example", "image-classification", "predict-cpp")
@@ -74,9 +74,6 @@ func (a *microConfig) Read() {
 			a.BaseSrcPath = DefaultSrcPath
 		}
 	}
-	if !com.IsDir(a.BaseSrcPath) {
-		log.Panicf("the directory %s does not exist. make sure that micro18.path is set correctly", a.BaseSrcPath)
-	}
 	if a.ServerRelativePath == "" {
 		a.ServerRelativePath = DefaultServerRelativePath
 	}
@@ -84,11 +81,6 @@ func (a *microConfig) Read() {
 		a.ClientRelativePath = DefaultClientRelativePath
 	}
 	a.ClientPath = filepath.Join(a.BaseSrcPath, a.ClientRelativePath)
-	if !com.IsDir(a.ClientPath) {
-		log.Panicf("the directory %s does not exist. make sure that micro18.path"+
-			"and micro18.client_relative_path are set correctly", a.ClientPath,
-		)
-	}
 	if a.ClientBuildCmd == "" {
 		a.ClientBuildCmd = DefaultClientBuildCmd
 	}
@@ -96,16 +88,27 @@ func (a *microConfig) Read() {
 		a.ClientRunCmd = DefaultClientRunCmd
 	}
 	a.ServerPath = filepath.Join(a.BaseSrcPath, a.ServerRelativePath)
-	if !com.IsDir(a.ServerPath) {
-		log.Panicf("the directory %s does not exist. make sure that micro18.path"+
-			"and micro18.server_relative_path are set correctly", a.ServerPath,
-		)
-	}
 	if a.ServerBuildCmd == "" {
 		a.ServerBuildCmd = DefaultServerBuildCmd
 	}
 	if a.ServerRunCmd == "" {
 		a.ServerRunCmd = DefaultServerRunCmd
+	}
+}
+
+func (a microConfig) Verify() {
+	if !com.IsDir(a.BaseSrcPath) {
+		log.Panicf("the directory %s does not exist. make sure that micro18.path is set correctly", a.BaseSrcPath)
+	}
+	if !com.IsDir(a.ClientPath) {
+		log.Panicf("the directory %s does not exist. make sure that micro18.path "+
+			"and micro18.client_relative_path are set correctly", a.ClientPath,
+		)
+	}
+	if !com.IsDir(a.ServerPath) {
+		log.Panicf("the directory %s does not exist. make sure that micro18.path"+
+			"and micro18.server_relative_path are set correctly", a.ServerPath,
+		)
 	}
 }
 

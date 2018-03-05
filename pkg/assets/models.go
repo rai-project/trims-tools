@@ -11,6 +11,7 @@ import (
 	"golang.org/x/sync/errgroup"
 
 	"github.com/rai-project/downloadmanager"
+	"github.com/rai-project/micro18-tools/pkg/config"
 	yaml "gopkg.in/yaml.v2"
 )
 
@@ -43,7 +44,7 @@ type ModelManifest struct {
 type ModelManifests []ModelManifest
 
 var (
-	Models ModelManifests
+	Models = ModelManifests{}
 )
 
 func (model ModelManifest) baseURL() string {
@@ -54,7 +55,7 @@ func (model ModelManifest) baseURL() string {
 }
 
 func (model ModelManifest) WorkDir() string {
-	baseDir := filepath.Join(Config.BasePath, model.Name)
+	baseDir := filepath.Join(config.Config.BasePath, model.Name)
 	if !com.IsDir(baseDir) {
 		err := os.MkdirAll(baseDir, os.ModePerm)
 		if err != nil {
@@ -88,32 +89,41 @@ func (model ModelManifest) GetGraphUrl() string {
 	return model.baseURL() + model.Model.GraphPath
 }
 
-func (model ModelManifest) Download(ctx context.Context) error {
+func (model ModelManifest) Download(ctx context.Context) (err error) {
+	defer func() {
+		if err != nil {
+			log.WithError(err).WithField("name", model.Name).Error("failed to download model")
+			return
+		}
+		log.WithField("name", model.Name).Info("model downloaded")
+	}()
 	if model.Model.IsArchive {
 		baseURL := model.Model.BaseUrl
-		_, err := downloadmanager.DownloadInto(baseURL, model.WorkDir(), downloadmanager.Context(ctx))
+		_, err = downloadmanager.DownloadInto(baseURL, model.WorkDir(), downloadmanager.Context(ctx))
 		if err != nil {
-			return errors.Wrapf(err, "failed to download model archive from %v", model.Model.BaseUrl)
+			err = errors.Wrapf(err, "failed to download model archive from %v", model.Model.BaseUrl)
+			return
 		}
-		return nil
+		return
 	}
 	checksum := model.Model.GraphChecksum
 	if checksum == "" {
-		return errors.New("Need graph file checksum in the model manifest")
-	}
-	if _, err := downloadmanager.DownloadFile(model.GetGraphUrl(), model.GetGraphPath(), downloadmanager.MD5Sum(checksum)); err != nil {
+		err = errors.New("Need graph file checksum in the model manifest")
 		return err
+	}
+	if _, err = downloadmanager.DownloadFile(model.GetGraphUrl(), model.GetGraphPath(), downloadmanager.MD5Sum(checksum)); err != nil {
+		return
 	}
 
 	checksum = model.Model.WeightsChecksum
 	if checksum == "" {
 		return errors.New("Need weights file checksum in the model manifest")
 	}
-	if _, err := downloadmanager.DownloadFile(model.GetWeightsUrl(), model.GetWeightsPath(), downloadmanager.MD5Sum(checksum)); err != nil {
-		return err
+	if _, err = downloadmanager.DownloadFile(model.GetWeightsUrl(), model.GetWeightsPath(), downloadmanager.MD5Sum(checksum)); err != nil {
+		return
 	}
 
-	return nil
+	return
 }
 
 func (ms ModelManifests) Download(ctx context.Context) error {
@@ -132,8 +142,9 @@ func (ms ModelManifests) Download(ctx context.Context) error {
 	return nil
 }
 
-func initModels() error {
-	assets, err := AssetDir("builtin_models")
+func DownloadModels(ctx context.Context) error {
+	prefix := "pkg/assets/builtin_models"
+	assets, err := AssetDir(prefix)
 	if err != nil {
 		return err
 	}
@@ -143,7 +154,7 @@ func initModels() error {
 			return err
 		}
 
-		bts, err := Asset(asset)
+		bts, err := Asset(prefix + "/" + asset)
 		if err != nil {
 			log.WithField("asset", asset).Error("failed to get asset bytes")
 			return err
@@ -160,9 +171,6 @@ func initModels() error {
 		}
 		Models = append(Models, model)
 	}
-	return nil
-}
 
-func init() {
-	initModels()
+	return Models.Download(ctx)
 }
