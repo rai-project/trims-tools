@@ -23,14 +23,10 @@ type ModelAssets struct {
 	GraphChecksum   string `protobuf:"bytes,6,opt,name=graph_checksum,json=graphChecksum,proto3" json:"graph_checksum,omitempty" yaml:"graph_checksum,omitempty"`
 }
 
-type ModelManifest_Type_Parameter struct {
-	Value string `protobuf:"bytes,1,opt,name=value,proto3" json:"value,omitempty" yaml:",inline"`
-}
-
 type ModelManifest_Type struct {
-	Type        string                                   `protobuf:"bytes,1,opt,name=type,proto3" json:"type,omitempty" yaml:"type,omitempty"`
-	Description string                                   `protobuf:"bytes,2,opt,name=description,proto3" json:"description,omitempty" yaml:"description,omitempty"`
-	Parameters  map[string]*ModelManifest_Type_Parameter `protobuf:"bytes,3,rep,name=parameters" json:"parameters,omitempty" yaml:"parameters,omitempty" protobuf_key:"bytes,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value"`
+	Type        string            `protobuf:"bytes,1,opt,name=type,proto3" json:"type,omitempty" yaml:"type,omitempty"`
+	Description string            `protobuf:"bytes,2,opt,name=description,proto3" json:"description,omitempty" yaml:"description,omitempty"`
+	Parameters  map[string]string `protobuf:"bytes,3,rep,name=parameters" json:"parameters,omitempty" yaml:"parameters,omitempty" protobuf_key:"bytes,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value"`
 }
 
 type ModelManifest struct {
@@ -133,7 +129,7 @@ func (model ModelManifest) GetFeaturesUrl() string {
 	if !ok {
 		return ""
 	}
-	return pfeats.Value
+	return pfeats
 }
 
 func (model ModelManifest) Download(ctx context.Context) (err error) {
