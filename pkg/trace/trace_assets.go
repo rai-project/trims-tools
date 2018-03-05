@@ -1,4 +1,4 @@
-package micro
+package trace
 
 // from https://github.com/golang/go/blob/master/src/cmd/trace/trace.go
 

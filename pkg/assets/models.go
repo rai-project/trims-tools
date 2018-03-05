@@ -69,7 +69,11 @@ func (model ModelManifest) CanonicalName() (string, error) {
 	if modelVersion == "" {
 		modelVersion = "latest"
 	}
-	return modelName + ":" + modelVersion, nil
+	cannonicalName := modelName + ":" + modelVersion
+	cannonicalName = strings.Replace(cannonicalName, ":", "_", -1)
+	cannonicalName = strings.Replace(cannonicalName, " ", "_", -1)
+	cannonicalName = strings.Replace(cannonicalName, "-", "_", -1)
+	return cannonicalName, nil
 }
 
 func (model ModelManifest) WorkDir() string {
@@ -77,9 +81,6 @@ func (model ModelManifest) WorkDir() string {
 	if err != nil {
 		return ""
 	}
-	cannonicalName = strings.Replace(cannonicalName, ":", "_", -1)
-	cannonicalName = strings.Replace(cannonicalName, " ", "_", -1)
-	cannonicalName = strings.Replace(cannonicalName, "-", "_", -1)
 
 	baseDir := filepath.Join(config.Config.BasePath, cannonicalName)
 	if !com.IsDir(baseDir) {
