@@ -64,9 +64,28 @@ func (model ModelManifest) baseURL() string {
 	return strings.TrimSuffix(model.Model.BaseUrl, "/") + "/"
 }
 
-func (model ModelManifest) WorkDir() string {
+func (model ModelManifest) CanonicalName() (string, error) {
 	modelName := strings.ToLower(model.Name)
-	baseDir := filepath.Join(config.Config.BasePath, modelName)
+	if modelName == "" {
+		return "", errors.New("model name must not be empty")
+	}
+	modelVersion := model.Version
+	if modelVersion == "" {
+		modelVersion = "latest"
+	}
+	return modelName + ":" + modelVersion, nil
+}
+
+func (model ModelManifest) WorkDir() string {
+	cannonicalName, err := model.CanonicalName()
+	if err != nil {
+		return ""
+	}
+	cannonicalName = strings.Replace(cannonicalName, ":", "_", -1)
+	cannonicalName = strings.Replace(cannonicalName, " ", "_", -1)
+	cannonicalName = strings.Replace(cannonicalName, "-", "_", -1)
+
+	baseDir := filepath.Join(config.Config.BasePath, cannonicalName)
 	if !com.IsDir(baseDir) {
 		err := os.MkdirAll(baseDir, os.ModePerm)
 		if err != nil {
