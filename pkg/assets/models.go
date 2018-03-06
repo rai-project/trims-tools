@@ -76,6 +76,14 @@ func (model ModelManifest) CanonicalName() (string, error) {
 	return cannonicalName, nil
 }
 
+func (model ModelManifest) MustCanonicalName() string {
+	cannonicalName, err := model.CanonicalName()
+	if err != nil {
+		panic(err)
+	}
+	return cannonicalName
+}
+
 func (model ModelManifest) WorkDir() string {
 	cannonicalName, err := model.CanonicalName()
 	if err != nil {
