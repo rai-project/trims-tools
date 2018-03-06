@@ -218,6 +218,36 @@ func (x *Trace) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
+func (x Trace) Adjust() (Trace, error) {
+	var timeAdjustmentI int64
+	var timeAdjustment time.Duration
+	events := TraceEvents{}
+	for ii := range x.TraceEvents {
+		event := x.TraceEvents[ii]
+		if event.Category == "ignore" {
+			if event.EventType == "E" {
+				timeAdjustmentI = timeAdjustmentI + event.Timestamp
+				timeAdjustment = event.StartTime.Add(timeAdjustment).Sub(x.StartTime)
+			}
+		} else if event.Name == "load_nd_array" {
+			continue
+		} else if timeAdjustmentI == 0 {
+			events = append(events, event)
+		} else if event.EventType == "B" || event.EventType == "E" {
+			// pp.Println(timeAdjustmentI, "   ", event.Timestamp, "   ", event.Timestamp-timeAdjustmentI)
+			event.Timestamp = event.Timestamp - timeAdjustmentI
+			event.Start = event.Start - timeAdjustmentI
+			event.End = event.End - timeAdjustmentI
+			event.Time = event.Time.Add(-timeAdjustment)
+			event.StartTime = event.StartTime.Add(-timeAdjustment)
+			event.EndTime = event.EndTime.Add(-timeAdjustment)
+			events = append(events, event)
+		}
+	}
+	x.TraceEvents = events
+	return x, nil
+}
+
 func (x Trace) HashID() int64 {
 	if x.Iteration != 0 {
 		return x.Iteration

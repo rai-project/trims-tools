@@ -48,6 +48,7 @@ var traceCombineCmd = &cobra.Command{
 			if err := json.Unmarshal(bts, &trace); err != nil {
 				return errors.Wrapf(err, "unable to unmarshal the profile file from %s", path)
 			}
+			trace, _ = trace.Adjust()
 			traces = append(traces, trace)
 		}
 		var combinedTrace trace.Trace
