@@ -9,6 +9,7 @@ import (
 	"github.com/Workiva/go-datastructures/augmentedtree"
 	"github.com/pkg/errors"
 	"github.com/rai-project/uuid"
+	"github.com/ulule/deepcopier"
 )
 
 var (
@@ -42,31 +43,103 @@ func mustTimeUnit(u string) time.Duration {
 // Trace is an entry of trace format.
 // https://github.com/catapult-project/catapult/tree/master/tracing
 type TraceEvent struct {
-	Name      string            `json:"name,omitempty"`
-	Category  string            `json:"cat,omitempty"`
-	EventType string            `json:"ph,omitempty"`
-	Timestamp int64             `json:"ts,omitempty"`  // displayTimeUnit
-	Duration  time.Duration     `json:"dur,omitempty"` // displayTimeUnit
-	ProcessID int64             `json:"pid,omitempty"`
-	ThreadID  int64             `json:"tid,omitempty"`
-	Args      map[string]string `json:"args,omitempty"`
-	Stack     int               `json:"sf,omitempty"`
-	EndStack  int               `json:"esf,omitempty"`
-	Init      string            `json:"init_time,omitempty"`
-	Start     int64             `json:"begin,omitempty"`
-	End       int64             `json:"end,omitempty"`
-	InitTime  time.Time         `json:"init_time_t,omitempty"`
-	StartTime time.Time         `json:"start_time_t,omitempty"`
-	EndTime   time.Time         `json:"end_time_t,omitempty"`
-	Time      time.Time         `json:"time_t,omitempty"`
-	TimeUnit  time.Duration     `json:"timeUnit,omitempty"`
-	TraceID   string            `json:"trace_id,omitempty"`
+	Name      string        `json:"name,omitempty"`
+	Category  string        `json:"cat,omitempty"`
+	EventType string        `json:"ph,omitempty"`
+	Timestamp int64         `json:"ts,omitempty"`  // displayTimeUnit
+	Duration  time.Duration `json:"dur,omitempty"` // displayTimeUnit
+	ProcessID int64         `json:"pid"`
+	ThreadID  int64         `json:"tid,omitempty"`
+	Args      interface{}   `json:"args,omitempty"`
+	Stack     int           `json:"sf,omitempty"`
+	EndStack  int           `json:"esf,omitempty"`
+	Init      string        `json:"init_time,omitempty"`
+	Start     int64         `json:"start,omitempty"`
+	End       int64         `json:"end,omitempty"`
+	InitTime  time.Time     `json:"init_time_t,omitempty"`
+	StartTime time.Time     `json:"start_time_t,omitempty"`
+	EndTime   time.Time     `json:"end_time_t,omitempty"`
+	Time      time.Time     `json:"time_t,omitempty"`
+	TimeUnit  time.Duration `json:"timeUnit,omitempty"`
+	TraceID   string        `json:"trace_id,omitempty"`
+}
+
+type JSONTraceEvent struct {
+	Name      string        `json:"name,omitempty"`
+	Category  string        `json:"cat,omitempty"`
+	EventType string        `json:"ph,omitempty"`
+	Timestamp int64         `json:"ts,omitempty"`  // displayTimeUnit
+	Duration  time.Duration `json:"dur,omitempty"` // displayTimeUnit
+	ProcessID int64         `json:"pid"`
+	ThreadID  int64         `json:"tid,omitempty"`
+	Args      interface{}   `json:"args,omitempty"`
+	Stack     int           `json:"sf,omitempty"`
+	EndStack  int           `json:"esf,omitempty"`
+	Init      string        `json:"init_time,omitempty"`
+	Start     int64         `json:"start,omitempty"`
+	End       int64         `json:"end,omitempty"`
+}
+
+type EventFrame struct {
+	Name   string `json:"name"`
+	Parent int    `json:"parent,omitempty"`
+}
+
+type TraceEvents []TraceEvent
+
+type TraceOtherData struct {
+	UPRBaseDirectory string `json:"UPR_BASE_DIR"`
+	EagerMode        bool   `json:"eager_mode"`
+	EagerModeAsync   bool   `json:"eager_mode_async"`
+	EndAt            string `json:"end_at"`
+	Git              struct {
+		Commit string `json:"commit"`
+		Date   string `json:"date"`
+	} `json:"git"`
+	Hostname     string `json:"hostname"`
+	IsClient     bool   `json:"is_client"`
+	ModelName    string `json:"model_name"`
+	ModelParams  string `json:"model_params"`
+	ModelPath    string `json:"model_path"`
+	StartAt      string `json:"start_at"`
+	SymbolParams string `json:"symbol_params"`
+	Username     string `json:"username"`
+}
+
+type Trace struct {
+	ID              string                `json:"id,omitempty"`
+	Iteration       int64                 `json:"iteration,omitempty"`
+	StartTime       time.Time             `json:"start_time,omitempty"`
+	EndTime         time.Time             `json:"end_time,omitempty"`
+	TraceEvents     TraceEvents           `json:"traceEvents,omitempty"`
+	DisplayTimeUnit string                `json:"displayTimeUnit,omitempty"`
+	Frames          map[string]EventFrame `json:"stackFrames"`
+	TimeUnit        string                `json:"timeUnit,omitempty"`
+	OtherDataRaw    TraceOtherData        `json:"otherData,omitempty"`
+	OtherData       []TraceOtherData      `json:"otherDatas,omitempty"`
+}
+
+type JSONTrace struct {
+	ID              string                `json:"id,omitempty"`
+	TraceEvents     TraceEvents           `json:"traceEvents,omitempty"`
+	DisplayTimeUnit string                `json:"displayTimeUnit,omitempty"`
+	Frames          map[string]EventFrame `json:"stackFrames"`
+	TimeUnit        string                `json:"timeUnit,omitempty"`
+	OtherDataRaw    TraceOtherData        `json:"otherData,omitempty"`
 }
 
 func (x *TraceEvent) UnmarshalJSON(data []byte) error {
-	err := json.Unmarshal(data, x)
+	var jsonTraceEvent JSONTraceEvent
+	err := json.Unmarshal(data, &jsonTraceEvent)
 	if err != nil {
-		return err
+		log.WithError(err).Error("failed to unmarshal trace event data")
+	}
+	if err := deepcopier.Copy(jsonTraceEvent).To(x); err != nil {
+		return errors.Wrapf(err, "unable to copy model")
+	}
+	x.Args = jsonTraceEvent.Args
+	if x.Init == "" {
+		return nil
 	}
 	timeUnit, err := timeUnit(DefaultDisplayTimeUnit)
 	if err != nil {
@@ -81,7 +154,6 @@ func (x *TraceEvent) UnmarshalJSON(data []byte) error {
 	x.Time = initTime.Add(time.Duration(x.Timestamp) * timeUnit)
 	x.StartTime = initTime.Add(time.Duration(x.Start) * timeUnit)
 	x.EndTime = initTime.Add(time.Duration(x.End) * timeUnit)
-
 	return nil
 }
 
@@ -119,57 +191,22 @@ func (x TraceEvent) ID() uint64 {
 	return h.Sum64()
 }
 
-type EventFrame struct {
-	Name   string `json:"name"`
-	Parent int    `json:"parent,omitempty"`
-}
-
-type TraceEvents []TraceEvent
-
 func (t TraceEvents) Len() int           { return len(t) }
 func (t TraceEvents) Swap(i, j int)      { t[i], t[j] = t[j], t[i] }
 func (t TraceEvents) Less(i, j int) bool { return t[i].Timestamp < t[j].Timestamp }
-
-type TraceOtherData struct {
-	UPRBaseDirectory string `json:"UPR_BASE_DIR"`
-	EagerMode        bool   `json:"eager_mode"`
-	EagerModeAsync   bool   `json:"eager_mode_async"`
-	EndAt            string `json:"end_at"`
-	Git              struct {
-		Commit string `json:"commit"`
-		Date   string `json:"date"`
-	} `json:"git"`
-	Hostname     string `json:"hostname"`
-	IsClient     bool   `json:"is_client"`
-	ModelName    string `json:"model_name"`
-	ModelParams  string `json:"model_params"`
-	ModelPath    string `json:"model_path"`
-	StartAt      string `json:"start_at"`
-	SymbolParams string `json:"symbol_params"`
-	Username     string `json:"username"`
-}
-
-//easyjson:json
-type Trace struct {
-	ID              string                `json:"id,omitempty"`
-	StartTime       time.Time             `json:"start_time,omitempty"`
-	EndTime         time.Time             `json:"end_time,omitempty"`
-	TraceEvents     TraceEvents           `json:"traceEvents,omitempty"`
-	DisplayTimeUnit string                `json:"displayTimeUnit,omitempty"`
-	Frames          map[string]EventFrame `json:"stackFrames"`
-	TimeUnit        string                `json:"timeUnit,omitempty"`
-	OtherDataRaw    TraceOtherData        `json:"otherData,omitempty"`
-	OtherData       []TraceOtherData      `json:"otherDatas,omitempty"`
-}
 
 func (t Trace) Len() int           { return t.TraceEvents.Len() }
 func (t Trace) Swap(i, j int)      { t.TraceEvents.Swap(i, j) }
 func (t Trace) Less(i, j int) bool { return t.TraceEvents.Less(i, j) }
 
 func (x *Trace) UnmarshalJSON(data []byte) error {
-	err := json.Unmarshal(data, x)
+	var jsonTrace JSONTrace
+	err := json.Unmarshal(data, &jsonTrace)
 	if err != nil {
-		return errors.Wrap(err, "failed to unmarshal trace data")
+		log.WithError(err).Error("failed to unmarshal trace data")
+	}
+	if err := deepcopier.Copy(jsonTrace).To(x); err != nil {
+		return errors.Wrapf(err, "unable to copy model")
 	}
 	x.ID = uuid.NewV4()
 	x.OtherData = []TraceOtherData{x.OtherDataRaw}
@@ -181,8 +218,11 @@ func (x *Trace) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-func (x Trace) HashID() uint64 {
-	h := fnv.New64a()
+func (x Trace) HashID() int64 {
+	if x.Iteration != 0 {
+		return x.Iteration
+	}
+	h := fnv.New32a()
 	h.Write([]byte(x.ID))
-	return h.Sum64()
+	return int64(h.Sum32())
 }

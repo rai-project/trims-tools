@@ -78,6 +78,7 @@ func Run(opts ...Option) error {
 				log.WithField("cmd", config.Config.ClientRunCmd).WithError(err).Error("failed to unmarshal profile output")
 				return err
 			}
+			trace.Iteration = int64(ii)
 			if err := trace.Upload(); err != nil {
 				err = errors.Wrapf(err, "unable to upload profile file %s", profileFilePath)
 				log.WithField("cmd", config.Config.ClientRunCmd).WithError(err).Error("failed to upload profile output")

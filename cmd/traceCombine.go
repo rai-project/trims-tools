@@ -15,20 +15,60 @@
 package cmd
 
 import (
+	"encoding/json"
 	"fmt"
+	"io/ioutil"
 
+	"github.com/Unknwon/com"
+	"github.com/pkg/errors"
+	"github.com/rai-project/micro18-tools/pkg/trace"
 	"github.com/spf13/cobra"
+)
+
+var (
+	traceCombineOutputFile string
 )
 
 // traceCombineCmd represents the traceCombine command
 var traceCombineCmd = &cobra.Command{
 	Use:   "combine",
 	Short: "A brief description of your command",
-	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("traceCombine called")
+	Args:  cobra.MinimumNArgs(1),
+	RunE: func(cmd *cobra.Command, args []string) error {
+		traces := []trace.Trace{}
+		for _, path := range args {
+			if !com.IsFile(path) {
+				return errors.Errorf("the profile file %s was not found", path)
+			}
+			bts, err := ioutil.ReadFile(path)
+			if err != nil {
+				return errors.Wrapf(err, "unable to read the profile file from %s", path)
+			}
+			var trace trace.Trace
+			if err := json.Unmarshal(bts, &trace); err != nil {
+				return errors.Wrapf(err, "unable to unmarshal the profile file from %s", path)
+			}
+			traces = append(traces, trace)
+		}
+		var combinedTrace trace.Trace
+		if len(traces) == 1 {
+			combinedTrace = traces[0]
+		} else {
+			combinedTrace = trace.Combine(traces[0], traces[1:]...)
+		}
+		bts, err := json.Marshal(combinedTrace)
+		if err != nil {
+			return errors.Wrap(err, "unable to marshal combined traces")
+		}
+		if err := ioutil.WriteFile(traceCombineOutputFile, bts, 0644); err != nil {
+			return errors.Wrapf(err, "unable to write combined traces to %s", traceCombineOutputFile)
+		}
+		fmt.Println("output is written to " + traceCombineOutputFile)
+		return nil
 	},
 }
 
 func init() {
 	traceCmd.AddCommand(traceCombineCmd)
+	traceCombineCmd.Flags().StringVarP(&traceCombineOutputFile, "output", "o", "combined.json", "Combined trace output file")
 }

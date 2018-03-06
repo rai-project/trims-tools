@@ -1,6 +1,8 @@
 package trace
 
-import "time"
+import (
+	"time"
+)
 
 func Combine(trace0 Trace, others ...Trace) Trace {
 	trace := &trace0
