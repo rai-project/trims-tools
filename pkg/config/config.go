@@ -13,31 +13,37 @@ import (
 )
 
 var (
-	HomeDir, _                = homedir.Dir()
-	DefaultSrcPath            = "Automatic"
-	DefaultBasePath           = utils.GetEnvOr("UPR_BASE_DIR", filepath.Join(HomeDir, "carml", "data", "mxnet"))
-	DefaultServerRelativePath = "bin"
-	DefaultServerBuildCmd     = "make"
-	DefaultServerRunCmd       = filepath.Join("bin", "uprd")
-	DefaultClientRelativePath = filepath.Join("example", "image-classification", "predict-cpp")
-	DefaultClientBuildCmd     = "make"
-	DefaultClientRunCmd       = "image-classification-predict"
+	HomeDir, _                    = homedir.Dir()
+	DefaultSrcPath                = "Automatic"
+	DefaultBasePath               = utils.GetEnvOr("UPR_BASE_DIR", filepath.Join(HomeDir, "carml", "data", "mxnet"))
+	DefaultServerRelativePath     = "bin"
+	DefaultServerBuildCmd         = "make"
+	DefaultServerRunCmd           = filepath.Join("bin", "uprd")
+	DefaultClientRelativePath     = filepath.Join("example", "image-classification", "predict-cpp")
+	DefaultClientBuildCmd         = "make"
+	DefaultClientRunCmd           = "image-classification-predict"
+	DefaultBaseBucketURL          = "http://s3.amazonaws.com/carml/micro18"
+	DefaultUploadBucketName       = "micro18"
+	DefaultProfileOutputDirectory = filepath.Join(HomeDir, "micro18_profiles")
 )
 
 type microConfig struct {
-	BuildTimeoutSeconds int64         `json:"build_timeout" config:"micro18.build_timeout" default:600`
-	PollingInterval     int           `json:"polling_interval" config:"micro18.polling_interval" default:100`
-	BaseSrcPath         string        `json:"src_path" config:"micro18.src_path"`
-	BasePath            string        `json:"base_path" config:"micro18.base_path"`
-	ServerRelativePath  string        `json:"server_relative_path" config:"micro18.server_relative_path"`
-	ServerPath          string        `json:"server_path" config:"-"`
-	ServerBuildCmd      string        `json:"server_build_cmd" config:"micro18.server_build_cmd"`
-	ServerRunCmd        string        `json:"server_run_cmd" config:"micro18.server_run_cmd"`
-	ClientRelativePath  string        `json:"client_relative_path" config:"micro18.client_relative_path"`
-	ClientPath          string        `json:"client_path" config:"-"`
-	ClientBuildCmd      string        `json:"client_build_cmd" config:"micro18.client_build_cmd"`
-	ClientRunCmd        string        `json:"client_run_cmd" config:"micro18.client_run_cmd"`
-	done                chan struct{} `json:"-" config:"-"`
+	BuildTimeoutSeconds    int64         `json:"build_timeout" config:"micro18.build_timeout" default:600`
+	PollingInterval        int           `json:"polling_interval" config:"micro18.polling_interval" default:100`
+	BaseSrcPath            string        `json:"src_path" config:"micro18.src_path"`
+	BasePath               string        `json:"base_path" config:"micro18.base_path"`
+	ServerRelativePath     string        `json:"server_relative_path" config:"micro18.server_relative_path"`
+	ServerPath             string        `json:"server_path" config:"-"`
+	ServerBuildCmd         string        `json:"server_build_cmd" config:"micro18.server_build_cmd"`
+	ServerRunCmd           string        `json:"server_run_cmd" config:"micro18.server_run_cmd"`
+	ClientRelativePath     string        `json:"client_relative_path" config:"micro18.client_relative_path"`
+	ClientPath             string        `json:"client_path" config:"-"`
+	ClientBuildCmd         string        `json:"client_build_cmd" config:"micro18.client_build_cmd"`
+	ClientRunCmd           string        `json:"client_run_cmd" config:"micro18.client_run_cmd"`
+	BaseBucketURL          string        `json:"base_bucket_url" config:"micro18.base_bucket_url"`
+	UploadBucketName       string        `json:"upload_bucket_name" config:"micro18.upload_bucket_name"`
+	ProfileOutputDirectory string        `json:"profile_output_directory" config:"micro18.profile_output_directory"`
+	done                   chan struct{} `json:"-" config:"-"`
 }
 
 var (
@@ -93,6 +99,18 @@ func (a *microConfig) Read() {
 	}
 	if a.ServerRunCmd == "" {
 		a.ServerRunCmd = DefaultServerRunCmd
+	}
+	if a.UploadBucketName == "" {
+		a.UploadBucketName = DefaultUploadBucketName
+	}
+	if a.BaseBucketURL == "" {
+		a.BaseBucketURL = DefaultBaseBucketURL
+	}
+	if a.ProfileOutputDirectory == "" {
+		a.ProfileOutputDirectory = DefaultProfileOutputDirectory
+	}
+	if !com.IsDir(a.ProfileOutputDirectory) {
+		os.MkdirAll(a.ProfileOutputDirectory, os.ModePerm)
 	}
 }
 

@@ -1,10 +1,15 @@
 package trace
 
 import (
+	"encoding/json"
 	"fmt"
+	"io/ioutil"
 	"os"
+	"path/filepath"
 	"strings"
 	"time"
+
+	"github.com/rai-project/uuid"
 
 	"github.com/pkg/errors"
 	"github.com/rai-project/micro18-tools/pkg/assets"
@@ -31,7 +36,10 @@ func Run(opts ...Option) error {
 	}
 
 	for _, model := range models {
+		var combined *Trace
 		for ii := 0; ii < options.iterationCount; ii++ {
+			id := uuid.NewV4()
+			profileFilePath := filepath.Join(config.Config.ProfileOutputDirectory, fmt.Sprintf("%s_%s.json", model.MustCanonicalName(), id))
 			env := map[string]string{
 				"DATE":                        time.Now().Format(time.RFC3339Nano),
 				"UPR_MODEL_NAME":              model.MustCanonicalName(),
@@ -40,6 +48,7 @@ func Run(opts ...Option) error {
 				"OMP_NUM_THREADS":             "1",
 				"MXNET_ENGINE_TYPE":           "NaiveEngine",
 				"MXNET_GPU_WORKER_NTHREADS":   "1",
+				"UPR_PROFILE_TARGET":          profileFilePath,
 			}
 			ran, err := execCmd(
 				config.Config.ClientPath,
@@ -51,9 +60,33 @@ func Run(opts ...Option) error {
 			)
 			if !ran {
 				log.WithError(errors.Errorf("failed to run cmd %s", config.Config.ClientRunCmd)).Error("failed to run model")
+				continue
 			}
 			if err != nil {
 				log.WithField("cmd", config.Config.ClientRunCmd).WithError(err).Error("failed to run model")
+				continue
+			}
+			bts, err := ioutil.ReadFile(profileFilePath)
+			if err != nil {
+				err = errors.Wrapf(err, "unable to read profile file %s", profileFilePath)
+				log.WithField("cmd", config.Config.ClientRunCmd).WithError(err).Error("failed to read profile output")
+				return err
+			}
+			var trace Trace
+			if err := json.Unmarshal(bts, &trace); err != nil {
+				err = errors.Wrapf(err, "unable to unmarshal profile file %s", profileFilePath)
+				log.WithField("cmd", config.Config.ClientRunCmd).WithError(err).Error("failed to unmarshal profile output")
+				return err
+			}
+			if err := trace.Upload(); err != nil {
+				err = errors.Wrapf(err, "unable to upload profile file %s", profileFilePath)
+				log.WithField("cmd", config.Config.ClientRunCmd).WithError(err).Error("failed to upload profile output")
+			}
+			if combined == nil {
+				combined = &trace
+				combined.ID = uuid.NewV4()
+			} else {
+				combined.Combine(trace)
 			}
 		}
 	}

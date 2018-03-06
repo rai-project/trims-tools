@@ -8,6 +8,7 @@ import (
 
 	"github.com/Workiva/go-datastructures/augmentedtree"
 	"github.com/pkg/errors"
+	"github.com/rai-project/uuid"
 )
 
 var (
@@ -30,6 +31,14 @@ func timeUnit(unit string) (time.Duration, error) {
 	}
 }
 
+func mustTimeUnit(u string) time.Duration {
+	unit, err := timeUnit(u)
+	if err != nil {
+		panic(err)
+	}
+	return unit
+}
+
 // Trace is an entry of trace format.
 // https://github.com/catapult-project/catapult/tree/master/tracing
 type TraceEvent struct {
@@ -46,11 +55,12 @@ type TraceEvent struct {
 	Init      string            `json:"init_time,omitempty"`
 	Start     int64             `json:"begin,omitempty"`
 	End       int64             `json:"end,omitempty"`
-	InitTime  time.Time         `json:"-"`
-	StartTime time.Time         `json:"-"`
-	EndTime   time.Time         `json:"-"`
-	Time      time.Time         `json:"-"`
-	TimeUnit  time.Duration     `json:"-"`
+	InitTime  time.Time         `json:"init_time_t,omitempty"`
+	StartTime time.Time         `json:"start_time_t,omitempty"`
+	EndTime   time.Time         `json:"end_time_t,omitempty"`
+	Time      time.Time         `json:"time_t,omitempty"`
+	TimeUnit  time.Duration     `json:"timeUnit,omitempty"`
+	TraceID   string            `json:"trace_id,omitempty"`
 }
 
 func (x *TraceEvent) UnmarshalJSON(data []byte) error {
@@ -141,14 +151,15 @@ type TraceOtherData struct {
 
 //easyjson:json
 type Trace struct {
-	ID              string                `json:"-"`
-	StartTime       time.Time             `json:"-"`
-	EndTime         time.Time             `json:"-"`
+	ID              string                `json:"id,omitempty"`
+	StartTime       time.Time             `json:"start_time,omitempty"`
+	EndTime         time.Time             `json:"end_time,omitempty"`
 	TraceEvents     TraceEvents           `json:"traceEvents,omitempty"`
 	DisplayTimeUnit string                `json:"displayTimeUnit,omitempty"`
 	Frames          map[string]EventFrame `json:"stackFrames"`
 	TimeUnit        string                `json:"timeUnit,omitempty"`
-	OtherData       TraceOtherData        `json:"otherData,omitempty"`
+	OtherDataRaw    TraceOtherData        `json:"otherData,omitempty"`
+	OtherData       []TraceOtherData      `json:"otherDatas,omitempty"`
 }
 
 func (t Trace) Len() int           { return t.TraceEvents.Len() }
@@ -158,7 +169,20 @@ func (t Trace) Less(i, j int) bool { return t.TraceEvents.Less(i, j) }
 func (x *Trace) UnmarshalJSON(data []byte) error {
 	err := json.Unmarshal(data, x)
 	if err != nil {
-		return err
+		return errors.Wrap(err, "failed to unmarshal trace data")
 	}
+	x.ID = uuid.NewV4()
+	x.OtherData = []TraceOtherData{x.OtherDataRaw}
+	for ii := range x.TraceEvents {
+		x.TraceEvents[ii].TraceID = x.ID
+	}
+	x.StartTime, _ = time.Parse(time.RFC3339Nano, x.OtherDataRaw.StartAt)
+	x.EndTime, _ = time.Parse(time.RFC3339Nano, x.OtherDataRaw.EndAt)
 	return nil
+}
+
+func (x Trace) HashID() uint64 {
+	h := fnv.New64a()
+	h.Write([]byte(x.ID))
+	return h.Sum64()
 }

@@ -17,9 +17,10 @@ var clientRunCmd = &cobra.Command{
 	Short: "Run the client command and produce profile files",
 	Run: func(cmd *cobra.Command, args []string) {
 		ctx := context.Background()
-		for ii := 0; ii < runClientNTimes; ii++ {
-			trace.Run(ctx, ii)
-		}
+		trace.Run(
+			trace.Context(ctx),
+			trace.IterationCount(runClientNTimes),
+		)
 	},
 }
 
