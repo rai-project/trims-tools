@@ -27,6 +27,8 @@ import (
 
 var (
 	traceCombineOutputFile string
+	traceCombineAdjust     bool
+	traceCombineSkipFirst  bool
 )
 
 // traceCombineCmd represents the traceCombine command
@@ -36,6 +38,12 @@ var traceCombineCmd = &cobra.Command{
 	Args:  cobra.MinimumNArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
 		traces := []trace.Trace{}
+		if traceCombineSkipFirst {
+			args = args[1:]
+		}
+		if len(args) == 0 {
+			return errors.Errorf("not profiles were specified. check to see if you skipped the first profile")
+		}
 		for _, path := range args {
 			if !com.IsFile(path) {
 				return errors.Errorf("the profile file %s was not found", path)
@@ -48,7 +56,9 @@ var traceCombineCmd = &cobra.Command{
 			if err := json.Unmarshal(bts, &trace); err != nil {
 				return errors.Wrapf(err, "unable to unmarshal the profile file from %s", path)
 			}
-			trace, _ = trace.Adjust()
+			if traceCombineAdjust {
+				trace, _ = trace.Adjust()
+			}
 			traces = append(traces, trace)
 		}
 		var combinedTrace trace.Trace
@@ -72,4 +82,6 @@ var traceCombineCmd = &cobra.Command{
 func init() {
 	traceCmd.AddCommand(traceCombineCmd)
 	traceCombineCmd.Flags().StringVarP(&traceCombineOutputFile, "output", "o", "combined.json", "Combined trace output file")
+	traceCombineCmd.Flags().BoolVar(&traceCombineAdjust, "adjust", true, "Adjust the timeline to ignore categories")
+	traceCombineCmd.Flags().BoolVar(&traceCombineSkipFirst, "rest", true, "Skip the first timeline")
 }

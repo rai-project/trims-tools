@@ -65,19 +65,19 @@ type TraceEvent struct {
 }
 
 type JSONTraceEvent struct {
-	Name      string        `json:"name,omitempty"`
-	Category  string        `json:"cat,omitempty"`
-	EventType string        `json:"ph,omitempty"`
-	Timestamp int64         `json:"ts,omitempty"`  // displayTimeUnit
-	Duration  time.Duration `json:"dur,omitempty"` // displayTimeUnit
-	ProcessID int64         `json:"pid"`
-	ThreadID  int64         `json:"tid,omitempty"`
-	Args      interface{}   `json:"args,omitempty"`
-	Stack     int           `json:"sf,omitempty"`
-	EndStack  int           `json:"esf,omitempty"`
-	Init      string        `json:"init_time,omitempty"`
-	Start     int64         `json:"start,omitempty"`
-	End       int64         `json:"end,omitempty"`
+	Name      string      `json:"name,omitempty"`
+	Category  string      `json:"cat,omitempty"`
+	EventType string      `json:"ph,omitempty"`
+	Timestamp int64       `json:"ts,omitempty"`  // displayTimeUnit
+	Duration  int64       `json:"dur,omitempty"` // displayTimeUnit
+	ProcessID int64       `json:"pid"`
+	ThreadID  int64       `json:"tid,omitempty"`
+	Args      interface{} `json:"args,omitempty"`
+	Stack     int         `json:"sf,omitempty"`
+	EndStack  int         `json:"esf,omitempty"`
+	Init      string      `json:"init_time,omitempty"`
+	Start     int64       `json:"start,omitempty"`
+	End       int64       `json:"end,omitempty"`
 }
 
 type EventFrame struct {
@@ -154,6 +154,9 @@ func (x *TraceEvent) UnmarshalJSON(data []byte) error {
 	x.Time = initTime.Add(time.Duration(x.Timestamp) * timeUnit)
 	x.StartTime = initTime.Add(time.Duration(x.Start) * timeUnit)
 	x.EndTime = initTime.Add(time.Duration(x.End) * timeUnit)
+	if x.Duration == 0 {
+		x.Duration = x.EndTime.Sub(x.StartTime)
+	}
 	return nil
 }
 
@@ -219,30 +222,59 @@ func (x *Trace) UnmarshalJSON(data []byte) error {
 }
 
 func (x Trace) Adjust() (Trace, error) {
-	var timeAdjustmentI int64
-	var timeAdjustment time.Duration
+	var minTimeStamp int64
+	var adjustedEvent TraceEvent
 	events := TraceEvents{}
-	for ii := range x.TraceEvents {
-		event := x.TraceEvents[ii]
+	for _, event := range x.TraceEvents { // assumes that there is only one thing to ignore
 		if event.Category == "ignore" {
 			if event.EventType == "E" {
-				timeAdjustmentI = timeAdjustmentI + event.Timestamp
-				timeAdjustment = event.StartTime.Add(timeAdjustment).Sub(x.StartTime)
+				adjustedEvent = event
 			}
-		} else if event.Name == "load_nd_array" {
-			continue
-		} else if timeAdjustmentI == 0 {
-			events = append(events, event)
-		} else if event.EventType == "B" || event.EventType == "E" {
-			// pp.Println(timeAdjustmentI, "   ", event.Timestamp, "   ", event.Timestamp-timeAdjustmentI)
-			event.Timestamp = event.Timestamp - timeAdjustmentI
-			event.Start = event.Start - timeAdjustmentI
-			event.End = event.End - timeAdjustmentI
-			event.Time = event.Time.Add(-timeAdjustment)
-			event.StartTime = event.StartTime.Add(-timeAdjustment)
-			event.EndTime = event.EndTime.Add(-timeAdjustment)
-			events = append(events, event)
 		}
+		if minTimeStamp < event.Timestamp {
+			minTimeStamp = event.Timestamp
+		}
+	}
+	if adjustedEvent.Name == "" {
+		return x, nil
+	}
+	// pp.Println(adjustedEvent)
+	for _, event := range x.TraceEvents {
+		timeUnit := event.TimeUnit
+		// initTime, _ := time.Parse(time.RFC3339Nano, event.Init)
+		// pp.Println(timeAdjustmentI, "   ", event.Timestamp, "   ", event.Timestamp-timeAdjustmentI)
+		if event.Category == "ignore" {
+			continue
+		}
+		if event.EndTime.After(adjustedEvent.Time) && event.StartTime.Before(adjustedEvent.Time) {
+			event.Duration = event.Duration - adjustedEvent.Duration
+		}
+		if event.EndTime.Before(adjustedEvent.Time) {
+			events = append(events, event)
+			continue
+		}
+		// if event.Name == "load_nd_array" {
+		// 	continue
+		// }
+
+		if event.EventType == "B" || event.EventType == "E" {
+			if event.Time.After(adjustedEvent.Time) {
+				event.Time = event.Time.Add(-adjustedEvent.Duration)
+				event.Timestamp = event.Timestamp - int64(adjustedEvent.Duration/timeUnit)
+				// pp.Println(event.Timestamp, "   ", adjustedEvent.Timestamp, "  ", int64(adjustedEvent.Duration), "   ", event.Timestamp-adjustedEvent.Timestamp+minTimeStamp)
+			}
+			if event.StartTime.After(adjustedEvent.StartTime) {
+				event.Start = event.Start - adjustedEvent.Start
+				event.StartTime = event.StartTime.Add(-adjustedEvent.Duration)
+			}
+
+			if event.EndTime.After(adjustedEvent.EndTime) {
+				event.End = event.End - adjustedEvent.End
+				event.EndTime = event.EndTime.Add(-adjustedEvent.Duration)
+			}
+		}
+
+		events = append(events, event)
 	}
 	x.TraceEvents = events
 	return x, nil
