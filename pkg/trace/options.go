@@ -5,6 +5,7 @@ import "context"
 type Options struct {
 	ctx                  context.Context
 	iterationCount       int
+	debug                bool
 	eagerInitialize      bool
 	eagerInitializeAsync bool
 	postprocess          bool
@@ -17,6 +18,7 @@ var (
 	DefaultOptions = Options{
 		ctx:                  context.Background(),
 		iterationCount:       3,
+		debug:                false,
 		eagerInitialize:      false,
 		eagerInitializeAsync: false,
 		postprocess:          false,
@@ -33,6 +35,12 @@ func Context(ctx context.Context) Option {
 func IterationCount(ii int) Option {
 	return func(o *Options) {
 		o.iterationCount = ii
+	}
+}
+
+func DebugMode(b bool) Option {
+	return func(o *Options) {
+		o.debug = b
 	}
 }
 

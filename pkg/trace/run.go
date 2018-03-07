@@ -70,6 +70,11 @@ func Run(opts ...Option) ([]*Trace, error) {
 				"UPR_INPUT_MEAN_G":            fmt.Sprintf("%v", mean[1]),
 				"UPR_INPUT_MEAN_B":            fmt.Sprintf("%v", mean[2]),
 			}
+			if options.debug {
+				env["GLOG_logtostderr"] = "1"
+				env["GLOG_v"] = "0"
+				env["GLOG_stderrthreshold"] = "0"
+			}
 			if options.eagerInitialize {
 				env["UPR_INITIALIZE_EAGER"] = "true"
 			}
