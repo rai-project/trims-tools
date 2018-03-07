@@ -23,4 +23,5 @@ func (tr *Trace) Combine(other Trace) {
 		event.EndTime = initTime.Add(time.Duration(event.End) * timeUnit)
 		tr.TraceEvents = append(tr.TraceEvents, event)
 	}
+	tr.OtherDataRaw = nil
 }

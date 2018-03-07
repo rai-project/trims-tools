@@ -115,8 +115,8 @@ type Trace struct {
 	DisplayTimeUnit string                `json:"displayTimeUnit,omitempty"`
 	Frames          map[string]EventFrame `json:"stackFrames"`
 	TimeUnit        string                `json:"timeUnit,omitempty"`
-	OtherDataRaw    TraceOtherData        `json:"otherData,omitempty"`
-	OtherData       []TraceOtherData      `json:"otherDatas,omitempty"`
+	OtherDataRaw    *TraceOtherData       `json:"otherData,omitempty"`
+	OtherData       []*TraceOtherData     `json:"otherDatas,omitempty"`
 }
 
 type JSONTrace struct {
@@ -212,12 +212,14 @@ func (x *Trace) UnmarshalJSON(data []byte) error {
 		return errors.Wrapf(err, "unable to copy model")
 	}
 	x.ID = uuid.NewV4()
-	x.OtherData = []TraceOtherData{x.OtherDataRaw}
+	x.OtherData = []*TraceOtherData{x.OtherDataRaw}
 	for ii := range x.TraceEvents {
 		x.TraceEvents[ii].TraceID = x.ID
 	}
-	x.StartTime, _ = time.Parse(time.RFC3339Nano, x.OtherDataRaw.StartAt)
-	x.EndTime, _ = time.Parse(time.RFC3339Nano, x.OtherDataRaw.EndAt)
+	if x.OtherDataRaw != nil {
+		x.StartTime, _ = time.Parse(time.RFC3339Nano, x.OtherDataRaw.StartAt)
+		x.EndTime, _ = time.Parse(time.RFC3339Nano, x.OtherDataRaw.EndAt)
+	}
 	return nil
 }
 

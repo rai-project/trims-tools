@@ -22,7 +22,7 @@ var clientRunCmd = &cobra.Command{
 		ctx := context.Background()
 		trace.Run(
 			trace.Context(ctx),
-			trace.Postprocess(runClientPostprocess),
+			trace.PostProcess(runClientPostprocess),
 			trace.IterationCount(runClientNTimes),
 			trace.EagerInitialize(runClientEager),
 			trace.EagerInitializeAsync(runClientEagerAsync),

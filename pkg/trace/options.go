@@ -36,7 +36,7 @@ func IterationCount(ii int) Option {
 	}
 }
 
-func PostProcesses(b bool) Option {
+func PostProcess(b bool) Option {
 	return func(o *Options) {
 		o.postprocess = b
 	}
