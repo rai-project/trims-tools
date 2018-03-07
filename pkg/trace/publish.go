@@ -36,8 +36,9 @@ func (tr Trace) Upload() error {
 	if err != nil {
 		return err
 	}
+	defer st.Close()
 
-	uploadKey := config.Config.UploadBucketName + "/" + tr.ID + ".json"
+	uploadKey := config.Config.UploadBucketName + "/" + tr.StartTime.String() + "/" + tr.ID + ".json"
 
 	key, err := st.UploadFrom(
 		bytes.NewBuffer(js),
