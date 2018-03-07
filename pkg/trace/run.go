@@ -6,6 +6,7 @@ import (
 	"io/ioutil"
 	"os"
 	"path/filepath"
+	"strconv"
 	"strings"
 	"time"
 
@@ -16,7 +17,7 @@ import (
 	"github.com/rai-project/micro18-tools/pkg/config"
 )
 
-func Run(opts ...Option) error {
+func Run(opts ...Option) ([]*Trace, error) {
 	hostname, _ := os.Hostname()
 
 	options := WithOptions(opts...)
@@ -31,12 +32,25 @@ func Run(opts ...Option) error {
 			}
 		}
 		if len(models) == 0 {
-			return errors.Errorf("the model %s was not found in the asset list", options.modelName)
+			return nil, errors.Errorf("the model %s was not found in the asset list", options.modelName)
 		}
 	}
 
+	var res []*Trace
 	for _, model := range models {
 		var combined *Trace
+		dims, err := model.GetImageDimensions()
+		if err != nil {
+			dims = []uint32{3, 224, 224}
+		}
+		mean, err := model.GetMeanImage()
+		if err != nil {
+			mean = []float32{0, 0, 0}
+		}
+		if len(dims) != 3 {
+			log.Errorf("expecting a 3 element vector for dimensions %v", dims)
+			continue
+		}
 		for ii := 0; ii < options.iterationCount; ii++ {
 			id := uuid.NewV4()
 			profileFilePath := filepath.Join(config.Config.ProfileOutputDirectory, fmt.Sprintf("%s_%s.json", model.MustCanonicalName(), id))
@@ -49,6 +63,18 @@ func Run(opts ...Option) error {
 				"MXNET_ENGINE_TYPE":           "NaiveEngine",
 				"MXNET_GPU_WORKER_NTHREADS":   "1",
 				"UPR_PROFILE_TARGET":          profileFilePath,
+				"UPR_INPUT_CHANNELS":          strconv.Itoa(int(dims[0])),
+				"UPR_INPUT_HEIGHT":            strconv.Itoa(int(dims[1])),
+				"UPR_INPUT_WIDTH":             strconv.Itoa(int(dims[2])),
+				"UPR_INPUT_MEAN_R":            fmt.Sprintf("%v", mean[0]),
+				"UPR_INPUT_MEAN_G":            fmt.Sprintf("%v", mean[1]),
+				"UPR_INPUT_MEAN_B":            fmt.Sprintf("%v", mean[2]),
+			}
+			if options.eagerInitialize {
+				env["UPR_INITIALIZE_EAGER"] = "true"
+			}
+			if options.eagerInitializeAsync {
+				env["UPR_INITIALIZE_EAGER_ASYNC"] = "true"
 			}
 			ran, err := execCmd(
 				config.Config.ClientPath,
@@ -57,6 +83,12 @@ func Run(opts ...Option) error {
 				os.Stderr,
 				config.Config.ClientRunCmd,
 				fmt.Sprintf("%s_%d", hostname, ii),
+				strconv.Itoa(int(dims[0])),
+				strconv.Itoa(int(dims[1])),
+				strconv.Itoa(int(dims[2])),
+				fmt.Sprintf("%v", mean[0]),
+				fmt.Sprintf("%v", mean[1]),
+				fmt.Sprintf("%v", mean[2]),
 			)
 			if !ran {
 				log.WithError(errors.Errorf("failed to run cmd %s", config.Config.ClientRunCmd)).Error("failed to run model")
@@ -66,17 +98,20 @@ func Run(opts ...Option) error {
 				log.WithField("cmd", config.Config.ClientRunCmd).WithError(err).Error("failed to run model")
 				continue
 			}
+			if !options.postprocess {
+				continue
+			}
 			bts, err := ioutil.ReadFile(profileFilePath)
 			if err != nil {
 				err = errors.Wrapf(err, "unable to read profile file %s", profileFilePath)
 				log.WithField("cmd", config.Config.ClientRunCmd).WithError(err).Error("failed to read profile output")
-				return err
+				return nil, err
 			}
 			var trace Trace
 			if err := json.Unmarshal(bts, &trace); err != nil {
 				err = errors.Wrapf(err, "unable to unmarshal profile file %s", profileFilePath)
 				log.WithField("cmd", config.Config.ClientRunCmd).WithError(err).Error("failed to unmarshal profile output")
-				return err
+				return nil, err
 			}
 			trace.Iteration = int64(ii)
 			if err := trace.Upload(); err != nil {
@@ -90,6 +125,9 @@ func Run(opts ...Option) error {
 				combined.Combine(trace)
 			}
 		}
+		if combined != nil {
+			res = append(res, combined)
+		}
 	}
-	return nil
+	return res, nil
 }

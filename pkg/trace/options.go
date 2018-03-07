@@ -7,6 +7,7 @@ type Options struct {
 	iterationCount       int
 	eagerInitialize      bool
 	eagerInitializeAsync bool
+	postprocess          bool
 	modelName            string
 }
 
@@ -18,6 +19,7 @@ var (
 		iterationCount:       3,
 		eagerInitialize:      false,
 		eagerInitializeAsync: false,
+		postprocess:          false,
 		modelName:            "All",
 	}
 )
@@ -31,6 +33,12 @@ func Context(ctx context.Context) Option {
 func IterationCount(ii int) Option {
 	return func(o *Options) {
 		o.iterationCount = ii
+	}
+}
+
+func PostProcesses(b bool) Option {
+	return func(o *Options) {
+		o.postprocess = b
 	}
 }
 
