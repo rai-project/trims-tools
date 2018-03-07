@@ -126,6 +126,9 @@ func Run(opts ...Option) ([]*Trace, error) {
 			}
 		}
 		if combined != nil {
+			if err := combined.Upload(); err != nil {
+				log.WithError(err).Error("failed to upload combined profile output")
+			}
 			res = append(res, combined)
 		}
 	}
