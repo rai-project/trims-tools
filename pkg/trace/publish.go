@@ -31,7 +31,7 @@ func (tr Trace) Upload() error {
 	st, err := s3.New(
 		s3.Session(session),
 		store.Bucket(config.Config.UploadBucketName),
-		store.BaseURL(s3.Config.BaseURL),
+		store.BaseURL(config.Config.BaseBucketURL),
 	)
 	if err != nil {
 		return err
