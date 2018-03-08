@@ -49,7 +49,7 @@ func getVersion() {
 		state = "clean"
 	}
 
-	RepositoryVersion = version{
+	Version = version{
 		BuildDate:  time.Now().String(),
 		GitCommit:  h.Hash().String(),
 		GitBranch:  h.Target().String(),
