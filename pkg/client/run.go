@@ -37,6 +37,8 @@ func Run(opts ...Option) ([]*trace.Trace, error) {
 			return nil, errors.Errorf("the model %s was not found in the asset list", options.modelName)
 		}
 	}
+	progress := utils.NewProgress("running client models", len(models)*options.iterationCount)
+	defer progress.FinishPrint("finished running client")
 
 	var res []*trace.Trace
 	for _, model := range models {
@@ -53,12 +55,17 @@ func Run(opts ...Option) ([]*trace.Trace, error) {
 			log.Errorf("expecting a 3 element vector for dimensions %v", dims)
 			continue
 		}
+		cannonicalName := model.MustCanonicalName()
+		progress.Prefix(fmt.Sprintf("running client model %s", cannonicalName))
+
 		for ii := 0; ii < options.iterationCount; ii++ {
+
+			progress.Increment()
 			id := uuid.NewV4()
 			profileFilePath := filepath.Join(config.Config.ProfileOutputDirectory, fmt.Sprintf("%s_%s.json", model.MustCanonicalName(), id))
 			env := map[string]string{
 				"DATE":                        time.Now().Format(time.RFC3339Nano),
-				"UPR_MODEL_NAME":              model.MustCanonicalName(),
+				"UPR_MODEL_NAME":              cannonicalName,
 				"UPR_CLIENT":                  "1",
 				"MXNET_CPU_PRIORITY_NTHREADS": "1",
 				"OMP_NUM_THREADS":             "1",

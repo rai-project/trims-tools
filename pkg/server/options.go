@@ -18,7 +18,7 @@ var (
 		ctx:                 context.Background(),
 		debug:               false,
 		evictionPolicy:      "lru",
-		modelEstimationRate: 1.5,
+		modelEstimationRate: 3.0,
 		memoryPercentage:    0.8,
 		uploadProfile:       true,
 	}

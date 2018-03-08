@@ -39,13 +39,9 @@ func getVersion() {
 		panic(err)
 	}
 
-	st, err := wt.Status()
-	if err != nil {
-		panic(err)
-	}
-
 	state := "dirty"
-	if st.IsClean() {
+	st, err := wt.Status()
+	if err == nil && st.IsClean() {
 		state = "clean"
 	}
 
