@@ -10,6 +10,7 @@ type Options struct {
 	eagerInitializeAsync bool
 	postprocess          bool
 	modelName            string
+	uploadProfile        bool
 }
 
 type Option func(*Options)
@@ -23,12 +24,19 @@ var (
 		eagerInitializeAsync: false,
 		postprocess:          false,
 		modelName:            "All",
+		uploadProfile:        true,
 	}
 )
 
 func Context(ctx context.Context) Option {
 	return func(o *Options) {
 		o.ctx = ctx
+	}
+}
+
+func UploadProfile(b bool) Option {
+	return func(o *Options) {
+		o.uploadProfile = b
 	}
 }
 

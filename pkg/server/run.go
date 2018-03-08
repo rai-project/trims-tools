@@ -68,9 +68,11 @@ func Run(opts ...Option) (*trace.Trace, error) {
 		return nil, err
 	}
 
-	if err := trace.Upload(); err != nil {
-		err = errors.Wrapf(err, "unable to upload profile file %s", profileFilePath)
-		log.WithField("cmd", config.Config.ClientRunCmd).WithError(err).Error("failed to upload profile output")
+	if options.uploadProfile {
+		if err := trace.Upload(); err != nil {
+			err = errors.Wrapf(err, "unable to upload profile file %s", profileFilePath)
+			log.WithField("cmd", config.Config.ClientRunCmd).WithError(err).Error("failed to upload profile output")
+		}
 	}
 
 	return &trace, nil

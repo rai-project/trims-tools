@@ -8,6 +8,7 @@ type Options struct {
 	evictionPolicy      string
 	modelEstimationRate float32
 	memoryPercentage    float32
+	uploadProfile       bool
 }
 
 type Option func(*Options)
@@ -19,12 +20,19 @@ var (
 		evictionPolicy:      "lru",
 		modelEstimationRate: 1.5,
 		memoryPercentage:    0.8,
+		uploadProfile:       true,
 	}
 )
 
 func Context(ctx context.Context) Option {
 	return func(o *Options) {
 		o.ctx = ctx
+	}
+}
+
+func UploadProfile(b bool) Option {
+	return func(o *Options) {
+		o.uploadProfile = b
 	}
 }
 
