@@ -3,7 +3,6 @@ package utils
 import (
 	"fmt"
 	"io"
-	"log"
 	"os"
 	"os/exec"
 	"strings"
@@ -53,7 +52,7 @@ func run(cwd string, env map[string]string, stdout, stderr io.Writer, cmd string
 	c.Stderr = stderr
 	c.Stdout = stdout
 	c.Stdin = os.Stdin
-	log.Println("exec:", cmd, strings.Join(args, " "))
+	//fmt.Println("exec:", c.Env, cmd, strings.Join(args, " "))
 	err = c.Run()
 	return cmdRan(err), ExitStatus(err), err
 }

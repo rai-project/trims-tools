@@ -21,7 +21,7 @@ var (
 	DefaultServerRunCmd           = filepath.Join("bin", "uprd")
 	DefaultClientRelativePath     = filepath.Join("example", "image-classification", "predict-cpp")
 	DefaultClientBuildCmd         = "make"
-	DefaultClientRunCmd           = "image-classification-predict"
+	DefaultClientRunCmd           = "./image-classification-predict"
 	DefaultBaseBucketURL          = "http://s3.amazonaws.com/carml/micro18"
 	DefaultUploadBucketName       = "micro18"
 	DefaultProfileOutputDirectory = filepath.Join(HomeDir, "micro18_profiles")

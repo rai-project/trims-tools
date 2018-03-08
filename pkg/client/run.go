@@ -119,13 +119,13 @@ func Run(opts ...Option) ([]*trace.Trace, error) {
 			if err != nil {
 				err = errors.Wrapf(err, "unable to read profile file %s", profileFilePath)
 				log.WithField("cmd", config.Config.ClientRunCmd).WithError(err).Error("failed to read profile output")
-				return nil, err
+				continue
 			}
 			var trace trace.Trace
 			if err := json.Unmarshal(bts, &trace); err != nil {
 				err = errors.Wrapf(err, "unable to unmarshal profile file %s", profileFilePath)
 				log.WithField("cmd", config.Config.ClientRunCmd).WithError(err).Error("failed to unmarshal profile output")
-				return nil, err
+				continue
 			}
 			trace.Iteration = int64(ii)
 			if options.uploadProfile {
