@@ -1,4 +1,4 @@
-package server
+package client
 
 import (
 	"github.com/rai-project/config"
@@ -6,11 +6,11 @@ import (
 )
 
 var (
-	log = logger.New().WithField("pkg", "micro/server")
+	log = logger.New().WithField("pkg", "micro/client")
 )
 
 func init() {
 	config.AfterInit(func() {
-		log = logger.New().WithField("pkg", "micro/server")
+		log = logger.New().WithField("pkg", "micro/client")
 	})
 }

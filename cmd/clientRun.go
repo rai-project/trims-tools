@@ -3,7 +3,7 @@ package cmd
 import (
 	"context"
 
-	"github.com/rai-project/micro18-tools/pkg/trace"
+	"github.com/rai-project/micro18-tools/pkg/client"
 	"github.com/spf13/cobra"
 )
 
@@ -21,13 +21,13 @@ var clientRunCmd = &cobra.Command{
 	Short: "Run the client command and produce profile files",
 	RunE: func(cmd *cobra.Command, args []string) error {
 		ctx := context.Background()
-		_, err := trace.Run(
-			trace.Context(ctx),
-			trace.DebugMode(runClientDebug),
-			trace.PostProcess(runClientPostprocess),
-			trace.IterationCount(runClientNTimes),
-			trace.EagerInitialize(runClientEager),
-			trace.EagerInitializeAsync(runClientEagerAsync),
+		_, err := client.Run(
+			client.Context(ctx),
+			client.DebugMode(runClientDebug),
+			client.PostProcess(runClientPostprocess),
+			client.IterationCount(runClientNTimes),
+			client.EagerInitialize(runClientEager),
+			client.EagerInitializeAsync(runClientEagerAsync),
 		)
 		return err
 	},

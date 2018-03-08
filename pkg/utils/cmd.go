@@ -1,8 +1,9 @@
-package trace
+package utils
 
 import (
 	"fmt"
 	"io"
+	"log"
 	"os"
 	"os/exec"
 	"strings"
@@ -20,7 +21,7 @@ import (
 // Ran reports if the command ran (rather than was not found or not executable).
 // Code reports the exit code the command returned if it ran. If err == nil, ran
 // is always true and code is always 0.
-func execCmd(cwd string, env map[string]string, stdout, stderr io.Writer, cmd string, args ...string) (ran bool, err error) {
+func ExecCmd(cwd string, env map[string]string, stdout, stderr io.Writer, cmd string, args ...string) (ran bool, err error) {
 	expand := func(s string) string {
 		s2, ok := env[s]
 		if ok {

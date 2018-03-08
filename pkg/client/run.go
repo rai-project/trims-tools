@@ -1,4 +1,4 @@
-package trace
+package client
 
 import (
 	"encoding/json"
@@ -15,9 +15,11 @@ import (
 	"github.com/pkg/errors"
 	"github.com/rai-project/micro18-tools/pkg/assets"
 	"github.com/rai-project/micro18-tools/pkg/config"
+	"github.com/rai-project/micro18-tools/pkg/trace"
+	"github.com/rai-project/micro18-tools/pkg/utils"
 )
 
-func Run(opts ...Option) ([]*Trace, error) {
+func Run(opts ...Option) ([]*trace.Trace, error) {
 	hostname, _ := os.Hostname()
 
 	options := WithOptions(opts...)
@@ -36,9 +38,9 @@ func Run(opts ...Option) ([]*Trace, error) {
 		}
 	}
 
-	var res []*Trace
+	var res []*trace.Trace
 	for _, model := range models {
-		var combined *Trace
+		var combined *trace.Trace
 		dims, err := model.GetImageDimensions()
 		if err != nil {
 			dims = []uint32{3, 224, 224}
@@ -81,7 +83,7 @@ func Run(opts ...Option) ([]*Trace, error) {
 			if options.eagerInitializeAsync {
 				env["UPR_INITIALIZE_EAGER_ASYNC"] = "true"
 			}
-			ran, err := execCmd(
+			ran, err := utils.ExecCmd(
 				config.Config.ClientPath,
 				env,
 				os.Stdout,
@@ -112,7 +114,7 @@ func Run(opts ...Option) ([]*Trace, error) {
 				log.WithField("cmd", config.Config.ClientRunCmd).WithError(err).Error("failed to read profile output")
 				return nil, err
 			}
-			var trace Trace
+			var trace trace.Trace
 			if err := json.Unmarshal(bts, &trace); err != nil {
 				err = errors.Wrapf(err, "unable to unmarshal profile file %s", profileFilePath)
 				log.WithField("cmd", config.Config.ClientRunCmd).WithError(err).Error("failed to unmarshal profile output")
