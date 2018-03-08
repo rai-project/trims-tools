@@ -5,6 +5,7 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
+	"sync"
 
 	"github.com/Unknwon/com"
 	"github.com/pkg/errors"
@@ -258,27 +259,38 @@ func init() {
 	if err != nil {
 		return
 	}
-	for _, asset := range assets {
-		ext := filepath.Ext(asset)
-		if ext != ".yml" && ext != ".yaml" {
-			continue
-		}
+	var wg sync.WaitGroup
+	var mut sync.Mutex
 
-		bts, err := Asset(prefix + "/" + asset)
-		if err != nil {
-			log.WithField("asset", asset).Error("failed to get asset bytes")
-			continue
-		}
+	wg.Add(len(assets))
 
-		var model ModelManifest
-		if err := yaml.Unmarshal(bts, &model); err != nil {
-			log.WithField("asset", asset).WithError(err).Error("failed to unmarshal model")
-			continue
-		}
-		if model.Name == "" {
-			log.WithField("asset", asset).WithField("name", model.Name).Error("empty model name")
-			continue
-		}
-		Models = append(Models, model)
+	for ii := range assets {
+		asset := assets[ii]
+		go func() {
+			defer wg.Done()
+			ext := filepath.Ext(asset)
+			if ext != ".yml" && ext != ".yaml" {
+				return
+			}
+
+			bts, err := Asset(prefix + "/" + asset)
+			if err != nil {
+				log.WithField("asset", asset).Error("failed to get asset bytes")
+				return
+			}
+
+			var model ModelManifest
+			if err := yaml.Unmarshal(bts, &model); err != nil {
+				log.WithField("asset", asset).WithError(err).Error("failed to unmarshal model")
+				return
+			}
+			if model.Name == "" {
+				log.WithField("asset", asset).WithField("name", model.Name).Error("empty model name")
+				return
+			}
+			mut.Lock()
+			defer mut.Unlock()
+			Models = append(Models, model)
+		}()
 	}
 }
