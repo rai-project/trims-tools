@@ -23,7 +23,7 @@ var (
 		eagerInitialize:      false,
 		eagerInitializeAsync: false,
 		postprocess:          false,
-		modelName:            "All",
+		modelName:            "all",
 		uploadProfile:        true,
 	}
 )

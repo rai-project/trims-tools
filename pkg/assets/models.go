@@ -24,9 +24,9 @@ type ModelAssets struct {
 }
 
 type ModelManifest_Type struct {
-	Type        string            `protobuf:"bytes,1,opt,name=type,proto3" json:"type,omitempty" yaml:"type,omitempty"`
-	Description string            `protobuf:"bytes,2,opt,name=description,proto3" json:"description,omitempty" yaml:"description,omitempty"`
-	Parameters  map[string]string `protobuf:"bytes,3,rep,name=parameters" json:"parameters,omitempty" yaml:"parameters,omitempty" protobuf_key:"bytes,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value"`
+	Type        string                 `protobuf:"bytes,1,opt,name=type,proto3" json:"type,omitempty" yaml:"type,omitempty"`
+	Description string                 `protobuf:"bytes,2,opt,name=description,proto3" json:"description,omitempty" yaml:"description,omitempty"`
+	Parameters  map[string]interface{} `protobuf:"bytes,3,rep,name=parameters" json:"parameters,omitempty" yaml:"parameters,omitempty" protobuf_key:"bytes,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value"`
 }
 
 type ModelManifest struct {
@@ -139,7 +139,7 @@ func (model ModelManifest) GetFeaturesUrl() string {
 	if !ok {
 		return ""
 	}
-	return pfeats
+	return pfeats.(string)
 }
 
 func (model ModelManifest) GetImageDimensions() ([]uint32, error) {
@@ -148,9 +148,13 @@ func (model ModelManifest) GetImageDimensions() ([]uint32, error) {
 	if typeParameters == nil {
 		return nil, errors.New("invalid type parameters")
 	}
-	pdims, ok := typeParameters["dimensions"]
+	pdims0, ok := typeParameters["dimensions"]
 	if !ok {
 		return nil, errors.New("expecting image type dimensions")
+	}
+	pdims, ok := pdims0.(string)
+	if !ok {
+		return nil, errors.New("expecting image type string")
 	}
 
 	var dims []uint32
@@ -169,10 +173,14 @@ func (model ModelManifest) GetMeanImage() ([]float32, error) {
 	if typeParameters == nil {
 		return nil, errors.New("invalid type parameters")
 	}
-	pmeanVal, ok := typeParameters["mean"]
+	pmean, ok := typeParameters["mean"]
 	if !ok {
 		log.Debug("using 0,0,0 as the mean image")
 		return []float32{0, 0, 0}, nil
+	}
+	pmeanVal, ok := pmean.(string)
+	if !ok {
+		return nil, errors.New("expecting parameters type string")
 	}
 
 	var vals []float32
@@ -241,34 +249,36 @@ func (ms ModelManifests) Download(ctx context.Context) error {
 }
 
 func DownloadModels(ctx context.Context) error {
+	return Models.Download(ctx)
+}
+
+func init() {
 	prefix := "pkg/assets/builtin_models"
 	assets, err := AssetDir(prefix)
 	if err != nil {
-		return err
+		return
 	}
 	for _, asset := range assets {
 		ext := filepath.Ext(asset)
 		if ext != ".yml" && ext != ".yaml" {
-			return err
+			continue
 		}
 
 		bts, err := Asset(prefix + "/" + asset)
 		if err != nil {
 			log.WithField("asset", asset).Error("failed to get asset bytes")
-			return err
+			continue
 		}
 
 		var model ModelManifest
 		if err := yaml.Unmarshal(bts, &model); err != nil {
 			log.WithField("asset", asset).WithError(err).Error("failed to unmarshal model")
-			return err
+			continue
 		}
 		if model.Name == "" {
 			log.WithField("asset", asset).WithField("name", model.Name).Error("empty model name")
-			return errors.New("empty model name found")
+			continue
 		}
 		Models = append(Models, model)
 	}
-
-	return Models.Download(ctx)
 }

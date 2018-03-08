@@ -13,20 +13,26 @@ var (
 )
 
 func DownloadFeatues(ctx context.Context) error {
+	config.Config.Wait()
+	baseDir := config.Config.BasePath
+	for feature, data := range Features {
+		ioutil.WriteFile(filepath.Join(baseDir, feature), []byte(data), 0644)
+	}
+	return nil
+}
+
+func init() {
 	prefix := "pkg/assets/builtin_features"
 	assets, err := AssetDir(prefix)
 	if err != nil {
-		return err
+		return
 	}
-	baseDir := config.Config.BasePath
 	for _, asset := range assets {
 		bts, err := Asset(prefix + "/" + asset)
 		if err != nil {
 			log.WithField("asset", asset).Error("failed to get asset bytes")
-			return err
+			continue
 		}
-		ioutil.WriteFile(filepath.Join(baseDir, asset), bts, 0644)
 		Features[asset] = string(bts)
 	}
-	return nil
 }
