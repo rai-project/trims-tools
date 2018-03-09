@@ -64,6 +64,8 @@ func Run(opts ...Option) ([]*trace.Trace, error) {
 			id := uuid.NewV4()
 			profileFilePath := filepath.Join(config.Config.ProfileOutputDirectory, fmt.Sprintf("%s_%s.json", model.MustCanonicalName(), id))
 			env := map[string]string{
+				"UPR_ENABLED":                 "true",
+				"UPR_RUN_ID":                  id,
 				"DATE":                        time.Now().Format(time.RFC3339Nano),
 				"UPR_MODEL_NAME":              cannonicalName,
 				"UPR_CLIENT":                  "1",
@@ -78,6 +80,9 @@ func Run(opts ...Option) ([]*trace.Trace, error) {
 				"UPR_INPUT_MEAN_R":            fmt.Sprintf("%v", mean[0]),
 				"UPR_INPUT_MEAN_G":            fmt.Sprintf("%v", mean[1]),
 				"UPR_INPUT_MEAN_B":            fmt.Sprintf("%v", mean[2]),
+				"UPR_GIT_SHA":                 config.Version.GitCommit,
+				"UPR_GIT_BRANCH":              config.Version.GitBranch,
+				"UPR_GIT_Date":                config.Version.BuildDate,
 			}
 			if options.debug {
 				env["GLOG_logtostderr"] = "1"

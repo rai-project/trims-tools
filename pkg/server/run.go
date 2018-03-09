@@ -30,6 +30,9 @@ func Run(opts ...Option) (*trace.Trace, error) {
 		"UPRD_EVICTION_POLICY":   fmt.Sprint(options.evictionPolicy),
 		"UPRD_ESTIMATION_RATE":   fmt.Sprint(options.modelEstimationRate),
 		"UPRD_MEMORY_PERCENTAGE": fmt.Sprint(options.memoryPercentage),
+		"UPR_GIT_SHA":            config.Version.GitCommit,
+		"UPR_GIT_BRANCH":         config.Version.GitBranch,
+		"UPR_GIT_Date":           config.Version.BuildDate,
 	}
 	if options.debug {
 		env["GLOG_logtostderr"] = "1"
