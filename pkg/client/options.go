@@ -1,16 +1,23 @@
 package client
 
-import "context"
+import (
+	"context"
+	"strings"
+
+	"github.com/spf13/cast"
+)
 
 type Options struct {
-	ctx                  context.Context
-	iterationCount       int
-	debug                bool
-	eagerInitialize      bool
-	eagerInitializeAsync bool
-	postprocess          bool
-	modelName            string
-	uploadProfile        bool
+	ctx                     context.Context
+	iterationCount          int
+	debug                   bool
+	eagerInitialize         bool
+	eagerInitializeAsync    bool
+	postprocess             bool
+	modelName               string
+	uploadProfile           bool
+	modelDistribution       string
+	modelDistributionParams []float64
 }
 
 type Option func(*Options)
@@ -73,6 +80,15 @@ func EagerInitializeAsync(b bool) Option {
 func ModelName(n string) Option {
 	return func(o *Options) {
 		o.modelName = n
+	}
+}
+
+func ModelDistribution(dist, params string) Option {
+	return func(o *Options) {
+		o.modelDistribution = dist
+		for _, e := range strings.Split(params, ",") {
+			o.modelDistributionParams = append(o.modelDistributionParams, cast.ToFloat64(e))
+		}
 	}
 }
 
