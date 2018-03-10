@@ -25,9 +25,9 @@ var clientRunCmd = &cobra.Command{
 	Short: "Run the client command and produce profile files",
 	RunE: func(cmd *cobra.Command, args []string) error {
 		ctx := context.Background()
-		_, err := client.Run(
+		client := client.New(
 			client.Context(ctx),
-			client.OriginalModel(runClientOriginal),
+			client.OriginalMode(runClientOriginal),
 			client.DebugMode(runClientDebug),
 			client.PostProcess(runClientPostprocess),
 			client.IterationCount(runClientNTimes),
@@ -35,13 +35,14 @@ var clientRunCmd = &cobra.Command{
 			client.EagerInitializeAsync(runClientEagerAsync),
 			client.ModelDistribution(runClientModelDistribution, runClientModelDistributionParameters),
 		)
+		_, err := client.Run()
 		return err
 	},
 }
 
 func init() {
 	clientCmd.AddCommand(clientRunCmd)
-	clientRunCmd.Flags().Bool(&runClientOriginal, "original", false, "Run an unmodified version of the inference (without persistent storage)")
+	clientRunCmd.Flags().BoolVar(&runClientOriginal, "original", false, "Run an unmodified version of the inference (without persistent storage)")
 	clientRunCmd.Flags().IntVarP(&runClientNTimes, "iterations", "n", 1, "Number of iterations to run the client")
 	clientRunCmd.Flags().StringVar(&runClientModelDistribution, "distribution", "uniform", "Distribution for selecting models while running client")
 	clientRunCmd.Flags().StringVar(&runClientModelDistributionParameters, "distribution_params", "", "Distribution parameters for selecting models while running client")
