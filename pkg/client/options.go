@@ -10,6 +10,7 @@ import (
 type Options struct {
 	ctx                     context.Context
 	original                bool
+	profileIO               bool
 	iterationCount          int
 	debug                   bool
 	eagerInitialize         bool
@@ -26,6 +27,7 @@ type Option func(*Options)
 var (
 	DefaultOptions = Options{
 		ctx:                  context.Background(),
+		profileIO:            true,
 		original:             false,
 		iterationCount:       3,
 		debug:                false,
@@ -58,6 +60,12 @@ func IterationCount(ii int) Option {
 func OriginalMode(b bool) Option {
 	return func(o *Options) {
 		o.original = b
+	}
+}
+
+func ProfileIO(b bool) Option {
+	return func(o *Options) {
+		o.profileIO = b
 	}
 }
 

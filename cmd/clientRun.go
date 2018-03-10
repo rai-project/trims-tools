@@ -9,6 +9,7 @@ import (
 
 var (
 	runClientOriginal                    bool
+	runClientProfileIO                   bool
 	runClientNTimes                      int
 	runClientEager                       bool
 	runClientEagerAsync                  bool
@@ -28,6 +29,7 @@ var clientRunCmd = &cobra.Command{
 		client := client.New(
 			client.Context(ctx),
 			client.OriginalMode(runClientOriginal),
+			client.ProfileIO(runClientProfileIO),
 			client.DebugMode(runClientDebug),
 			client.PostProcess(runClientPostprocess),
 			client.IterationCount(runClientNTimes),
@@ -43,6 +45,7 @@ var clientRunCmd = &cobra.Command{
 func init() {
 	clientCmd.AddCommand(clientRunCmd)
 	clientRunCmd.Flags().BoolVar(&runClientOriginal, "original", false, "Run an unmodified version of the inference (without persistent storage)")
+	clientRunCmd.Flags().BoolVar(&runClientProfileIO, "profileio", true, "Profile I/O model read (this only makes sense when evaluating the original mxnet implementation)")
 	clientRunCmd.Flags().IntVarP(&runClientNTimes, "iterations", "n", 1, "Number of iterations to run the client")
 	clientRunCmd.Flags().StringVar(&runClientModelDistribution, "distribution", "uniform", "Distribution for selecting models while running client")
 	clientRunCmd.Flags().StringVar(&runClientModelDistributionParameters, "distribution_params", "", "Distribution parameters for selecting models while running client")
