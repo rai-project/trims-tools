@@ -87,7 +87,7 @@ func (c Client) RunOne(model assets.ModelManifest) (*trace.Trace, error) {
 	cannonicalName := model.MustCanonicalName()
 
 	id := uuid.NewV4()
-	profileFilePath := filepath.Join(config.Config.ProfileOutputDirectory, fmt.Sprintf("%s_%s.json", model.MustCanonicalName(), id))
+	profileFilePath := filepath.Join(config.Config.ProfileOutputDirectory, time.Now().Format("Jan-_2-15"), fmt.Sprintf("%s_%s.json", cannonicalName, id))
 	env := map[string]string{
 		"UPR_ENABLED":                 "true",
 		"UPR_RUN_ID":                  id,
@@ -108,6 +108,11 @@ func (c Client) RunOne(model assets.ModelManifest) (*trace.Trace, error) {
 		"UPR_GIT_SHA":                 config.Version.GitCommit,
 		"UPR_GIT_BRANCH":              config.Version.GitBranch,
 		"UPR_GIT_Date":                config.Version.BuildDate,
+	}
+	if options.original {
+		env["UPR_ENABLED"] = "true"
+	} else {
+		env["UPR_ENABLED"] = "false"
 	}
 	if options.debug {
 		env["GLOG_logtostderr"] = "1"

@@ -8,6 +8,7 @@ import (
 )
 
 var (
+	runClientOriginal                    bool
 	runClientNTimes                      int
 	runClientEager                       bool
 	runClientEagerAsync                  bool
@@ -26,6 +27,7 @@ var clientRunCmd = &cobra.Command{
 		ctx := context.Background()
 		_, err := client.Run(
 			client.Context(ctx),
+			client.OriginalModel(runClientOriginal),
 			client.DebugMode(runClientDebug),
 			client.PostProcess(runClientPostprocess),
 			client.IterationCount(runClientNTimes),
@@ -39,6 +41,7 @@ var clientRunCmd = &cobra.Command{
 
 func init() {
 	clientCmd.AddCommand(clientRunCmd)
+	clientRunCmd.Flags().Bool(&runClientOriginal, "original", false, "Run an unmodified version of the inference (without persistent storage)")
 	clientRunCmd.Flags().IntVarP(&runClientNTimes, "iterations", "n", 1, "Number of iterations to run the client")
 	clientRunCmd.Flags().StringVar(&runClientModelDistribution, "distribution", "uniform", "Distribution for selecting models while running client")
 	clientRunCmd.Flags().StringVar(&runClientModelDistributionParameters, "distribution_params", "", "Distribution parameters for selecting models while running client")

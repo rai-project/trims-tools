@@ -9,6 +9,7 @@ import (
 
 type Options struct {
 	ctx                     context.Context
+	original                bool
 	iterationCount          int
 	debug                   bool
 	eagerInitialize         bool
@@ -25,6 +26,7 @@ type Option func(*Options)
 var (
 	DefaultOptions = Options{
 		ctx:                  context.Background(),
+		original:             false,
 		iterationCount:       3,
 		debug:                false,
 		eagerInitialize:      false,
@@ -50,6 +52,12 @@ func UploadProfile(b bool) Option {
 func IterationCount(ii int) Option {
 	return func(o *Options) {
 		o.iterationCount = ii
+	}
+}
+
+func OriginalMode(b bool) Option {
+	return func(o *Options) {
+		o.original = b
 	}
 }
 
