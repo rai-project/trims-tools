@@ -22,8 +22,8 @@ var (
 	DefaultClientRelativePath     = filepath.Join("example", "image-classification", "predict-cpp")
 	DefaultClientBuildCmd         = "make"
 	DefaultClientRunCmd           = "./image-classification-predict"
-	DefaultBaseBucketURL          = "http://s3.amazonaws.com/carml/micro18"
-	DefaultUploadBucketName       = "micro18"
+	DefaultBaseBucketURL          = "http://s3.amazonaws.com/micro18profiles"
+	DefaultUploadBucketName       = "traces"
 	DefaultProfileOutputDirectory = filepath.Join(HomeDir, "micro18_profiles")
 )
 
