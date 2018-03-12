@@ -87,6 +87,7 @@ func (c Client) run() ([]*trace.Trace, error) {
 	iterationCount := map[string]int{}
 
 	runModel := func(arg interface{}) interface{} {
+		defer wg.Done()
 		model := arg.(assets.ModelManifest)
 		if options.showProgress {
 			defer progress.Increment()
@@ -98,6 +99,7 @@ func (c Client) run() ([]*trace.Trace, error) {
 		if trace == nil {
 			return nil
 		}
+		wg.Add(1)
 		go func() {
 			defer wg.Done()
 			mut.Lock()
@@ -184,6 +186,7 @@ func (c Client) runWorkload() ([]*trace.Trace, error) {
 	iterationCount := map[string]int{}
 
 	runModel := func(arg interface{}) interface{} {
+		defer wg.Done()
 		if options.showProgress {
 			defer progress.Increment()
 		}
@@ -214,6 +217,7 @@ func (c Client) runWorkload() ([]*trace.Trace, error) {
 
 		trace.Iteration = int64(iterCnt)
 
+		wg.Add(1)
 		go func() {
 			defer wg.Done()
 			mut.Lock()
