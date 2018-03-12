@@ -28,21 +28,21 @@ var (
 )
 
 type microConfig struct {
-	BuildTimeoutSeconds    int64         `json:"build_timeout" config:"micro18.build_timeout" default:600`
-	PollingInterval        int           `json:"polling_interval" config:"micro18.polling_interval" default:100`
-	BaseSrcPath            string        `json:"src_path" config:"micro18.src_path"`
-	BasePath               string        `json:"base_path" config:"micro18.base_path"`
-	ServerRelativePath     string        `json:"server_relative_path" config:"micro18.server_relative_path"`
-	ServerPath             string        `json:"server_path" config:"-"`
-	ServerBuildCmd         string        `json:"server_build_cmd" config:"micro18.server_build_cmd"`
-	ServerRunCmd           string        `json:"server_run_cmd" config:"micro18.server_run_cmd"`
-	ClientRelativePath     string        `json:"client_relative_path" config:"micro18.client_relative_path"`
-	ClientPath             string        `json:"client_path" config:"-"`
-	ClientBuildCmd         string        `json:"client_build_cmd" config:"micro18.client_build_cmd"`
-	ClientRunCmd           string        `json:"client_run_cmd" config:"micro18.client_run_cmd"`
-	BaseBucketURL          string        `json:"base_bucket_url" config:"micro18.base_bucket_url"`
-	UploadBucketName       string        `json:"upload_bucket_name" config:"micro18.upload_bucket_name"`
-	ProfileOutputDirectory string        `json:"profile_output_directory" config:"micro18.profile_output_directory"`
+	BuildTimeoutSeconds    int64         `json:"build_timeout" yaml:"micro18.build_timeout" config:"micro18.build_timeout" default:600`
+	PollingInterval        int           `json:"polling_interval" yaml:"micro18.polling_interval" config:"micro18.polling_interval" default:100`
+	BaseSrcPath            string        `json:"src_path" yaml:"micro18.src_path" config:"micro18.src_path"`
+	BasePath               string        `json:"base_path" yaml:"micro18.base_path" config:"micro18.base_path"`
+	ServerRelativePath     string        `json:"server_relative_path" yaml:"micro18.server_relative_path" config:"micro18.server_relative_path"`
+	ServerPath             string        `json:"server_path" yaml:"-" config:"-"`
+	ServerBuildCmd         string        `json:"server_build_cmd" yaml:"micro18.server_build_cmd" config:"micro18.server_build_cmd"`
+	ServerRunCmd           string        `json:"server_run_cmd" yaml:"micro18.server_run_cmd" config:"micro18.server_run_cmd"`
+	ClientRelativePath     string        `json:"client_relative_path" yaml:"micro18.client_relative_path" config:"micro18.client_relative_path"`
+	ClientPath             string        `json:"client_path" yaml:"-" config:"-"`
+	ClientBuildCmd         string        `json:"client_build_cmd" yaml:"micro18.client_build_cmd" config:"micro18.client_build_cmd"`
+	ClientRunCmd           string        `json:"client_run_cmd" yaml:"micro18.client_run_cmd" config:"micro18.client_run_cmd"`
+	BaseBucketURL          string        `json:"base_bucket_url" yaml:"micro18.base_bucket_url" config:"micro18.base_bucket_url"`
+	UploadBucketName       string        `json:"upload_bucket_name" yaml:"micro18.upload_bucket_name" config:"micro18.upload_bucket_name"`
+	ProfileOutputDirectory string        `json:"profile_output_directory" yaml:"micro18.profile_output_directory" config:"micro18.profile_output_directory"`
 	done                   chan struct{} `json:"-" config:"-"`
 }
 

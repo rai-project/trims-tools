@@ -10,21 +10,20 @@ The current client looks for the config in `~/.carml_config.yml`, but this can b
 ### Defaults
 
 ```
-buildtimeoutseconds: 0
-pollinginterval: 0
-basesrcpath: $GOPATH/src/github.com/rai-project/mxnet-mirror
-basepath: $HOME/carml/data/mxnet
-serverrelativepath: bin
-serverpath: $GOPATH/src/github.com/rai-project/mxnet-mirror/bin
-serverbuildcmd: make
-serverruncmd: bin/uprd
-clientrelativepath: example/image-classification/predict-cpp
-clientpath: $GOPATH/src/github.com/rai-project/mxnet-mirror/example/image-classification/predict-cpp
-clientbuildcmd: make
-clientruncmd: ./image-classification-predict
-basebucketurl: http://s3.amazonaws.com/micro18profiles
-uploadbucketname: traces
-profileoutputdirectory: $HOME/micro18_profiles
+micro18:
+  build_timeout: 0
+  polling_interval: 0
+  src_path: $GOPATH/src/github.com/rai-project/mxnet-mirror
+  base_path: $HOME/carml/data/mxnet
+  server_relative_path: bin
+  server_build_cmd: make
+  server_run_cmd: bin/uprd
+  client_relative_path: example/image-classification/predict-cpp
+  client_build_cmd: make
+  client_run_cmd: ./image-classification-predict
+  base_bucket_url: http://s3.amazonaws.com/micro18profiles
+  upload_bucket_name: traces
+  profile_output_directory: $HOME//micro18_profiles
 ```
 
 ## Monitoring Memory Usage
@@ -106,3 +105,13 @@ By default this is set to 1.
 ## Server
 
 ...
+
+## Other Tools
+
+### Downloading Models
+
+```
+micro18-tools download assets
+```
+
+This will download it to the directory specified by `micro18.base_path` in the config file.
