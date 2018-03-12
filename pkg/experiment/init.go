@@ -13,7 +13,6 @@ var (
 
 func init() {
 	config.AfterInit(func() {
-		Config.Wait()
 		log = logger.New().WithField("pkg", "micro/experiment")
 	})
 }
