@@ -10,6 +10,10 @@ import (
 	"github.com/spf13/cobra"
 )
 
+var (
+	runClientMemoryOutputFormat string
+)
+
 var clientRunMemoryCmd = &cobra.Command{
 	Use:     "memory_usage",
 	Aliases: []string{"memory"},
@@ -35,7 +39,7 @@ var clientRunMemoryCmd = &cobra.Command{
 		}
 		//pp.Println(traces)
 		meminfo := trace.MemoryInformation(traces)
-		meminfo.Write("table", os.Stdout)
+		meminfo.Write(runClientMemoryOutputFormat, os.Stdout)
 		return err
 	},
 }
@@ -43,5 +47,6 @@ var clientRunMemoryCmd = &cobra.Command{
 func init() {
 	clientRunMemoryCmd.Flags().StringVar(&runClientModels, "models", "all", "List of models to use (comma seperated)")
 	clientRunMemoryCmd.Flags().BoolVarP(&runClientDebug, "debug", "d", false, "Print debug messages from the client")
+	clientRunMemoryCmd.Flags().StringVar(&runClientMemoryOutputFormat, "format", "table", "Output format to print the memory information")
 	clientCmd.AddCommand(clientRunMemoryCmd)
 }
