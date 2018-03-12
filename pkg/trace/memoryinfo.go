@@ -25,7 +25,7 @@ func (m MemoryInformation) Write(fmt string, output io.Writer) error {
 func (m MemoryInformation) dsvHeader() []string {
 	return []string{
 		"model_name",
-		"memory_usage",
+		"memory_usage (MB)",
 		//"allocation_sizes",
 	}
 }
