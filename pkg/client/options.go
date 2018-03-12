@@ -26,6 +26,7 @@ type Options struct {
 	concurrentRunCount      int
 	modelIterationCount     int
 	profileMemory           bool
+	showProgress            bool
 }
 
 type Option func(*Options)
@@ -47,6 +48,7 @@ var (
 		concurrentRunCount:      runtime.NumCPU(),
 		modelIterationCount:     -1,
 		profileMemory:           false,
+		showProgress:            true,
 	}
 )
 
@@ -101,6 +103,12 @@ func DebugMode(b bool) Option {
 func PostProcess(b bool) Option {
 	return func(o *Options) {
 		o.postprocess = b
+	}
+}
+
+func ShowProgress(b bool) Option {
+	return func(o *Options) {
+		o.showProgress = b
 	}
 }
 

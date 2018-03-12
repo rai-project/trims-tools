@@ -12,6 +12,7 @@ import (
 	"time"
 
 	"github.com/Jeffail/tunny"
+	"github.com/cheggaaa/pb"
 	"github.com/rai-project/micro18-tools/pkg/workload"
 
 	"github.com/rai-project/uuid"
@@ -52,8 +53,11 @@ func (c Client) run() ([]*trace.Trace, error) {
 		}
 	}
 
-	progress := utils.NewProgress("running client models", len(models)*options.iterationCount)
-	defer progress.FinishPrint("finished running client")
+	var progress *pb.ProgressBar
+	if options.showProgress {
+		progress = utils.NewProgress("running client models", len(models)*options.iterationCount)
+		defer progress.FinishPrint("finished running client")
+	}
 
 	var res []*trace.Trace
 	var combined *trace.Trace
@@ -63,7 +67,9 @@ func (c Client) run() ([]*trace.Trace, error) {
 
 	runModel := func(arg interface{}) interface{} {
 		model := arg.(assets.ModelManifest)
-		defer progress.Increment()
+		if options.showProgress {
+			defer progress.Increment()
+		}
 		trace, err := c.RunOnce(model)
 		if err != nil {
 			return nil
@@ -103,10 +109,14 @@ func (c Client) run() ([]*trace.Trace, error) {
 	execPool := tunny.NewFunc(options.concurrentRunCount, runModel)
 
 	for _, model := range models {
+		// if options.showProgress {
 		// progress.Prefix(fmt.Sprintf("running client model %s", model.MustCanonicalName()))
+		// }
 		for ii := 0; ii < options.iterationCount; ii++ {
 			wg.Add(1)
+			// if options.showProgress {
 			//progress.Prefix(fmt.Sprintf("running client model %s", model.MustCanonicalName()))
+			// }
 			go func(model assets.ModelManifest) {
 				execPool.Process(model)
 			}(model)
@@ -144,8 +154,11 @@ func (c Client) runWorkload() ([]*trace.Trace, error) {
 		return nil, err
 	}
 
-	progress := utils.NewProgress("running client models", len(models)*options.iterationCount)
-	defer progress.FinishPrint("finished running client")
+	var progress *pb.ProgressBar
+	if options.showProgress {
+		progress = utils.NewProgress("running client models", len(models)*options.iterationCount)
+		defer progress.FinishPrint("finished running client")
+	}
 
 	var res []*trace.Trace
 	var combined *trace.Trace
@@ -154,7 +167,9 @@ func (c Client) runWorkload() ([]*trace.Trace, error) {
 	iterationCount := map[string]int{}
 
 	runModel := func(arg interface{}) interface{} {
-		defer progress.Increment()
+		if options.showProgress {
+			defer progress.Increment()
+		}
 
 		model := arg.(assets.ModelManifest)
 		cannonicalName := model.MustCanonicalName()
@@ -206,7 +221,9 @@ func (c Client) runWorkload() ([]*trace.Trace, error) {
 
 	for model := range modelGen.ModelGenerator(models) {
 		wg.Add(1)
+		// if options.showProgress {
 		//progress.Prefix(fmt.Sprintf("running client model %s", model.MustCanonicalName()))
+		// }
 		go func(model assets.ModelManifest) {
 			execPool.Process(model)
 		}(model)
@@ -289,11 +306,14 @@ func (c Client) RunOnce(model assets.ModelManifest) (*trace.Trace, error) {
 		config.Config.ClientRunCmd,
 	)
 	if !ran {
-		err := errors.Errorf("failed to run cmd %s", config.Config.ClientRunCmd)
+		path := filepath.Join(config.Config.ClientPath, config.Config.ClientRunCmd)
+		err := errors.Errorf("failed to run cmd %s", path)
 		log.WithError(err).Error("failed to run model")
 		return nil, err
 	}
 	if err != nil {
+		path := filepath.Join(config.Config.ClientPath, config.Config.ClientRunCmd)
+		err = errors.Wrapf(err, "failed to run cmd %s", path)
 		log.WithField("cmd", config.Config.ClientRunCmd).WithError(err).Error("failed to run model")
 		return nil, err
 	}
