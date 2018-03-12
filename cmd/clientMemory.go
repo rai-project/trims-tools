@@ -5,6 +5,7 @@ import (
 	"os"
 
 	"github.com/rai-project/micro18-tools/pkg/client"
+	"github.com/rai-project/micro18-tools/pkg/trace"
 	"github.com/spf13/cobra"
 )
 
@@ -25,7 +26,7 @@ var clientRunMemoryCmd = &cobra.Command{
 		if err != nil {
 			return err
 		}
-		meminfo := trace.MemoryInformation{traces}
+		meminfo := trace.MemoryInformation(traces)
 		meminfo.Write("table", os.Stdout)
 		return err
 	},

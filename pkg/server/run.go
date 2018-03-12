@@ -15,7 +15,7 @@ import (
 	"github.com/rai-project/uuid"
 )
 
-func (s Server) Run() ([]*trace.Trace, error) {
+func (s Server) Run() (*trace.Trace, error) {
 	options := s.options
 
 	if ok, err := IsValidEvictionPolicy(options.evictionPolicy); !ok {

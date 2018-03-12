@@ -45,8 +45,8 @@ var serverRunCmd = &cobra.Command{
 func init() {
 	serverRunCmd.Flags().BoolVarP(&runServerDebug, "debug", "d", false, "Print debug messages from the client")
 	serverRunCmd.Flags().StringVar(&runServerEvictionPolicy, "eviction", "lru", "Eviction policy used by the server")
-	serverRunCmd.Flags().FloatVar(&runServerModelEstimationRate, "model_estimation_rate", 3.0, "File size multiplier used to determine how much memory would be used by a model")
-	serverRunCmd.Flags().FloatVar(&runServerMemoryPercentage, "memory_percentage", 0.8, "Percentage of GPU memory that can be used to persist models")
+	serverRunCmd.Flags().Float32Var(&runServerModelEstimationRate, "model_estimation_rate", 3.0, "File size multiplier used to determine how much memory would be used by a model")
+	serverRunCmd.Flags().Float32Var(&runServerMemoryPercentage, "memory_percentage", 0.8, "Percentage of GPU memory that can be used to persist models")
 
 	serverCmd.AddCommand(serverRunCmd)
 }
