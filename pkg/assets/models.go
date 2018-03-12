@@ -4,6 +4,7 @@ import (
 	"context"
 	"os"
 	"path/filepath"
+	"sort"
 	"strings"
 	"sync"
 
@@ -297,4 +298,10 @@ func init() {
 			Models = append(Models, model)
 		}()
 	}
+
+	wg.Wait()
+
+	sort.Slice(&Models, func(ii, jj int) bool {
+		return Models[ii].Name < Models[jj].Name
+	})
 }
