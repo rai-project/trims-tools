@@ -11,20 +11,40 @@ import (
 	homedir "github.com/mitchellh/go-homedir"
 	"github.com/rai-project/config"
 	"github.com/rai-project/logger"
+	"github.com/rai-project/micro18-tools/pkg/gpumem"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 )
 
 var (
-	IsDebug   bool = true
-	IsVerbose bool = true
-	CfgFile   string
-	log       *logrus.Entry = logrus.New().WithField("pkg", "micro/cmd")
+	IsDebug       bool = true
+	IsVerbose     bool = true
+	CfgFile       string
+	monitorMemory bool
+	memoryInfo    *gpumem.Memory
+	log           *logrus.Entry = logrus.New().WithField("pkg", "micro/cmd")
 )
 
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
 	Use: "micro",
+	PersistentPreRunE: func(cmd *cobra.Command, args []string) error {
+		if monitorMemory {
+			info, err := gpumem.New()
+			if err != nil {
+				log.WithError(err).Error("failed to create gpu memory info object")
+			}
+			memoryInfo = info
+		}
+		return nil
+	},
+	PersistentPostRunE: func(cmd *cobra.Command, args []string) error {
+		if memoryInfo != nil {
+			memoryInfo.Stop()
+			memoryInfo.Print()
+		}
+		return nil
+	},
 }
 
 // Execute adds all child commands to the root command and sets flags appropriately.
@@ -43,6 +63,7 @@ func init() {
 	// Cobra supports persistent flags, which, if defined here,
 	// will be global for your application.
 	rootCmd.PersistentFlags().StringVar(&CfgFile, "config", "", "config file (default is $HOME/.carml_config.yaml)")
+	rootCmd.PersistentFlags().BoolVar(&monitorMemory, "monitor_memory", gpumem.IsSupported, "monitors the memory during evaluation and prints the memory information at the end")
 
 	// Cobra also supports local flags, which will only run
 	// when this action is called directly.
