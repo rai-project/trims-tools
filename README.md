@@ -33,11 +33,15 @@ profileoutputdirectory: $HOME/micro18_profiles
 
 This option is only supported on linux and uses the nvml library.
 
-## Trace
+## Trace Tools
 
-### Combining
+### Combining Traces
 
-### Uploading
+...
+
+### Uploading Traces
+
+...
 
 ## Client
 
@@ -98,3 +102,7 @@ If the `model_iterations` of iterations is set to a valid other than `-1` then e
 
 The number of concurrent requests can be specified using the `--concurrent` option.
 By default this is set to 1.
+
+## Server
+
+...
