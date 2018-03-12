@@ -85,7 +85,6 @@ func init() {
 	}
 	for _, cmd := range runCmds {
 		clientCmd.AddCommand(cmd)
-		clientCmd.AddCommand(cmd)
 		cmd.Flags().BoolVar(&runClientProfileIO, "profileio", true, "Profile I/O model read (this only makes sense when evaluating the original mxnet implementation)")
 		cmd.Flags().IntVar(&runClientModelIterations, "model_iterations", -1, "Number of iterations to run each model")
 		cmd.Flags().IntVarP(&runClientNTimes, "iterations", "n", 1, "Number of iterations to run the client")
