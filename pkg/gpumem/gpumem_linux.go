@@ -6,6 +6,8 @@ import (
 	"encoding/csv"
 	"encoding/json"
 	"fmt"
+	"io"
+	"os"
 	"strconv"
 	"strings"
 	"sync"
@@ -20,15 +22,15 @@ import (
 
 type Entry struct {
 	timestamp  time.Time
-	MemoryUsed int64
-	MemoryFree int64
+	MemoryUsed uint64
+	MemoryFree uint64
 }
 
 type Device struct {
 	mut     sync.Mutex
 	index   int
 	handle  nvml.DeviceHandle
-	entries []*Entry
+	entries []Entry
 }
 
 type Memory struct {
@@ -44,7 +46,7 @@ func New() (*Memory, error) {
 	if err != nil {
 		return nil, err
 	}
-	devices := make([]Device, devs)
+	devices := make([]*Device, devs)
 	for ii := range devices {
 		handle, err := nvml.DeviceGetHandleByIndex(ii)
 		if err != nil {
@@ -57,7 +59,7 @@ func New() (*Memory, error) {
 	}
 	return &Memory{
 		devices: devices,
-		output:  io.Stdout,
+		output:  os.Stdout,
 	}, nil
 }
 
@@ -81,11 +83,11 @@ func (m *Memory) Start(timestep time.Duration) error {
 	return nil
 }
 
-func (*Memory) Stop() {
+func (m *Memory) Stop() {
 	if m.started == false {
 		return
 	}
-	close(done)
+	close(m.done)
 }
 
 func (*Memory) Print() {
@@ -108,22 +110,22 @@ func (m *Memory) Write(fmt string, output io.Writer) error {
 
 	switch fmt {
 	case "csv", "tsv":
-		return m.writeCSV(p)
+		return m.writeCSV(fmt)
 	case "table":
-		return writeTable(p)
+		return m.writeTable()
 	case "json":
 		bts, err := json.Marshal(m)
 		if err != nil {
 			return errors.Wrap(err, "failed to serialize gpu memory information to json")
 		}
-		_, err := output.Write(bts)
+		_, err = output.Write(bts)
 		return err
 	case "yaml":
 		bts, err := yaml.Marshal(m)
 		if err != nil {
 			return errors.Wrap(err, "failed to serialize gpu memory information to json")
 		}
-		_, err := output.Write(bts)
+		_, err = output.Write(bts)
 		return err
 	}
 	return errors.Errorf("the format %s is not a valid output format for gpu memory information", fmt)
@@ -132,7 +134,7 @@ func (m *Memory) Write(fmt string, output io.Writer) error {
 func (m *Memory) dsvHeader() []string {
 	firstDevice := m.devices[0]
 	header := []string{"device_id"}
-	for ii, entry := range dev.Entry {
+	for ii := range firstDevice.entries {
 		header = append(
 			header,
 			fmt.Sprintf("timestamp_%d", ii),
@@ -147,7 +149,7 @@ func (m *Memory) dsvRows() [][]string {
 	rows := [][]string{}
 	for _, dev := range m.devices {
 		row := []string{
-			strconv.Itoa(dev.idx),
+			strconv.Itoa(dev.index),
 		}
 		for _, entry := range dev.entries {
 			row = append(
@@ -165,23 +167,23 @@ func (m *Memory) dsvRows() [][]string {
 func (m *Memory) writeCSV(fmt string) error {
 	w := csv.NewWriter(m.output)
 	if fmt == "tsv" {
-		w.Comma = "\t"
+		w.Comma = '\t'
 	}
-	w.Write(dsvHeader())
-	w.WriteAll(dsvRows())
+	w.Write(m.dsvHeader())
+	w.WriteAll(m.dsvRows())
 	w.Flush()
 	return nil
 }
 
 func (m *Memory) writeTable() error {
-	w = tablewriter.NewWriter(m.output)
-	w.SetHeader(dsvHeader())
-	w.AppendBulk(dsvRows())
+	w := tablewriter.NewWriter(m.output)
+	w.SetHeader(m.dsvHeader())
+	w.AppendBulk(m.dsvRows())
 	w.Render()
 	return nil
 }
 
-func (dev *DeviceMemory) recordInfo() {
+func (dev *Device) recordInfo() {
 	timestamp := time.Now()
 	info, err := nvml.DeviceMemoryInformation(dev.handle)
 	if err != nil {
