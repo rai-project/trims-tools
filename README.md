@@ -3,6 +3,12 @@
 This repository includes a set of tools that are useful for performing experiments for the Micro18 papers.
 The tools may be applicable for other types of projects which perform workload characterization and/or use the Chrome trace format.
 
+## Monitoring Memory Usage
+
+... using the `monitor_memory` option.
+
+This option is only supported on linux and uses the nvml library.
+
 ## Trace
 
 ### Combining
