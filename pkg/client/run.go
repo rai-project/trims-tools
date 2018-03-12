@@ -332,7 +332,11 @@ func (c Client) RunOnce(model assets.ModelManifest) (*trace.Trace, error) {
 	if err != nil {
 		path := filepath.Join(config.Config.ClientPath, config.Config.ClientRunCmd)
 		err = errors.Wrapf(err, "failed to run cmd %s", path)
-		log.WithField("cmd", config.Config.ClientRunCmd).WithField("model_name", cannonicalName).WithError(err).Error("failed to run model")
+		lg := log.WithField("cmd", config.Config.ClientRunCmd).WithField("model_name", cannonicalName)
+		if options.debug {
+			lg = lg.WithError(err)
+		}
+		lg.Error("failed to run model")
 		return nil, err
 	}
 	if !options.postprocess {
