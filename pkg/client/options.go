@@ -2,6 +2,7 @@ package client
 
 import (
 	"context"
+	"runtime"
 	"strings"
 
 	"github.com/spf13/cast"
@@ -20,6 +21,7 @@ type Options struct {
 	uploadProfile           bool
 	modelDistribution       string
 	modelDistributionParams []float64
+	concurrentRunCount      int
 }
 
 type Option func(*Options)
@@ -38,12 +40,19 @@ var (
 		uploadProfile:           true,
 		modelDistribution:       "none",
 		modelDistributionParams: []float64{},
+		concurrentRunCount:      runtime.NumCPU(),
 	}
 )
 
 func Context(ctx context.Context) Option {
 	return func(o *Options) {
 		o.ctx = ctx
+	}
+}
+
+func ConcurrentRunCount(ii int) Option {
+	return func(o *Options) {
+		o.concurrentRunCount = ii
 	}
 }
 

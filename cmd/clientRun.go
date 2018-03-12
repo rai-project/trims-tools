@@ -32,6 +32,7 @@ func makeClientRun(ctx context.Context, extraOpts ...client.Option) *client.Clie
 			client.IterationCount(runClientNTimes),
 			client.EagerInitialize(runClientEager),
 			client.EagerInitializeAsync(runClientEagerAsync),
+			client.ConcurrentRunCount(runClientConcurrentCount),
 			client.ModelDistribution(runClientModelDistribution, runClientModelDistributionParameters),
 		},
 		extraOpts...,

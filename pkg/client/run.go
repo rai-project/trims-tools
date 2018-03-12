@@ -6,7 +6,6 @@ import (
 	"io/ioutil"
 	"os"
 	"path/filepath"
-	"runtime"
 	"strconv"
 	"strings"
 	"sync"
@@ -146,8 +145,7 @@ func (c Client) runWorkload() ([]*trace.Trace, error) {
 		return nil
 	}
 
-	numCPUs := runtime.NumCPU()
-	execPool := tunny.NewFunc(numCPUs, runModel)
+	execPool := tunny.NewFunc(options.concurrentRunCount, runModel)
 
 	for model := range modelGen.ModelGenerator(models) {
 		wg.Add(1)
