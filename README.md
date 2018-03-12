@@ -3,6 +3,30 @@
 This repository includes a set of tools that are useful for performing experiments for the Micro18 papers.
 The tools may be applicable for other types of projects which perform workload characterization and/or use the Chrome trace format.
 
+## Config
+
+The current client looks for the config in `~/.carml_config.yml`, but this can be overridden using the `--config=<<file_path>>` option.
+
+### Defaults
+
+```
+buildtimeoutseconds: 0
+pollinginterval: 0
+basesrcpath: /Users/abduld/.gvm/pkgsets/go1.10/global/src/github.com/rai-project/mxnet-mirror
+basepath: /Users/abduld/carml/data/mxnet
+serverrelativepath: bin
+serverpath: /Users/abduld/.gvm/pkgsets/go1.10/global/src/github.com/rai-project/mxnet-mirror/bin
+serverbuildcmd: make
+serverruncmd: bin/uprd
+clientrelativepath: example/image-classification/predict-cpp
+clientpath: /Users/abduld/.gvm/pkgsets/go1.10/global/src/github.com/rai-project/mxnet-mirror/example/image-classification/predict-cpp
+clientbuildcmd: make
+clientruncmd: ./image-classification-predict
+basebucketurl: http://s3.amazonaws.com/micro18profiles
+uploadbucketname: traces
+profileoutputdirectory: /Users/abduld/micro18_profiles
+```
+
 ## Monitoring Memory Usage
 
 ... using the `monitor_memory` option.
