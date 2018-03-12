@@ -61,7 +61,6 @@ func (c Client) run() ([]*trace.Trace, error) {
 	runModel := func(arg interface{}) interface{} {
 		model := arg.(assets.ModelManifest)
 		defer progress.Increment()
-		defer wg.Done()
 		trace, err := c.RunOnce(model)
 		if err != nil {
 			return nil
@@ -70,6 +69,7 @@ func (c Client) run() ([]*trace.Trace, error) {
 			return nil
 		}
 		go func() {
+			defer wg.Done()
 			mut.Lock()
 			defer mut.Unlock()
 			cannonicalName := model.MustCanonicalName()
@@ -151,9 +151,24 @@ func (c Client) runWorkload() ([]*trace.Trace, error) {
 	iterationCount := map[string]int{}
 
 	runModel := func(arg interface{}) interface{} {
-		model := arg.(assets.ModelManifest)
 		defer progress.Increment()
-		defer wg.Done()
+
+		model := arg.(assets.ModelManifest)
+		cannonicalName := model.MustCanonicalName()
+
+		mut.Lock()
+		iterCnt, ok := iterationCount[cannonicalName]
+		if !ok {
+			iterCnt = 1
+			iterationCount[cannonicalName] = iterCnt
+		} else {
+			iterationCount[cannonicalName] = iterCnt + 1
+		}
+		mut.Unlock()
+
+		if options.modelIterationCount != -1 && iterCnt >= options.modelIterationCount {
+			return nil
+		}
 		trace, err := c.RunOnce(model)
 		if err != nil {
 			return nil
@@ -161,18 +176,13 @@ func (c Client) runWorkload() ([]*trace.Trace, error) {
 		if trace == nil {
 			return nil
 		}
+
+		trace.Iteration = int64(iterCnt)
+
 		go func() {
+			defer wg.Done()
 			mut.Lock()
 			defer mut.Unlock()
-			cannonicalName := model.MustCanonicalName()
-			ii, ok := iterationCount[cannonicalName]
-			if !ok {
-				ii = 0
-				iterationCount[cannonicalName] = ii
-			} else {
-				iterationCount[cannonicalName] = ii + 1
-			}
-			trace.Iteration = int64(ii)
 			if combined == nil {
 				combined = trace
 				combined.ID = uuid.NewV4()

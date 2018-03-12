@@ -5,6 +5,8 @@ import (
 	"runtime"
 	"strings"
 
+	"github.com/rai-project/micro18-tools/pkg/workload"
+
 	"github.com/spf13/cast"
 )
 
@@ -22,6 +24,7 @@ type Options struct {
 	modelDistribution       string
 	modelDistributionParams []float64
 	concurrentRunCount      int
+	modelIterationCount     int
 }
 
 type Option func(*Options)
@@ -41,6 +44,7 @@ var (
 		modelDistribution:       "none",
 		modelDistributionParams: []float64{},
 		concurrentRunCount:      runtime.NumCPU(),
+		modelIterationCount:     -1,
 	}
 )
 
@@ -65,6 +69,12 @@ func UploadProfile(b bool) Option {
 func IterationCount(ii int) Option {
 	return func(o *Options) {
 		o.iterationCount = ii
+	}
+}
+
+func ModelIterationCount(ii int) Option {
+	return func(o *Options) {
+		o.modelIterationCount = ii
 	}
 }
 
@@ -112,6 +122,19 @@ func ModelName(n string) Option {
 
 func ModelDistribution(dist, params string) Option {
 	return func(o *Options) {
+		if strings.ToLower(dist) == "none" {
+			o.modelDistribution = "none"
+			return
+		}
+		if !workload.IsValidDistribution(dist) {
+			panic(
+				"the distribution " +
+					dist +
+					" is not valid. Please specify one of " +
+					strings.Join(workload.ValidDistributions, ",") +
+					" distributions",
+			)
+		}
 		o.modelDistribution = dist
 		for _, e := range strings.Split(params, ",") {
 			o.modelDistributionParams = append(o.modelDistributionParams, cast.ToFloat64(e))

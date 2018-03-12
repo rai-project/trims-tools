@@ -19,6 +19,7 @@ var (
 	runClientModelDistribution           string
 	runClientModelDistributionParameters string
 	runClientConcurrentCount             int
+	runClientModelIterations             int
 )
 
 func makeClientRun(ctx context.Context, extraOpts ...client.Option) *client.Client {
@@ -33,6 +34,7 @@ func makeClientRun(ctx context.Context, extraOpts ...client.Option) *client.Clie
 			client.EagerInitialize(runClientEager),
 			client.EagerInitializeAsync(runClientEagerAsync),
 			client.ConcurrentRunCount(runClientConcurrentCount),
+			client.ModelIterationCount(runClientModelIterations),
 			client.ModelDistribution(runClientModelDistribution, runClientModelDistributionParameters),
 		},
 		extraOpts...,
@@ -85,8 +87,9 @@ func init() {
 		clientCmd.AddCommand(cmd)
 		clientCmd.AddCommand(cmd)
 		cmd.Flags().BoolVar(&runClientProfileIO, "profileio", true, "Profile I/O model read (this only makes sense when evaluating the original mxnet implementation)")
+		cmd.Flags().IntVar(&runClientModelIterations, "model_iterations", -1, "Number of iterations to run each model")
 		cmd.Flags().IntVarP(&runClientNTimes, "iterations", "n", 1, "Number of iterations to run the client")
-		cmd.Flags().StringVar(&runClientModelDistribution, "distribution", "uniform", "Distribution for selecting models while running client")
+		cmd.Flags().StringVar(&runClientModelDistribution, "distribution", "none", "Distribution for selecting models while running client")
 		cmd.Flags().StringVar(&runClientModelDistributionParameters, "distribution_params", "", "Distribution parameters for selecting models while running client")
 		cmd.Flags().IntVar(&runClientConcurrentCount, "concurrent", 1, " Number of clients to run concurrently")
 		cmd.Flags().BoolVarP(&runClientDebug, "debug", "d", false, "Print debug messages from the client")
