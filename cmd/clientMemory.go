@@ -24,11 +24,13 @@ var clientRunMemoryCmd = &cobra.Command{
 			client.UploadProfile(false),
 			client.ConcurrentRunCount(1),
 			client.ShowProgress(false),
+			client.PostProcess(true),
 		)
 		traces, err := client.Run()
 		if err != nil {
 			return err
 		}
+		//pp.Println(traces)
 		meminfo := trace.MemoryInformation(traces)
 		meminfo.Write("table", os.Stdout)
 		return err

@@ -3,7 +3,6 @@ package trace
 import (
 	"encoding/csv"
 	"io"
-	"strings"
 
 	"github.com/olekukonko/tablewriter"
 	"github.com/pkg/errors"
@@ -24,7 +23,11 @@ func (m MemoryInformation) Write(fmt string, output io.Writer) error {
 }
 
 func (m MemoryInformation) dsvHeader() []string {
-	return []string{"model_name", "memory_usage", "allocation_sizes"}
+	return []string{
+		"model_name",
+		"memory_usage",
+		//"allocation_sizes",
+	}
 }
 
 func (m MemoryInformation) dsvRows() [][]string {
@@ -39,7 +42,7 @@ func (m MemoryInformation) dsvRows() [][]string {
 		cudaMallocUsage := []uint64{}
 		for _, event := range events {
 			if event.Category == "memory" && event.Name == "cudaMalloc" {
-				args, ok := event.Args.(map[string]string)
+				args, ok := event.Args.(map[string]interface{})
 				if !ok {
 					log.WithField("args", event.Args).Error("failed to cast event args to a map string")
 					continue
@@ -53,15 +56,18 @@ func (m MemoryInformation) dsvRows() [][]string {
 			}
 		}
 
-		cudaMallocTotal := uint64(0)
-		for _, u := range cudaMallocUsage {
+		allocs := []string{}
+		cudaMallocTotal := float64(0)
+		for _, u0 := range cudaMallocUsage {
+			u := float64(u0) / float64(1024*1024)
 			cudaMallocTotal += u
+			allocs = append(allocs, cast.ToString(u))
 		}
 
 		row := []string{
 			modelName,
 			cast.ToString(cudaMallocTotal),
-			strings.Join(cast.ToStringSlice(cudaMallocUsage), ";"),
+			//	strings.Join(allocs, ";"),
 		}
 		rows = append(rows, row)
 	}

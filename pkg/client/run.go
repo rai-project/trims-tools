@@ -113,17 +113,12 @@ func (c Client) run() ([]*trace.Trace, error) {
 				iterationCount[cannonicalName] = ii + 1
 			}
 			trace.Iteration = int64(ii)
+			res = append(res, trace)
 			if combined == nil {
 				combined = trace
 				combined.ID = uuid.NewV4()
 			} else {
 				combined.Combine(*trace)
-			}
-			if combined != nil {
-				if err := combined.Upload(); err != nil {
-					log.WithError(err).Error("failed to upload combined profile output")
-				}
-				res = append(res, combined)
 			}
 		}()
 		return nil
@@ -147,7 +142,7 @@ func (c Client) run() ([]*trace.Trace, error) {
 	}
 	wg.Wait()
 
-	if combined != nil {
+	if combined != nil && options.uploadProfile {
 		if err := combined.Upload(); err != nil {
 			log.WithError(err).Error("failed to upload combined profile output")
 		}
@@ -216,6 +211,7 @@ func (c Client) runWorkload() ([]*trace.Trace, error) {
 		}
 
 		trace.Iteration = int64(iterCnt)
+		res = append(res, trace)
 
 		wg.Add(1)
 		go func() {
@@ -227,12 +223,6 @@ func (c Client) runWorkload() ([]*trace.Trace, error) {
 				combined.ID = uuid.NewV4()
 			} else {
 				combined.Combine(*trace)
-			}
-			if combined != nil {
-				if err := combined.Upload(); err != nil {
-					log.WithError(err).Error("failed to upload combined profile output")
-				}
-				res = append(res, combined)
 			}
 		}()
 		return nil
@@ -251,7 +241,7 @@ func (c Client) runWorkload() ([]*trace.Trace, error) {
 	}
 	wg.Wait()
 
-	if combined != nil {
+	if combined != nil && options.uploadProfile {
 		if err := combined.Upload(); err != nil {
 			log.WithError(err).Error("failed to upload combined profile output")
 		}
@@ -278,7 +268,14 @@ func (c Client) RunOnce(model assets.ModelManifest) (*trace.Trace, error) {
 	cannonicalName := model.MustCanonicalName()
 
 	id := uuid.NewV4()
-	profileFilePath := filepath.Join(config.Config.ProfileOutputDirectory, time.Now().Format("Jan-_2-15"), fmt.Sprintf("%s_%s.json", cannonicalName, id))
+	profileDir := filepath.Join(config.Config.ProfileOutputDirectory, time.Now().Format("Jan-_2-15"))
+	if !com.IsDir(profileDir) {
+		err := os.MkdirAll(profileDir, os.ModePerm)
+		if err != nil {
+			return nil, err
+		}
+	}
+	profileFilePath := filepath.Join(profileDir, fmt.Sprintf("%s_%s.json", cannonicalName, id))
 	env := map[string]string{
 		"UPR_ENABLED":                 "true",
 		"UPR_RUN_ID":                  id,
