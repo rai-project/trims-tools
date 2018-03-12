@@ -47,6 +47,6 @@ var clientRunMemoryCmd = &cobra.Command{
 func init() {
 	clientRunMemoryCmd.Flags().StringVar(&runClientModels, "models", "all", "List of models to use (comma seperated)")
 	clientRunMemoryCmd.Flags().BoolVarP(&runClientDebug, "debug", "d", false, "Print debug messages from the client")
-	clientRunMemoryCmd.Flags().StringVar(&runClientMemoryOutputFormat, "format", "table", "Output format to print the memory information")
+	clientRunMemoryCmd.Flags().StringVarP(&runClientMemoryOutputFormat, "format", "f", "table", "Output format to print the memory information")
 	clientCmd.AddCommand(clientRunMemoryCmd)
 }
