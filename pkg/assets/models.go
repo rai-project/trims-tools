@@ -284,10 +284,14 @@ func init() {
 				log.WithField("asset", asset).WithError(err).Error("failed to unmarshal model")
 				return
 			}
+			if model.Hidden {
+				return
+			}
 			if model.Name == "" {
 				log.WithField("asset", asset).WithField("name", model.Name).Error("empty model name")
 				return
 			}
+
 			mut.Lock()
 			defer mut.Unlock()
 			Models = append(Models, model)
