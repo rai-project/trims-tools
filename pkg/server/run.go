@@ -8,6 +8,7 @@ import (
 	"path/filepath"
 	"time"
 
+	"github.com/Unknwon/com"
 	"github.com/pkg/errors"
 	"github.com/rai-project/micro18-tools/pkg/config"
 	"github.com/rai-project/micro18-tools/pkg/trace"
@@ -17,6 +18,12 @@ import (
 
 func (s Server) Run() (*trace.Trace, error) {
 	options := s.options
+
+	cmdPath := filepath.Join(config.Config.ServerPath, config.Config.ServerRunCmd)
+	if !com.IsFile(cmdPath) {
+		return nil, errors.Errorf("the server command %s was not found in %s. make sure that the code compiled correctly",
+			config.Config.ClientRunCmd, config.Config.ClientPath)
+	}
 
 	if ok, err := IsValidEvictionPolicy(options.evictionPolicy); !ok {
 		return nil, err

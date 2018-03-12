@@ -11,6 +11,8 @@ import (
 	"sync"
 	"time"
 
+	"github.com/Unknwon/com"
+
 	"github.com/Jeffail/tunny"
 	"github.com/cheggaaa/pb"
 	"github.com/rai-project/micro18-tools/pkg/workload"
@@ -26,6 +28,12 @@ import (
 
 func (c Client) Run() ([]*trace.Trace, error) {
 	options := c.options
+
+	cmdPath := filepath.Join(config.Config.ClientPath, config.Config.ClientRunCmd)
+	if !com.IsFile(cmdPath) {
+		return nil, errors.Errorf("the client command %s was not found in %s. make sure that the code compiled correctly",
+			config.Config.ClientRunCmd, config.Config.ClientPath)
+	}
 
 	if options.modelDistribution == "none" {
 		return c.run()
