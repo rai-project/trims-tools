@@ -63,7 +63,7 @@ func init() {
 	// Cobra supports persistent flags, which, if defined here,
 	// will be global for your application.
 	rootCmd.PersistentFlags().StringVar(&CfgFile, "config", "", "config file (default is $HOME/.carml_config.yaml)")
-	rootCmd.PersistentFlags().BoolVar(&monitorMemory, "monitor_memory", false && gpumem.IsSupported, "monitors the memory during evaluation and prints the memory information at the end")
+	rootCmd.PersistentFlags().BoolVar(&monitorMemory, "monitor_memory", gpumem.IsSupported, "monitors the memory during evaluation and prints the memory information at the end")
 
 	// Cobra also supports local flags, which will only run
 	// when this action is called directly.

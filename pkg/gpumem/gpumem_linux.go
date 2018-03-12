@@ -91,7 +91,7 @@ func (m *Memory) Stop() {
 }
 
 func (*Memory) Print() {
-	fmt.Println("todo.. implement the memory print function")
+	m.Write("table", os.Stdout)
 }
 
 func (m *Memory) SetOutputFormat(fmt string) {
