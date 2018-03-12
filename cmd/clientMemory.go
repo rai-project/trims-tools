@@ -21,6 +21,7 @@ var clientRunMemoryCmd = &cobra.Command{
 			client.IterationCount(1),
 			client.ProfileMemory(true),
 			client.UploadProfile(false),
+			client.ConcurrentRunCount(1),
 		)
 		traces, err := client.Run()
 		if err != nil {
