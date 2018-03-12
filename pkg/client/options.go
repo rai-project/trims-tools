@@ -42,7 +42,7 @@ var (
 		original:                false,
 		iterationCount:          3,
 		debug:                   false,
-		eagerInitialize:         false,
+		eagerInitialize:         true,
 		eagerInitializeAsync:    false,
 		postprocess:             false,
 		modelName:               "all",
