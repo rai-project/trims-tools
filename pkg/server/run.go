@@ -23,7 +23,7 @@ func (s Server) Run() (*trace.Trace, error) {
 	}
 
 	id := uuid.NewV4()
-	profileFilePath := filepath.Join(config.Config.ProfileOutputDirectory, fmt.Sprintf("server_%s.json", id))
+	profileFilePath := filepath.Join(config.Config.ProfileOutputDirectory, time.Now().Format("Jan-_2-15"), fmt.Sprintf("server_%s.json", id))
 	env := map[string]string{
 		"DATE":                   time.Now().Format(time.RFC3339Nano),
 		"UPR_RUN_ID":             id,
