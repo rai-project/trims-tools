@@ -41,6 +41,7 @@ func (s Server) Run() (*trace.Trace, error) {
 		env["GLOG_stderrthreshold"] = "0"
 	}
 
+	log.WithField("server_path", config.Config.ServerPath).WithField("run_cmd", config.Config.ServerRunCmd).Debug("running server")
 	ran, err := utils.ExecCmd(
 		config.Config.ServerPath,
 		env,
@@ -49,12 +50,14 @@ func (s Server) Run() (*trace.Trace, error) {
 		config.Config.ServerRunCmd,
 	)
 	if !ran {
-		err = errors.Errorf("unable to run server cmd %s", config.Config.ClientRunCmd)
+		path := filepath.Join(config.Config.ServerPath, config.Config.ServerRunCmd)
+		err = errors.Errorf("unable to run server cmd %s", path)
 		log.WithError(err).Error("unable to run server")
 		return nil, err
 	}
 	if err != nil {
-		err = errors.Errorf("failed to run server cmd %s", config.Config.ClientRunCmd)
+		path := filepath.Join(config.Config.ServerPath, config.Config.ServerRunCmd)
+		err = errors.Errorf("failed to run server cmd %s", path)
 		log.WithField("cmd", config.Config.ServerRunCmd).WithError(err).Error("failed to run server")
 		return nil, err
 	}

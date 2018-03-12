@@ -16,7 +16,7 @@ var (
 	HomeDir, _                    = homedir.Dir()
 	DefaultSrcPath                = "Automatic"
 	DefaultBasePath               = utils.GetEnvOr("UPR_BASE_DIR", filepath.Join(HomeDir, "carml", "data", "mxnet"))
-	DefaultServerRelativePath     = "bin"
+	DefaultServerRelativePath     = ""
 	DefaultServerBuildCmd         = "make"
 	DefaultServerRunCmd           = filepath.Join("bin", "uprd")
 	DefaultClientRelativePath     = filepath.Join("example", "image-classification", "predict-cpp")
