@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
-	"os"
 	"path/filepath"
 	"time"
 
@@ -52,8 +51,8 @@ func (s Server) Run() (*trace.Trace, error) {
 	ran, err := utils.ExecCmd(
 		config.Config.ServerPath,
 		env,
-		os.Stdout,
-		os.Stderr,
+		options.stdout,
+		options.stderr,
 		config.Config.ServerRunCmd,
 	)
 	if !ran {

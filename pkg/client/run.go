@@ -319,8 +319,8 @@ func (c Client) RunOnce(model assets.ModelManifest) (*trace.Trace, error) {
 	ran, err := utils.ExecCmd(
 		config.Config.ClientPath,
 		env,
-		os.Stdout,
-		os.Stderr,
+		options.stdout,
+		options.stderr,
 		config.Config.ClientRunCmd,
 	)
 	if !ran {

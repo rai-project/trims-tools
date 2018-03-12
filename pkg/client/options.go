@@ -2,6 +2,8 @@ package client
 
 import (
 	"context"
+	"io"
+	"os"
 	"runtime"
 	"strings"
 
@@ -27,6 +29,8 @@ type Options struct {
 	modelIterationCount     int
 	profileMemory           bool
 	showProgress            bool
+	stderr                  io.Writer
+	stdout                  io.Writer
 }
 
 type Option func(*Options)
@@ -49,6 +53,8 @@ var (
 		modelIterationCount:     -1,
 		profileMemory:           false,
 		showProgress:            true,
+		stderr:                  os.Stderr,
+		stdout:                  os.Stdout,
 	}
 )
 
@@ -133,6 +139,18 @@ func ModelName(n string) Option {
 func ProfileMemory(b bool) Option {
 	return func(o *Options) {
 		o.profileMemory = b
+	}
+}
+
+func Stdout(w io.Writer) Option {
+	return func(o *Options) {
+		o.stdout = w
+	}
+}
+
+func Stderr(w io.Writer) Option {
+	return func(o *Options) {
+		o.stderr = w
 	}
 }
 

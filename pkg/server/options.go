@@ -1,6 +1,10 @@
 package server
 
-import "context"
+import (
+	"context"
+	"io"
+	"os"
+)
 
 type Options struct {
 	ctx                 context.Context
@@ -9,6 +13,8 @@ type Options struct {
 	modelEstimationRate float32
 	memoryPercentage    float32
 	uploadProfile       bool
+	stderr              io.Writer
+	stdout              io.Writer
 }
 
 type Option func(*Options)
@@ -21,6 +27,8 @@ var (
 		modelEstimationRate: 3.0,
 		memoryPercentage:    0.8,
 		uploadProfile:       true,
+		stderr:              os.Stderr,
+		stdout:              os.Stdout,
 	}
 )
 
@@ -57,6 +65,18 @@ func ModelEstimationRate(n float32) Option {
 func MemoryPercentage(n float32) Option {
 	return func(o *Options) {
 		o.memoryPercentage = n
+	}
+}
+
+func Stdout(w io.Writer) Option {
+	return func(o *Options) {
+		o.stdout = w
+	}
+}
+
+func Stderr(w io.Writer) Option {
+	return func(o *Options) {
+		o.stderr = w
 	}
 }
 

@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"context"
+	"io/ioutil"
 	"os"
 
 	"github.com/rai-project/micro18-tools/pkg/client"
@@ -25,6 +26,8 @@ var clientRunMemoryCmd = &cobra.Command{
 			client.ConcurrentRunCount(1),
 			client.ShowProgress(false),
 			client.PostProcess(true),
+			client.Stdout(ioutil.Discard),
+			client.Stderr(ioutil.Discard),
 		)
 		traces, err := client.Run()
 		if err != nil {
