@@ -33,24 +33,37 @@ func (c Client) Run() ([]*trace.Trace, error) {
 	return c.runWorkload()
 }
 
+func (c Client) runModels() (assets.ModelManifests, error) {
+	options := c.options
+	if strings.ToLower(options.modelName) == "all" {
+		return assets.Models, nil
+	}
+	models := assets.ModelManifests{}
+	modelsNames := strings.Split(strings.ToLower(options.modelName), ",")
+	for _, modelName := range modelsNames {
+		for _, m := range assets.Models {
+			if strings.ToLower(m.MustCanonicalName()) == modelName {
+				models = assets.ModelManifests{m}
+				break
+			}
+		}
+	}
+	if len(models) == 0 {
+		return models, errors.Errorf("the model %s was not found in the asset list", options.modelName)
+	}
+	return models, nil
+}
+
 func (c Client) run() ([]*trace.Trace, error) {
 	options := c.options
 
-	models := assets.Models
-	if strings.ToLower(options.modelName) != "all" {
-		models = assets.ModelManifests{}
-		modelsNames := strings.Split(strings.ToLower(options.modelName), ",")
-		for _, modelName := range modelsNames {
-			for _, m := range assets.Models {
-				if strings.ToLower(m.MustCanonicalName()) == modelName {
-					models = assets.ModelManifests{m}
-					break
-				}
-			}
-		}
-		if len(models) == 0 {
-			return nil, errors.Errorf("the model %s was not found in the asset list", options.modelName)
-		}
+	models, err := c.runModels()
+	if err != nil {
+		return nil, err
+	}
+
+	if options.showProgress && len(models) <= 1 {
+		options.showProgress = false
 	}
 
 	var progress *pb.ProgressBar
@@ -136,19 +149,15 @@ func (c Client) run() ([]*trace.Trace, error) {
 func (c Client) runWorkload() ([]*trace.Trace, error) {
 	options := c.options
 
-	models := assets.Models
-	if strings.ToLower(options.modelName) != "all" {
-		models = assets.ModelManifests{}
-		for _, m := range assets.Models {
-			if strings.ToLower(m.MustCanonicalName()) == strings.ToLower(options.modelName) {
-				models = assets.ModelManifests{m}
-				break
-			}
-		}
-		if len(models) == 0 {
-			return nil, errors.Errorf("the model %s was not found in the asset list", options.modelName)
-		}
+	models, err := c.runModels()
+	if err != nil {
+		return nil, err
 	}
+
+	if options.showProgress && len(models) <= 1 {
+		options.showProgress = false
+	}
+
 	modelGen, err := workload.New(options.modelDistribution, options.modelDistributionParams)
 	if err != nil {
 		return nil, err
