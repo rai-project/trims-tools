@@ -53,32 +53,70 @@ func (c Client) run() ([]*trace.Trace, error) {
 	defer progress.FinishPrint("finished running client")
 
 	var res []*trace.Trace
-	for _, model := range models {
-		var combined *trace.Trace
-		progress.Prefix(fmt.Sprintf("running client model %s", model.MustCanonicalName()))
-		for ii := 0; ii < options.iterationCount; ii++ {
-			progress.Increment()
-			trace, err := c.RunOnce(model)
-			if err != nil {
-				continue
-			}
-			if trace == nil {
-				continue
+	var combined *trace.Trace
+	var mut sync.Mutex
+	var wg sync.WaitGroup
+	iterationCount := map[string]int{}
+
+	runModel := func(arg interface{}) interface{} {
+		model := arg.(assets.ModelManifest)
+		defer progress.Increment()
+		defer wg.Done()
+		trace, err := c.RunOnce(model)
+		if err != nil {
+			return nil
+		}
+		if trace == nil {
+			return nil
+		}
+		go func() {
+			mut.Lock()
+			defer mut.Unlock()
+			cannonicalName := model.MustCanonicalName()
+			ii, ok := iterationCount[cannonicalName]
+			if !ok {
+				ii = 0
+				iterationCount[cannonicalName] = ii
+			} else {
+				iterationCount[cannonicalName] = ii + 1
 			}
 			trace.Iteration = int64(ii)
+			ii++
 			if combined == nil {
 				combined = trace
 				combined.ID = uuid.NewV4()
 			} else {
 				combined.Combine(*trace)
 			}
-		}
-		if combined != nil {
-			if err := combined.Upload(); err != nil {
-				log.WithError(err).Error("failed to upload combined profile output")
+			if combined != nil {
+				if err := combined.Upload(); err != nil {
+					log.WithError(err).Error("failed to upload combined profile output")
+				}
+				res = append(res, combined)
 			}
-			res = append(res, combined)
+		}()
+		return nil
+	}
+
+	execPool := tunny.NewFunc(options.concurrentRunCount, runModel)
+
+	for _, model := range models {
+		// progress.Prefix(fmt.Sprintf("running client model %s", model.MustCanonicalName()))
+		for ii := 0; ii < options.iterationCount; ii++ {
+			wg.Add(1)
+			//progress.Prefix(fmt.Sprintf("running client model %s", model.MustCanonicalName()))
+			go func(model assets.ModelManifest) {
+				execPool.Process(model)
+			}(model)
 		}
+	}
+	wg.Wait()
+
+	if combined != nil {
+		if err := combined.Upload(); err != nil {
+			log.WithError(err).Error("failed to upload combined profile output")
+		}
+		res = append(res, combined)
 	}
 	return res, nil
 }
@@ -107,11 +145,11 @@ func (c Client) runWorkload() ([]*trace.Trace, error) {
 	progress := utils.NewProgress("running client models", len(models)*options.iterationCount)
 	defer progress.FinishPrint("finished running client")
 
-	ii := 0
 	var res []*trace.Trace
 	var combined *trace.Trace
 	var mut sync.Mutex
 	var wg sync.WaitGroup
+	iterationCount := map[string]int{}
 
 	runModel := func(arg interface{}) interface{} {
 		model := arg.(assets.ModelManifest)
@@ -127,6 +165,14 @@ func (c Client) runWorkload() ([]*trace.Trace, error) {
 		go func() {
 			mut.Lock()
 			defer mut.Unlock()
+			cannonicalName := model.MustCanonicalName()
+			ii, ok := iterationCount[cannonicalName]
+			if !ok {
+				ii = 0
+				iterationCount[cannonicalName] = ii
+			} else {
+				iterationCount[cannonicalName] = ii + 1
+			}
 			trace.Iteration = int64(ii)
 			ii++
 			if combined == nil {
@@ -155,6 +201,13 @@ func (c Client) runWorkload() ([]*trace.Trace, error) {
 		}(model)
 	}
 	wg.Wait()
+
+	if combined != nil {
+		if err := combined.Upload(); err != nil {
+			log.WithError(err).Error("failed to upload combined profile output")
+		}
+		res = append(res, combined)
+	}
 	return res, nil
 }
 
