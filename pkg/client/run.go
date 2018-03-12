@@ -326,13 +326,13 @@ func (c Client) RunOnce(model assets.ModelManifest) (*trace.Trace, error) {
 	if !ran {
 		path := filepath.Join(config.Config.ClientPath, config.Config.ClientRunCmd)
 		err := errors.Errorf("failed to run cmd %s", path)
-		log.WithError(err).Error("failed to run model")
+		log.WithError(err).WithField("model_name", cannonicalName).Error("failed to run model")
 		return nil, err
 	}
 	if err != nil {
 		path := filepath.Join(config.Config.ClientPath, config.Config.ClientRunCmd)
 		err = errors.Wrapf(err, "failed to run cmd %s", path)
-		log.WithField("cmd", config.Config.ClientRunCmd).WithError(err).Error("failed to run model")
+		log.WithField("cmd", config.Config.ClientRunCmd).WithField("model_name", cannonicalName).WithError(err).Error("failed to run model")
 		return nil, err
 	}
 	if !options.postprocess {
