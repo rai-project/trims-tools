@@ -81,7 +81,6 @@ func (c Client) run() ([]*trace.Trace, error) {
 				iterationCount[cannonicalName] = ii + 1
 			}
 			trace.Iteration = int64(ii)
-			ii++
 			if combined == nil {
 				combined = trace
 				combined.ID = uuid.NewV4()
@@ -174,7 +173,6 @@ func (c Client) runWorkload() ([]*trace.Trace, error) {
 				iterationCount[cannonicalName] = ii + 1
 			}
 			trace.Iteration = int64(ii)
-			ii++
 			if combined == nil {
 				combined = trace
 				combined.ID = uuid.NewV4()
