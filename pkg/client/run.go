@@ -298,9 +298,9 @@ func (c Client) RunOnce(model assets.ModelManifest) (*trace.Trace, error) {
 		"UPR_GIT_Date":                config.Version.BuildDate,
 	}
 	if options.original {
-		env["UPR_ENABLED"] = "true"
-	} else {
 		env["UPR_ENABLED"] = "false"
+	} else {
+		env["UPR_ENABLED"] = "true"
 	}
 	if options.profileMemory {
 		env["UPR_ENABLE_MEMORY_PROFILE"] = "true"
