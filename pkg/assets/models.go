@@ -176,7 +176,7 @@ func (model ModelManifest) GetMeanImage() ([]float32, error) {
 	}
 	pmean, ok := typeParameters["mean"]
 	if !ok {
-		log.Debug("using 0,0,0 as the mean image")
+		//log.Debug("using 0,0,0 as the mean image")
 		return []float32{0, 0, 0}, nil
 	}
 	pmeanVal, ok := pmean.(string)
