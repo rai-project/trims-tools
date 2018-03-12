@@ -15,8 +15,8 @@ import (
 	"github.com/rai-project/uuid"
 )
 
-func Run(opts ...Option) (*trace.Trace, error) {
-	options := WithOptions(opts...)
+func (s Server) Run() ([]*trace.Trace, error) {
+	options := s.options
 
 	if ok, err := IsValidEvictionPolicy(options.evictionPolicy); !ok {
 		return nil, err
@@ -26,6 +26,7 @@ func Run(opts ...Option) (*trace.Trace, error) {
 	profileFilePath := filepath.Join(config.Config.ProfileOutputDirectory, fmt.Sprintf("server_%s.json", id))
 	env := map[string]string{
 		"DATE":                   time.Now().Format(time.RFC3339Nano),
+		"UPR_RUN_ID":             id,
 		"UPR_PROFILE_TARGET":     profileFilePath,
 		"UPRD_EVICTION_POLICY":   fmt.Sprint(options.evictionPolicy),
 		"UPRD_ESTIMATION_RATE":   fmt.Sprint(options.modelEstimationRate),

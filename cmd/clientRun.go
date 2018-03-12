@@ -9,6 +9,7 @@ import (
 )
 
 var (
+	runClientModels                      string
 	runClientOriginal                    bool
 	runClientProfileIO                   bool
 	runClientNTimes                      int
@@ -20,12 +21,15 @@ var (
 	runClientModelDistributionParameters string
 	runClientConcurrentCount             int
 	runClientModelIterations             int
+	runClientProfileMemory               bool
+	runClientUploadTraces                bool
 )
 
 func makeClientRun(ctx context.Context, extraOpts ...client.Option) *client.Client {
 	opts := append(
 		[]client.Option{
 			client.Context(ctx),
+			client.ModelName(runClientModels),
 			client.OriginalMode(runClientOriginal),
 			client.ProfileIO(runClientProfileIO),
 			client.DebugMode(runClientDebug),
@@ -36,6 +40,8 @@ func makeClientRun(ctx context.Context, extraOpts ...client.Option) *client.Clie
 			client.ConcurrentRunCount(runClientConcurrentCount),
 			client.ModelIterationCount(runClientModelIterations),
 			client.ModelDistribution(runClientModelDistribution, runClientModelDistributionParameters),
+			client.ProfileMemory(runClientProfileMemory),
+			client.UploadProfile(runClientUploadTraces),
 		},
 		extraOpts...,
 	)
@@ -85,7 +91,8 @@ func init() {
 	}
 	for _, cmd := range runCmds {
 		clientCmd.AddCommand(cmd)
-		cmd.Flags().BoolVar(&runClientProfileIO, "profileio", true, "Profile I/O model read (this only makes sense when evaluating the original mxnet implementation)")
+		cmd.Flags().StringVar(&runClientModels, "models", "all", "List of models to use (comma seperated)")
+		cmd.Flags().BoolVar(&runClientProfileIO, "profile_io", true, "Profile I/O model read (this only makes sense when evaluating the original mxnet implementation)")
 		cmd.Flags().IntVar(&runClientModelIterations, "model_iterations", -1, "Number of iterations to run each model")
 		cmd.Flags().IntVarP(&runClientNTimes, "iterations", "n", 1, "Number of iterations to run the client")
 		cmd.Flags().StringVar(&runClientModelDistribution, "distribution", "none", "Distribution for selecting models while running client")
@@ -95,6 +102,8 @@ func init() {
 		cmd.Flags().BoolVar(&runClientPostprocess, "postprocess", true, "whether to postprocess the client output as part of the run")
 		cmd.Flags().BoolVar(&runClientEager, "eager", true, "eagerly initialize the client")
 		cmd.Flags().BoolVar(&runClientEagerAsync, "eager_async", false, "eagerly initialize the client but make it asynchronous")
+		cmd.Flags().BoolVar(&runClientProfileMemory, "profile_memory", true, "track the cudaMalloc and cudaFree calls")
+		cmd.Flags().BoolVar(&runClientUploadTraces, "trace_upload", true, "upload the traces to AWS S3 once complete")
 	}
 	clientRunCmd.Flags().BoolVar(&runClientOriginal, "original", false, "Run an unmodified version of the inference (without persistent storage)")
 }

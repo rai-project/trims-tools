@@ -1,34 +1,52 @@
-// Copyright © 2018 NAME HERE <EMAIL ADDRESS>
-//
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-//
-//     http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
-
 package cmd
 
 import (
-	"fmt"
+	"context"
 
+	"github.com/rai-project/micro18-tools/pkg/server"
 	"github.com/spf13/cobra"
 )
+
+var (
+	runServerDebug               bool
+	runServerEvictionPolicy      string
+	runServerModelEstimationRate float32
+	runServerMemoryPercentage    float32
+)
+
+func makeServerRun(ctx context.Context) *server.Server {
+	return server.New(
+		server.Context(ctx),
+		server.DebugMode(runServerDebug),
+		server.EvictionPolicy(runServerEvictionPolicy),
+		server.ModelEstimationRate(runServerModelEstimationRate),
+		server.MemoryPercentage(runServerMemoryPercentage),
+	)
+}
 
 // serverRunCmd represents the serverRun command
 var serverRunCmd = &cobra.Command{
 	Use:   "run",
 	Short: "Run the server command and produce profile files",
-	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("serverRun called")
+	PreRunE: func(cmd *cobra.Command, args []string) error {
+		if ok, err := server.IsValidEvictionPolicy(runServerEvictionPolicy); !ok {
+			return err
+		}
+		return nil
+	},
+	RunE: func(cmd *cobra.Command, args []string) error {
+		ctx := context.Background()
+		server := makeServerRun(ctx)
+		_, err := server.Run()
+		return err
 	},
 }
 
 func init() {
+	serverRunCmd.Flags().BoolVarP(&runServerDebug, "debug", "d", false, "Print debug messages from the client")
+	serverRunCmd.Flags().StringVar(&runServerEvictionPolicy, "eviction", "lru", "Eviction policy used by the server")
+	serverRunCmd.Flags().FloatVar(&runServerModelEstimationRate, "model_estimation_rate", 3.0, "File size multiplier used to determine how much memory would be used by a model")
+	serverRunCmd.Flags().FloatVar(&runServerMemoryPercentage, "memory_percentage", 0.8, "Percentage of GPU memory that can be used to persist models")
+
 	serverCmd.AddCommand(serverRunCmd)
 }

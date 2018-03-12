@@ -18,6 +18,7 @@ var (
 )
 
 func IsValidEvictionPolicy(policy string) (bool, error) {
+	policy = strings.ToLower(policy)
 	for _, p := range EvictionPolicies {
 		if p == policy {
 			return true, nil

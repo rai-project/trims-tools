@@ -38,10 +38,13 @@ func (c Client) run() ([]*trace.Trace, error) {
 	models := assets.Models
 	if strings.ToLower(options.modelName) != "all" {
 		models = assets.ModelManifests{}
-		for _, m := range assets.Models {
-			if strings.ToLower(m.MustCanonicalName()) == strings.ToLower(options.modelName) {
-				models = assets.ModelManifests{m}
-				break
+		modelsNames := strings.Split(strings.ToLower(options.modelName), ",")
+		for _, modelName := range modelsNames {
+			for _, m := range assets.Models {
+				if strings.ToLower(m.MustCanonicalName()) == modelName {
+					models = assets.ModelManifests{m}
+					break
+				}
 			}
 		}
 		if len(models) == 0 {
@@ -263,6 +266,9 @@ func (c Client) RunOnce(model assets.ModelManifest) (*trace.Trace, error) {
 		env["UPR_ENABLED"] = "true"
 	} else {
 		env["UPR_ENABLED"] = "false"
+	}
+	if options.profileMemory {
+		env["UPR_ENABLE_MEMORY_PROFILE"] = "true"
 	}
 	if options.debug {
 		env["GLOG_logtostderr"] = "1"

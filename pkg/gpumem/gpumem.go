@@ -4,6 +4,7 @@ package gpumem
 
 import (
 	"errors"
+	"io"
 	"time"
 )
 
@@ -28,6 +29,6 @@ func (*Memory) Stop() {
 func (*Memory) Print() {
 }
 
-func (m *Memory) Write(p []byte) (n int, err error) {
-	return 0, nil
+func (*Memory) Write(fmt string, output io.Writer) error {
+	return nil
 }

@@ -25,6 +25,7 @@ type Options struct {
 	modelDistributionParams []float64
 	concurrentRunCount      int
 	modelIterationCount     int
+	profileMemory           bool
 }
 
 type Option func(*Options)
@@ -45,6 +46,7 @@ var (
 		modelDistributionParams: []float64{},
 		concurrentRunCount:      runtime.NumCPU(),
 		modelIterationCount:     -1,
+		profileMemory:           false,
 	}
 )
 
@@ -117,6 +119,12 @@ func EagerInitializeAsync(b bool) Option {
 func ModelName(n string) Option {
 	return func(o *Options) {
 		o.modelName = n
+	}
+}
+
+func ProfileMemory(b bool) Option {
+	return func(o *Options) {
+		o.profileMemory = b
 	}
 }
 
