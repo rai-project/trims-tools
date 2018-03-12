@@ -91,9 +91,7 @@ func initConfig() {
 	if c, err := homedir.Expand(CfgFile); err == nil {
 		CfgFile = c
 	}
-	if config.IsValidRemotePrefix(CfgFile) {
-		opts = append(opts, config.ConfigRemotePath(CfgFile))
-	} else if com.IsFile(CfgFile) {
+	if com.IsFile(CfgFile) {
 		if c, err := filepath.Abs(CfgFile); err == nil {
 			CfgFile = c
 		}
