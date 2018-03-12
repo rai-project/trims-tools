@@ -39,7 +39,7 @@ func (t Trace) Screenshot() string {
 	return ""
 }
 
-func init() {
+func InitChrome() {
 
 	// Init Google Chrome
 	chrome = chrm.Chrome{
