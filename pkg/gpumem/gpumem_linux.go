@@ -90,7 +90,7 @@ func (m *Memory) Stop() {
 	close(m.done)
 }
 
-func (*Memory) Print() {
+func (m *Memory) Print() {
 	m.Write("table", os.Stdout)
 }
 
