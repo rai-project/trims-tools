@@ -22,6 +22,7 @@ var clientRunMemoryCmd = &cobra.Command{
 		ctx := context.Background()
 		client := client.New(
 			client.Context(ctx),
+			client.OriginalMode(false),
 			client.DebugMode(runClientDebug),
 			client.ModelName(runClientModels),
 			client.IterationCount(1),
