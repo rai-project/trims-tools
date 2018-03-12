@@ -301,7 +301,7 @@ func init() {
 
 	wg.Wait()
 
-	sort.Slice(&Models, func(ii, jj int) bool {
+	sort.Slice(Models, func(ii, jj int) bool {
 		return Models[ii].Name < Models[jj].Name
 	})
 }
