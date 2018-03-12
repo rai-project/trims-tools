@@ -28,5 +28,6 @@ func (*Memory) Stop() {
 func (*Memory) Print() {
 }
 
-func (*Memory) Show(fmt string) {
+func (m *Memory) Write(p []byte) (n int, err error) {
+	return 0, nil
 }
