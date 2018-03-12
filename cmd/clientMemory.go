@@ -17,6 +17,7 @@ var clientRunMemoryCmd = &cobra.Command{
 		ctx := context.Background()
 		client := client.New(
 			client.Context(ctx),
+			client.DebugMode(runClientDebug),
 			client.ModelName(runClientModels),
 			client.IterationCount(1),
 			client.ProfileMemory(true),
@@ -36,5 +37,6 @@ var clientRunMemoryCmd = &cobra.Command{
 
 func init() {
 	clientRunMemoryCmd.Flags().StringVar(&runClientModels, "models", "all", "List of models to use (comma seperated)")
+	clientRunMemoryCmd.Flags().BoolVarP(&runClientDebug, "debug", "d", false, "Print debug messages from the client")
 	clientCmd.AddCommand(clientRunMemoryCmd)
 }
