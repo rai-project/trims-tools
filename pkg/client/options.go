@@ -26,16 +26,18 @@ type Option func(*Options)
 
 var (
 	DefaultOptions = Options{
-		ctx:                  context.Background(),
-		profileIO:            true,
-		original:             false,
-		iterationCount:       3,
-		debug:                false,
-		eagerInitialize:      false,
-		eagerInitializeAsync: false,
-		postprocess:          false,
-		modelName:            "all",
-		uploadProfile:        true,
+		ctx:                     context.Background(),
+		profileIO:               true,
+		original:                false,
+		iterationCount:          3,
+		debug:                   false,
+		eagerInitialize:         false,
+		eagerInitializeAsync:    false,
+		postprocess:             false,
+		modelName:               "all",
+		uploadProfile:           true,
+		modelDistribution:       "none",
+		modelDistributionParams: []float64{},
 	}
 )
 

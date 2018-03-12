@@ -6,9 +6,14 @@ import (
 	"io/ioutil"
 	"os"
 	"path/filepath"
+	"runtime"
 	"strconv"
 	"strings"
+	"sync"
 	"time"
+
+	"github.com/Jeffail/tunny"
+	"github.com/rai-project/micro18-tools/pkg/workload"
 
 	"github.com/rai-project/uuid"
 
@@ -20,6 +25,15 @@ import (
 )
 
 func (c Client) Run() ([]*trace.Trace, error) {
+	options := c.options
+
+	if options.modelDistribution == "none" {
+		return c.run()
+	}
+	return c.runWorkload()
+}
+
+func (c Client) run() ([]*trace.Trace, error) {
 	options := c.options
 
 	models := assets.Models
@@ -35,6 +49,7 @@ func (c Client) Run() ([]*trace.Trace, error) {
 			return nil, errors.Errorf("the model %s was not found in the asset list", options.modelName)
 		}
 	}
+
 	progress := utils.NewProgress("running client models", len(models)*options.iterationCount)
 	defer progress.FinishPrint("finished running client")
 
@@ -44,7 +59,7 @@ func (c Client) Run() ([]*trace.Trace, error) {
 		progress.Prefix(fmt.Sprintf("running client model %s", model.MustCanonicalName()))
 		for ii := 0; ii < options.iterationCount; ii++ {
 			progress.Increment()
-			trace, err := c.RunOne(model)
+			trace, err := c.RunOnce(model)
 			if err != nil {
 				continue
 			}
@@ -69,7 +84,83 @@ func (c Client) Run() ([]*trace.Trace, error) {
 	return res, nil
 }
 
-func (c Client) RunOne(model assets.ModelManifest) (*trace.Trace, error) {
+func (c Client) runWorkload() ([]*trace.Trace, error) {
+	options := c.options
+
+	models := assets.Models
+	if strings.ToLower(options.modelName) != "all" {
+		models = assets.ModelManifests{}
+		for _, m := range assets.Models {
+			if strings.ToLower(m.MustCanonicalName()) == strings.ToLower(options.modelName) {
+				models = assets.ModelManifests{m}
+				break
+			}
+		}
+		if len(models) == 0 {
+			return nil, errors.Errorf("the model %s was not found in the asset list", options.modelName)
+		}
+	}
+	modelGen, err := workload.New(options.modelDistribution, options.modelDistributionParams)
+	if err != nil {
+		return nil, err
+	}
+
+	progress := utils.NewProgress("running client models", len(models)*options.iterationCount)
+	defer progress.FinishPrint("finished running client")
+
+	ii := 0
+	var res []*trace.Trace
+	var combined *trace.Trace
+	var mut sync.Mutex
+	var wg sync.WaitGroup
+
+	runModel := func(arg interface{}) interface{} {
+		model := arg.(assets.ModelManifest)
+		defer progress.Increment()
+		defer wg.Done()
+		trace, err := c.RunOnce(model)
+		if err != nil {
+			return nil
+		}
+		if trace == nil {
+			return nil
+		}
+		go func() {
+			mut.Lock()
+			defer mut.Unlock()
+			trace.Iteration = int64(ii)
+			ii++
+			if combined == nil {
+				combined = trace
+				combined.ID = uuid.NewV4()
+			} else {
+				combined.Combine(*trace)
+			}
+			if combined != nil {
+				if err := combined.Upload(); err != nil {
+					log.WithError(err).Error("failed to upload combined profile output")
+				}
+				res = append(res, combined)
+			}
+		}()
+		return nil
+	}
+
+	numCPUs := runtime.NumCPU()
+	execPool := tunny.NewFunc(numCPUs, runModel)
+
+	for model := range modelGen.ModelGenerator(models) {
+		wg.Add(1)
+		//progress.Prefix(fmt.Sprintf("running client model %s", model.MustCanonicalName()))
+		go func(model assets.ModelManifest) {
+			execPool.Process(model)
+		}(model)
+	}
+	wg.Wait()
+	return res, nil
+}
+
+func (c Client) RunOnce(model assets.ModelManifest) (*trace.Trace, error) {
 	options := c.options
 
 	dims, err := model.GetImageDimensions()
