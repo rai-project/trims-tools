@@ -12,14 +12,14 @@ The current client looks for the config in `~/.carml_config.yml`, but this can b
 ```
 buildtimeoutseconds: 0
 pollinginterval: 0
-basesrcpath: /Users/abduld/.gvm/pkgsets/go1.10/global/src/github.com/rai-project/mxnet-mirror
+basesrcpath: $GOPATH/src/github.com/rai-project/mxnet-mirror
 basepath: /Users/abduld/carml/data/mxnet
 serverrelativepath: bin
-serverpath: /Users/abduld/.gvm/pkgsets/go1.10/global/src/github.com/rai-project/mxnet-mirror/bin
+serverpath: $GOPATH/src/github.com/rai-project/mxnet-mirror/bin
 serverbuildcmd: make
 serverruncmd: bin/uprd
 clientrelativepath: example/image-classification/predict-cpp
-clientpath: /Users/abduld/.gvm/pkgsets/go1.10/global/src/github.com/rai-project/mxnet-mirror/example/image-classification/predict-cpp
+clientpath: $GOPATH/src/github.com/rai-project/mxnet-mirror/example/image-classification/predict-cpp
 clientbuildcmd: make
 clientruncmd: ./image-classification-predict
 basebucketurl: http://s3.amazonaws.com/micro18profiles
