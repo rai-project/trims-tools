@@ -13,7 +13,7 @@ The current client looks for the config in `~/.carml_config.yml`, but this can b
 buildtimeoutseconds: 0
 pollinginterval: 0
 basesrcpath: $GOPATH/src/github.com/rai-project/mxnet-mirror
-basepath: /Users/abduld/carml/data/mxnet
+basepath: $HOME/carml/data/mxnet
 serverrelativepath: bin
 serverpath: $GOPATH/src/github.com/rai-project/mxnet-mirror/bin
 serverbuildcmd: make
@@ -24,7 +24,7 @@ clientbuildcmd: make
 clientruncmd: ./image-classification-predict
 basebucketurl: http://s3.amazonaws.com/micro18profiles
 uploadbucketname: traces
-profileoutputdirectory: /Users/abduld/micro18_profiles
+profileoutputdirectory: $HOME/micro18_profiles
 ```
 
 ## Monitoring Memory Usage
