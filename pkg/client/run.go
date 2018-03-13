@@ -144,7 +144,7 @@ func (c Client) run() ([]*trace.Trace, error) {
 
 	if combined != nil {
 		id := uuid.NewV4()
-		profileDir := filepath.Join(config.Config.ProfileOutputDirectory, time.Now().Format("Jan-_2-15"))
+		profileDir := filepath.Join(config.Config.ProfileOutputDirectory, time.Now().Format("2006-Jan-_2-15"))
 		if !com.IsDir(profileDir) {
 			err := os.MkdirAll(profileDir, os.ModePerm)
 			if err != nil {
@@ -257,7 +257,7 @@ func (c Client) runWorkload() ([]*trace.Trace, error) {
 	wg.Wait()
 	if combined != nil {
 		id := uuid.NewV4()
-		profileDir := filepath.Join(config.Config.ProfileOutputDirectory, time.Now().Format("Jan-_2-15"))
+		profileDir := filepath.Join(config.Config.ProfileOutputDirectory, time.Now().Format("2006-Jan-_2-15"))
 		if !com.IsDir(profileDir) {
 			err := os.MkdirAll(profileDir, os.ModePerm)
 			if err != nil {
@@ -297,7 +297,7 @@ func (c Client) RunOnce(model assets.ModelManifest) (*trace.Trace, error) {
 	cannonicalName := model.MustCanonicalName()
 
 	id := uuid.NewV4()
-	profileDir := filepath.Join(config.Config.ProfileOutputDirectory, time.Now().Format("Jan-_2-15"))
+	profileDir := filepath.Join(config.Config.ProfileOutputDirectory, time.Now().Format("2006-Jan-_2-15"))
 	if !com.IsDir(profileDir) {
 		err := os.MkdirAll(profileDir, os.ModePerm)
 		if err != nil {
