@@ -5,7 +5,6 @@ package gpumem
 import (
 	"encoding/csv"
 	"encoding/json"
-	"fmt"
 	"io"
 	"os"
 	"strconv"
@@ -13,6 +12,7 @@ import (
 	"sync"
 	"time"
 
+	humanize "github.com/dustin/go-humanize"
 	"github.com/olekukonko/tablewriter"
 	"github.com/pkg/errors"
 	nvml "github.com/rai-project/nvml-go"
@@ -33,15 +33,16 @@ type Device struct {
 	entries []Entry
 }
 
-type Memory struct {
-	done    chan bool
-	started bool
-	fmt     string
-	output  io.Writer
-	devices []*Device
+type System struct {
+	done       chan bool
+	started    bool
+	fmt        string
+	fullOutput bool
+	output     io.Writer
+	devices    []*Device
 }
 
-func New() (*Memory, error) {
+func New() (*System, error) {
 	devs, err := nvml.DeviceCount()
 	if err != nil {
 		return nil, errors.Wrapf(err, "cannot get nvml device count")
@@ -57,53 +58,59 @@ func New() (*Memory, error) {
 			handle: handle,
 		}
 	}
-	return &Memory{
+	return &System{
+		done:    make(chan bool),
+		started: false,
 		devices: devices,
 		output:  os.Stdout,
 	}, nil
 }
 
-func (m *Memory) Start(timestep time.Duration) error {
+func (m *System) Start(timestep time.Duration) error {
 	if m.started == true {
 		return errors.New("memory info already started")
 	}
-	m.started = true
 	ticker := time.NewTicker(timestep)
-	for {
-		select {
-		case <-ticker.C:
-			for _, dev := range m.devices {
-				dev.recordInfo()
+	go func() {
+		for {
+			select {
+			case <-ticker.C:
+				go func() {
+					for _, dev := range m.devices {
+						dev.recordInfo()
+					}
+				}()
+			case <-m.done:
+				ticker.Stop()
+				break
 			}
-		case <-m.done:
-			ticker.Stop()
-			break
 		}
-	}
+	}()
+	m.started = true
 	return nil
 }
 
-func (m *Memory) Stop() {
+func (m *System) Stop() {
 	if m.started == false {
 		return
 	}
 	close(m.done)
 }
 
-func (m *Memory) Print() {
+func (m *System) Print() {
 	m.Write("table", os.Stdout)
 }
 
-func (m *Memory) SetOutputFormat(fmt string) {
+func (m *System) SetOutputFormat(fmt string) {
 	m.fmt = fmt
 }
 
-func (m *Memory) SetOutput(output io.Writer) {
+func (m *System) SetOutput(output io.Writer) {
 	m.output = output
 }
 
-func (m *Memory) Write(fmt string, output io.Writer) error {
-	fmt = strings.ToLower(m.fmt)
+func (m *System) Write(fmt string, output io.Writer) error {
+	fmt = strings.ToLower(fmt)
 
 	m.SetOutputFormat(fmt)
 	m.SetOutput(output)
@@ -128,43 +135,104 @@ func (m *Memory) Write(fmt string, output io.Writer) error {
 		_, err = output.Write(bts)
 		return err
 	}
+	log.Errorf("the format %s is not a valid output format for gpu memory information", fmt)
 	return errors.Errorf("the format %s is not a valid output format for gpu memory information", fmt)
 }
 
-func (m *Memory) dsvHeader() []string {
-	firstDevice := m.devices[0]
-	header := []string{"device_id"}
-	for ii := range firstDevice.entries {
-		header = append(
-			header,
-			fmt.Sprintf("timestamp_%d", ii),
-			fmt.Sprintf("memory_used_%d", ii),
-			fmt.Sprintf("memory_free_%d", ii),
-		)
+func (m *System) dsvHeader() []string {
+	return []string{
+		"device_idx",
+		"time_stamp",
+		"memory_used",
+		"human_memory_used",
+		"memory_free",
+		"human_memory_free",
 	}
-	return header
 }
 
-func (m *Memory) dsvRows() [][]string {
+func (m *System) dsvRows() [][]string {
+	rowDivider := []string{
+		"---",
+		"---",
+		"---",
+		"---",
+		"---",
+		"---",
+	}
+	fullOutput := m.fullOutput
 	rows := [][]string{}
+	totalUsed := []uint64{}
+	totalFree := []uint64{}
+	totalEntries := []uint64{}
 	for _, dev := range m.devices {
-		row := []string{
-			strconv.Itoa(dev.index),
-		}
+		currTotalUsed := uint64(0)
+		currTotalFree := uint64(0)
+		devIdx := strconv.Itoa(dev.index)
 		for _, entry := range dev.entries {
-			row = append(
-				row,
-				entry.timestamp.Format(time.RFC3339),
-				cast.ToString(entry.MemoryUsed),
-				cast.ToString(entry.MemoryFree),
+			currTotalUsed += entry.MemoryUsed
+			currTotalFree += entry.MemoryFree
+			if fullOutput {
+				rows = append(
+					rows,
+					[]string{
+						devIdx,
+						entry.timestamp.Format(time.RFC3339Nano),
+						cast.ToString(entry.MemoryUsed),
+						humanize.Bytes(entry.MemoryUsed),
+						cast.ToString(entry.MemoryFree),
+						humanize.Bytes(entry.MemoryFree),
+					},
+				)
+			}
+		}
+		totalUsed = append(totalUsed, currTotalUsed)
+		totalFree = append(totalFree, currTotalFree)
+		totalEntries = append(totalEntries, uint64(len(dev.entries)))
+	}
+	if fullOutput {
+		rows = append(
+			rows,
+			rowDivider,
+		)
+		for ii, dev := range m.devices {
+			devIdx := strconv.Itoa(dev.index)
+			rows = append(
+				rows,
+				[]string{
+					devIdx,
+					"total",
+					cast.ToString(totalUsed[ii]),
+					humanize.Bytes(totalUsed[ii]),
+					cast.ToString(totalFree[ii]),
+					humanize.Bytes(totalFree[ii]),
+				},
 			)
 		}
-		rows = append(rows, row)
+		rows = append(
+			rows,
+			rowDivider,
+		)
+	}
+	for ii, dev := range m.devices {
+		devIdx := strconv.Itoa(dev.index)
+		averageUsed := uint64(float64(totalUsed[ii]) / float64(totalEntries[ii]))
+		averageFree := uint64(float64(totalFree[ii]) / float64(totalEntries[ii]))
+		rows = append(
+			rows,
+			[]string{
+				devIdx,
+				"average",
+				cast.ToString(averageUsed),
+				humanize.Bytes(averageUsed),
+				cast.ToString(averageFree),
+				humanize.Bytes(averageFree),
+			},
+		)
 	}
 	return rows
 }
 
-func (m *Memory) writeCSV(fmt string) error {
+func (m *System) writeCSV(fmt string) error {
 	w := csv.NewWriter(m.output)
 	if fmt == "tsv" {
 		w.Comma = '\t'
@@ -175,7 +243,7 @@ func (m *Memory) writeCSV(fmt string) error {
 	return nil
 }
 
-func (m *Memory) writeTable() error {
+func (m *System) writeTable() error {
 	w := tablewriter.NewWriter(m.output)
 	w.SetHeader(m.dsvHeader())
 	w.AppendBulk(m.dsvRows())
@@ -187,6 +255,7 @@ func (dev *Device) recordInfo() {
 	timestamp := time.Now()
 	info, err := nvml.DeviceMemoryInformation(dev.handle)
 	if err != nil {
+		log.WithError(err).Error("failed to get device memory information")
 		return
 	}
 	dev.mut.Lock()

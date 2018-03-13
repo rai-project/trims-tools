@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"time"
 
 	"github.com/Unknwon/com"
 	"github.com/fatih/color"
@@ -21,7 +22,7 @@ var (
 	IsVerbose     bool = true
 	CfgFile       string
 	monitorMemory bool
-	memoryInfo    *gpumem.Memory
+	memoryInfo    *gpumem.System
 	log           *logrus.Entry = logrus.New().WithField("pkg", "micro/cmd")
 )
 
@@ -29,13 +30,15 @@ var (
 var rootCmd = &cobra.Command{
 	Use: "micro",
 	PersistentPreRunE: func(cmd *cobra.Command, args []string) error {
-		if monitorMemory {
+		if monitorMemory && gpumem.IsSupported {
 			info, err := gpumem.New()
 			if err != nil {
+				pp.Println(err)
 				log.WithError(err).Error("failed to create gpu memory info object")
 				return nil
 			}
 			memoryInfo = info
+			memoryInfo.Start(5 * time.Millisecond)
 		}
 		return nil
 	},
