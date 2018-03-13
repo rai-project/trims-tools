@@ -151,7 +151,7 @@ func (c Client) run() ([]*trace.Trace, error) {
 				return nil, err
 			}
 		}
-		path := filepath.Join(profileDir, "combine-"+id+".json")
+		path := filepath.Join(profileDir, "combined-"+id+".json")
 		bts, err := json.Marshal(combined)
 		if err == nil {
 			ioutil.WriteFile(path, bts, 0644)
@@ -264,7 +264,7 @@ func (c Client) runWorkload() ([]*trace.Trace, error) {
 				return nil, err
 			}
 		}
-		path := filepath.Join(profileDir, "combine-"+id+".json")
+		path := filepath.Join(profileDir, "combined-"+id+".json")
 		bts, err := json.Marshal(combined)
 		if err == nil {
 			ioutil.WriteFile(path, bts, 0644)
@@ -305,7 +305,11 @@ func (c Client) RunOnce(model assets.ModelManifest) (*trace.Trace, error) {
 			return nil, err
 		}
 	}
-	profileFilePath := filepath.Join(profileDir, fmt.Sprintf("%s_%s.json", cannonicalName, id))
+	profileBaseName := fmt.Sprintf("%s_%s.json", cannonicalName, id)
+	if !options.original {
+		profileBaseName = "upr_" + profileBaseName
+	}
+	profileFilePath := filepath.Join(profileDir, profileBaseName)
 	env := map[string]string{
 		"UPR_ENABLED":                 "true",
 		"UPR_RUN_ID":                  id,
