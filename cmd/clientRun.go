@@ -83,6 +83,11 @@ var clientRunCompare = &cobra.Command{
 				continue
 			}
 
+			if len(modTrace) == 0 {
+				log.WithField("model_name", model.MustCanonicalName()).Error("no traces captured")
+				continue
+			}
+
 			firstTrace := *modTrace[0]
 			restTraces := []trace.Trace{}
 			for _, tr := range append(modTrace[1:], origTrace...) {

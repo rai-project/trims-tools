@@ -147,7 +147,7 @@ func (c Client) run() ([]*trace.Trace, error) {
 func (c Client) runWorkload() ([]*trace.Trace, error) {
 	options := c.options
 
-	models, err := c.runModels()
+	models, err := assets.FilterModels(options.modelName)
 	if err != nil {
 		return nil, err
 	}

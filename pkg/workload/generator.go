@@ -108,14 +108,16 @@ func NewPareto(xm float64, alpha float64) *Generator {
 }
 
 func (g *Generator) Next(arry []interface{}) interface{} {
+	arryLen := len(arry)
 	r := g.Rand()
-	idx := int(r * float64(len(arry)))
+	idx := int(r * float64(arryLen))
+	if idx < 0 {
+		idx = -1 * idx
+	}
+	for idx >= arryLen {
+		idx = idx - arryLen
+	}
 	return arry[idx]
-}
-
-func (g *Generator) NextModel(models assets.ModelManifests) assets.ModelManifest {
-	n := g.Next([]interface{}{models})
-	return n.(assets.ModelManifest)
 }
 
 func (g *Generator) Generator(arry []interface{}) <-chan interface{} {
@@ -136,6 +138,10 @@ func (g *Generator) Generator(arry []interface{}) <-chan interface{} {
 
 func (g *Generator) ModelGenerator(models assets.ModelManifests) <-chan assets.ModelManifest {
 	gen := make(chan assets.ModelManifest, 2)
+	arry := make([]interface{}, len(models))
+	for ii, m := range models {
+		arry[ii] = m
+	}
 	go func() {
 		defer close(gen)
 		for {
@@ -143,7 +149,8 @@ func (g *Generator) ModelGenerator(models assets.ModelManifests) <-chan assets.M
 			case <-g.done:
 				return
 			default:
-				gen <- g.NextModel(models)
+				n := g.Next(arry)
+				gen <- n.(assets.ModelManifest)
 			}
 		}
 	}()
