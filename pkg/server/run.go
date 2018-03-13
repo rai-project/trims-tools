@@ -41,6 +41,7 @@ func (s Server) Run() (*trace.Trace, error) {
 	env := map[string]string{
 		"DATE":                   time.Now().Format(time.RFC3339Nano),
 		"UPR_RUN_ID":             id,
+		"MXNET_ENGINE_TYPE":      "NaiveEngine",
 		"UPR_PROFILE_TARGET":     profileFilePath,
 		"UPRD_EVICTION_POLICY":   fmt.Sprint(options.evictionPolicy),
 		"UPRD_ESTIMATION_RATE":   fmt.Sprint(options.modelEstimationRate),
