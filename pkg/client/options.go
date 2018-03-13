@@ -170,6 +170,9 @@ func ModelDistribution(dist, params string) Option {
 			)
 		}
 		o.modelDistribution = dist
+		if params == "" {
+			return
+		}
 		for _, e := range strings.Split(params, ",") {
 			o.modelDistributionParams = append(o.modelDistributionParams, cast.ToFloat64(e))
 		}
