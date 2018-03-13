@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/Unknwon/com"
+	"github.com/rai-project/micro18-tools/pkg/assets"
 	"github.com/rai-project/micro18-tools/pkg/client"
 	mconfig "github.com/rai-project/micro18-tools/pkg/config"
 	"github.com/rai-project/micro18-tools/pkg/trace"
@@ -63,32 +64,49 @@ var clientRunCompare = &cobra.Command{
 	RunE: func(cmd *cobra.Command, args []string) error {
 		ctx := context.Background()
 
-		orig := makeClientRun(ctx, client.OriginalMode(true))
-		origTrace, err := orig.Run()
-
-		mod := makeClientRun(ctx, client.OriginalMode(false))
-		modTrace, err := mod.Run()
-
-		firstTrace := *modTrace[0]
-		restTraces := []trace.Trace{}
-		for _, tr := range append(modTrace[1:], origTrace...) {
-			restTraces = append(restTraces, *tr)
+		models, err := assets.FilterModels(runClientModels)
+		if err != nil {
+			return err
 		}
-		combined := trace.Combine(firstTrace, restTraces...)
-
-		if combined != nil {
-			id := uuid.NewV4()
-			profileDir := filepath.Join(mconfig.Config.ProfileOutputDirectory, time.Now().Format("2006-Jan-_2-15"))
-			if !com.IsDir(profileDir) {
-				err := os.MkdirAll(profileDir, os.ModePerm)
-				if err != nil {
-					return err
-				}
+		for _, model := range models {
+			orig := makeClientRun(ctx, client.OriginalMode(true), client.ModelName(model.MustCanonicalName()))
+			origTrace, err := orig.Run()
+			if err != nil {
+				log.WithError(err).Error("failed to run client with upr enabled")
+				continue
 			}
-			path := filepath.Join(profileDir, "combine-"+id+".json")
-			bts, err := json.Marshal(combined)
-			if err == nil {
-				ioutil.WriteFile(path, bts, 0644)
+
+			mod := makeClientRun(ctx, client.OriginalMode(false), client.ModelName(model.MustCanonicalName()))
+			modTrace, err := mod.Run()
+			if err != nil {
+				log.WithError(err).Error("failed to run client with upr disabled")
+				continue
+			}
+
+			firstTrace := *modTrace[0]
+			restTraces := []trace.Trace{}
+			for _, tr := range append(modTrace[1:], origTrace...) {
+				if tr == nil {
+					continue
+				}
+				restTraces = append(restTraces, *tr)
+			}
+			combined := trace.Combine(firstTrace, restTraces...)
+
+			if combined != nil {
+				id := uuid.NewV4()
+				profileDir := filepath.Join(mconfig.Config.ProfileOutputDirectory, time.Now().Format("2006-Jan-_2-15"))
+				if !com.IsDir(profileDir) {
+					err := os.MkdirAll(profileDir, os.ModePerm)
+					if err != nil {
+						return err
+					}
+				}
+				path := filepath.Join(profileDir, "compared-"+model.MustCanonicalName()+"-"+id+".json")
+				bts, err := json.Marshal(combined)
+				if err == nil {
+					ioutil.WriteFile(path, bts, 0644)
+				}
 			}
 		}
 

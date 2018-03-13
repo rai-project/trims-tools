@@ -7,7 +7,6 @@ import (
 	"os"
 	"path/filepath"
 	"strconv"
-	"strings"
 	"sync"
 	"time"
 
@@ -41,31 +40,10 @@ func (c Client) Run() ([]*trace.Trace, error) {
 	return c.runWorkload()
 }
 
-func (c Client) runModels() (assets.ModelManifests, error) {
-	options := c.options
-	if strings.ToLower(options.modelName) == "all" {
-		return assets.Models, nil
-	}
-	models := assets.ModelManifests{}
-	modelsNames := strings.Split(strings.ToLower(options.modelName), ",")
-	for _, modelName := range modelsNames {
-		for _, m := range assets.Models {
-			if strings.ToLower(m.MustCanonicalName()) == modelName {
-				models = assets.ModelManifests{m}
-				break
-			}
-		}
-	}
-	if len(models) == 0 {
-		return models, errors.Errorf("the model %s was not found in the asset list", options.modelName)
-	}
-	return models, nil
-}
-
 func (c Client) run() ([]*trace.Trace, error) {
 	options := c.options
 
-	models, err := c.runModels()
+	models, err := assets.FilterModels(options.modelName)
 	if err != nil {
 		return nil, err
 	}

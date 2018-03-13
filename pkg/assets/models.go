@@ -13,6 +13,7 @@ import (
 	"github.com/spf13/cast"
 
 	"github.com/rai-project/downloadmanager"
+	"github.com/rai-project/micro18-tools/pkg/assets"
 	"github.com/rai-project/micro18-tools/pkg/config"
 	yaml "gopkg.in/yaml.v2"
 )
@@ -272,6 +273,26 @@ func (ms ModelManifests) Download(ctx context.Context) error {
 
 func DownloadModels(ctx context.Context) error {
 	return Models.Download(ctx)
+}
+
+func FilterModels(filter string) (ModelManifests, error) {
+	if strings.ToLower(options.modelName) == "all" {
+		return assets.Models, nil
+	}
+	models := ModelManifests{}
+	modelsNames := strings.Split(strings.ToLower(options.modelName), ",")
+	for _, modelName := range modelsNames {
+		for _, m := range Models {
+			if strings.ToLower(m.MustCanonicalName()) == modelName {
+				models = ModelManifests{m}
+				break
+			}
+		}
+	}
+	if len(models) == 0 {
+		return models, errors.Errorf("the model %s was not found in the asset list", options.modelName)
+	}
+	return models, nil
 }
 
 func init() {
