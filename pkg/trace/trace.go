@@ -43,41 +43,43 @@ func mustTimeUnit(u string) time.Duration {
 // Trace is an entry of trace format.
 // https://github.com/catapult-project/catapult/tree/master/tracing
 type TraceEvent struct {
-	Name      string        `json:"name,omitempty"`
-	Category  string        `json:"cat,omitempty"`
-	EventType string        `json:"ph,omitempty"`
-	Timestamp int64         `json:"ts,omitempty"`  // displayTimeUnit
-	Duration  time.Duration `json:"dur,omitempty"` // displayTimeUnit
-	ProcessID int64         `json:"pid"`
-	ThreadID  int64         `json:"tid,omitempty"`
-	Args      interface{}   `json:"args,omitempty"`
-	Stack     int           `json:"sf,omitempty"`
-	EndStack  int           `json:"esf,omitempty"`
-	Init      string        `json:"init_time,omitempty"`
-	Start     int64         `json:"start,omitempty"`
-	End       int64         `json:"end,omitempty"`
-	InitTime  time.Time     `json:"init_time_t,omitempty"`
-	StartTime time.Time     `json:"start_time_t,omitempty"`
-	EndTime   time.Time     `json:"end_time_t,omitempty"`
-	Time      time.Time     `json:"time_t,omitempty"`
-	TimeUnit  time.Duration `json:"timeUnit,omitempty"`
-	TraceID   string        `json:"trace_id,omitempty"`
+	Name       string        `json:"name,omitempty"`
+	Category   string        `json:"cat,omitempty"`
+	EventType  string        `json:"ph,omitempty"`
+	Timestamp  int64         `json:"ts,omitempty"`  // displayTimeUnit
+	Duration   time.Duration `json:"dur,omitempty"` // displayTimeUnit
+	ProcessID  int64         `json:"pid"`
+	ThreadID   int64         `json:"tid,omitempty"`
+	Args       interface{}   `json:"args,omitempty"`
+	Stack      int           `json:"sf,omitempty"`
+	EndStack   int           `json:"esf,omitempty"`
+	Init       string        `json:"init_time,omitempty"`
+	Start      int64         `json:"start,omitempty"`
+	End        int64         `json:"end,omitempty"`
+	InitTime   time.Time     `json:"init_time_t,omitempty"`
+	StartTime  time.Time     `json:"start_time_t,omitempty"`
+	EndTime    time.Time     `json:"end_time_t,omitempty"`
+	Time       time.Time     `json:"time_t,omitempty"`
+	TimeUnit   time.Duration `json:"timeUnit,omitempty"`
+	UPREnabled string        `json:"upr_enabled,omitempty"`
+	TraceID    string        `json:"trace_id,omitempty"`
 }
 
 type JSONTraceEvent struct {
-	Name      string      `json:"name,omitempty"`
-	Category  string      `json:"cat,omitempty"`
-	EventType string      `json:"ph,omitempty"`
-	Timestamp int64       `json:"ts,omitempty"`  // displayTimeUnit
-	Duration  int64       `json:"dur,omitempty"` // displayTimeUnit
-	ProcessID int64       `json:"pid"`
-	ThreadID  int64       `json:"tid,omitempty"`
-	Args      interface{} `json:"args,omitempty"`
-	Stack     int         `json:"sf,omitempty"`
-	EndStack  int         `json:"esf,omitempty"`
-	Init      string      `json:"init_time,omitempty"`
-	Start     int64       `json:"start,omitempty"`
-	End       int64       `json:"end,omitempty"`
+	Name       string      `json:"name,omitempty"`
+	Category   string      `json:"cat,omitempty"`
+	EventType  string      `json:"ph,omitempty"`
+	Timestamp  int64       `json:"ts,omitempty"`  // displayTimeUnit
+	Duration   int64       `json:"dur,omitempty"` // displayTimeUnit
+	ProcessID  int64       `json:"pid"`
+	ThreadID   int64       `json:"tid,omitempty"`
+	Args       interface{} `json:"args,omitempty"`
+	Stack      int         `json:"sf,omitempty"`
+	EndStack   int         `json:"esf,omitempty"`
+	Init       string      `json:"init_time,omitempty"`
+	Start      int64       `json:"start,omitempty"`
+	End        int64       `json:"end,omitempty"`
+	UPREnabled string      `json:"upr_enabled,omitempty"`
 }
 
 type EventFrame struct {
@@ -88,6 +90,7 @@ type EventFrame struct {
 type TraceEvents []TraceEvent
 
 type TraceOtherData struct {
+	UPREnabled       string `json:"upr_enabled,omitempty"`
 	UPRBaseDirectory string `json:"UPR_BASE_DIR"`
 	EagerMode        bool   `json:"eager_mode"`
 	EagerModeAsync   bool   `json:"eager_mode_async"`
@@ -108,6 +111,7 @@ type TraceOtherData struct {
 
 type Trace struct {
 	ID              string                `json:"id,omitempty"`
+	UPREnabled      string                `json:"upr_enabled,omitempty"`
 	Iteration       int64                 `json:"iteration,omitempty"`
 	StartTime       time.Time             `json:"start_time,omitempty"`
 	EndTime         time.Time             `json:"end_time,omitempty"`
@@ -121,6 +125,7 @@ type Trace struct {
 
 type JSONTrace struct {
 	ID              string                `json:"id,omitempty"`
+	UPREnabled      string                `json:"upr_enabled,omitempty"`
 	TraceEvents     TraceEvents           `json:"traceEvents,omitempty"`
 	DisplayTimeUnit string                `json:"displayTimeUnit,omitempty"`
 	Frames          map[string]EventFrame `json:"stackFrames"`
