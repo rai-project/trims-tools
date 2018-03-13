@@ -24,7 +24,7 @@ var (
 		ctx:                 context.Background(),
 		debug:               false,
 		evictionPolicy:      "lru",
-		modelEstimationRate: 3.0,
+		modelEstimationRate: 1.0,
 		memoryPercentage:    0.8,
 		uploadProfile:       true,
 		stderr:              os.Stderr,
