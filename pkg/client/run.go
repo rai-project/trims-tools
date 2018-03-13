@@ -284,6 +284,7 @@ func (c Client) RunOnce(model assets.ModelManifest) (*trace.Trace, error) {
 
 	dims, err := model.GetImageDimensions()
 	if err != nil {
+		log.WithError(err).Errorf("failed to get image dimensions for %s", model.MustCanonicalName())
 		dims = []uint32{3, 224, 224}
 	}
 	mean, err := model.GetMeanImage()
