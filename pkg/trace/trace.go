@@ -61,7 +61,7 @@ type TraceEvent struct {
 	EndTime    time.Time     `json:"end_time_t,omitempty"`
 	Time       time.Time     `json:"time_t,omitempty"`
 	TimeUnit   time.Duration `json:"timeUnit,omitempty"`
-	UPREnabled string        `json:"upr_enabled,omitempty"`
+	UPREnabled bool          `json:"upr_enabled,omitempty"`
 	TraceID    string        `json:"trace_id,omitempty"`
 }
 
@@ -79,7 +79,7 @@ type JSONTraceEvent struct {
 	Init       string      `json:"init_time,omitempty"`
 	Start      int64       `json:"start,omitempty"`
 	End        int64       `json:"end,omitempty"`
-	UPREnabled string      `json:"upr_enabled,omitempty"`
+	UPREnabled bool        `json:"upr_enabled,omitempty"`
 }
 
 type EventFrame struct {
@@ -90,7 +90,7 @@ type EventFrame struct {
 type TraceEvents []TraceEvent
 
 type TraceOtherData struct {
-	UPREnabled       string `json:"upr_enabled,omitempty"`
+	UPREnabled       bool   `json:"upr_enabled,omitempty"`
 	UPRBaseDirectory string `json:"UPR_BASE_DIR"`
 	EagerMode        bool   `json:"eager_mode"`
 	EagerModeAsync   bool   `json:"eager_mode_async"`
@@ -111,7 +111,7 @@ type TraceOtherData struct {
 
 type Trace struct {
 	ID              string                `json:"id,omitempty"`
-	UPREnabled      string                `json:"upr_enabled,omitempty"`
+	UPREnabled      bool                  `json:"upr_enabled,omitempty"`
 	Iteration       int64                 `json:"iteration,omitempty"`
 	StartTime       time.Time             `json:"start_time,omitempty"`
 	EndTime         time.Time             `json:"end_time,omitempty"`
@@ -125,7 +125,7 @@ type Trace struct {
 
 type JSONTrace struct {
 	ID              string                `json:"id,omitempty"`
-	UPREnabled      string                `json:"upr_enabled,omitempty"`
+	UPREnabled      bool                  `json:"upr_enabled,omitempty"`
 	TraceEvents     TraceEvents           `json:"traceEvents,omitempty"`
 	DisplayTimeUnit string                `json:"displayTimeUnit,omitempty"`
 	Frames          map[string]EventFrame `json:"stackFrames"`
