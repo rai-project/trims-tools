@@ -44,13 +44,13 @@ type Memory struct {
 func New() (*Memory, error) {
 	devs, err := nvml.DeviceCount()
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrapf(err, "cannot get nvml device count")
 	}
 	devices := make([]*Device, devs)
 	for ii := range devices {
 		handle, err := nvml.DeviceGetHandleByIndex(ii)
 		if err != nil {
-			return nil, err
+			return nil, errors.Wrapf(err, "cannot get device handle for %d", ii)
 		}
 		devices[ii] = &Device{
 			index:  ii,
