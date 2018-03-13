@@ -4,12 +4,12 @@ import (
 	"time"
 )
 
-func Combine(trace0 Trace, others ...Trace) Trace {
+func Combine(trace0 Trace, others ...Trace) *Trace {
 	trace := &trace0
 	for _, o := range others {
 		trace.Combine(o)
 	}
-	return *trace
+	return trace
 }
 
 func (tr *Trace) Combine(other Trace) {

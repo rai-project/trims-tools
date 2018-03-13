@@ -142,6 +142,21 @@ func (c Client) run() ([]*trace.Trace, error) {
 	}
 	wg.Wait()
 
+	if combined != nil {
+		id := uuid.NewV4()
+		profileDir := filepath.Join(config.Config.ProfileOutputDirectory, time.Now().Format("Jan-_2-15"))
+		if !com.IsDir(profileDir) {
+			err := os.MkdirAll(profileDir, os.ModePerm)
+			if err != nil {
+				return nil, err
+			}
+		}
+		path := filepath.Join(profileDir, "combine-"+id+".json")
+		bts, err := json.Marshal(combined)
+		if err == nil {
+			ioutil.WriteFile(path, bts, 0644)
+		}
+	}
 	if combined != nil && options.uploadProfile {
 		if err := combined.Upload(); err != nil {
 			log.WithError(err).Error("failed to upload combined profile output")
@@ -240,7 +255,21 @@ func (c Client) runWorkload() ([]*trace.Trace, error) {
 		}(model)
 	}
 	wg.Wait()
-
+	if combined != nil {
+		id := uuid.NewV4()
+		profileDir := filepath.Join(config.Config.ProfileOutputDirectory, time.Now().Format("Jan-_2-15"))
+		if !com.IsDir(profileDir) {
+			err := os.MkdirAll(profileDir, os.ModePerm)
+			if err != nil {
+				return nil, err
+			}
+		}
+		path := filepath.Join(profileDir, "combine-"+id+".json")
+		bts, err := json.Marshal(combined)
+		if err == nil {
+			ioutil.WriteFile(path, bts, 0644)
+		}
+	}
 	if combined != nil && options.uploadProfile {
 		if err := combined.Upload(); err != nil {
 			log.WithError(err).Error("failed to upload combined profile output")

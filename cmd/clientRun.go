@@ -2,9 +2,17 @@ package cmd
 
 import (
 	"context"
+	"encoding/json"
+	"io/ioutil"
+	"os"
+	"path/filepath"
+	"time"
 
+	"github.com/Unknwon/com"
 	"github.com/rai-project/micro18-tools/pkg/client"
+	mconfig "github.com/rai-project/micro18-tools/pkg/config"
 	"github.com/rai-project/micro18-tools/pkg/trace"
+	"github.com/rai-project/uuid"
 	"github.com/spf13/cobra"
 )
 
@@ -66,7 +74,23 @@ var clientRunCompare = &cobra.Command{
 		for _, tr := range append(modTrace[1:], origTrace...) {
 			restTraces = append(restTraces, *tr)
 		}
-		trace.Combine(firstTrace, restTraces...)
+		combined := trace.Combine(firstTrace, restTraces...)
+
+		if combined != nil {
+			id := uuid.NewV4()
+			profileDir := filepath.Join(mconfig.Config.ProfileOutputDirectory, time.Now().Format("Jan-_2-15"))
+			if !com.IsDir(profileDir) {
+				err := os.MkdirAll(profileDir, os.ModePerm)
+				if err != nil {
+					return err
+				}
+			}
+			path := filepath.Join(profileDir, "combine-"+id+".json")
+			bts, err := json.Marshal(combined)
+			if err == nil {
+				ioutil.WriteFile(path, bts, 0644)
+			}
+		}
 
 		return err
 	},
