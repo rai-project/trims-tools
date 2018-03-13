@@ -10,6 +10,7 @@ import (
 
 	"github.com/Unknwon/com"
 	"github.com/pkg/errors"
+	"github.com/spf13/cast"
 
 	"github.com/rai-project/downloadmanager"
 	"github.com/rai-project/micro18-tools/pkg/config"
@@ -154,6 +155,15 @@ func (model ModelManifest) GetImageDimensions() ([]uint32, error) {
 	if !ok {
 		return nil, errors.New("expecting image type dimensions")
 	}
+
+	pdimsArry, ok := pdims0.([]interface{})
+	if ok {
+		dims := []uint32{}
+		for _, e := range pdimsArry {
+			dims = append(dims, cast.ToUint32(e))
+		}
+		return dims, nil
+	}
 	pdims, ok := pdims0.(string)
 	if !ok {
 		return nil, errors.New("expecting image type string")
@@ -180,6 +190,16 @@ func (model ModelManifest) GetMeanImage() ([]float32, error) {
 		//log.Debug("using 0,0,0 as the mean image")
 		return []float32{0, 0, 0}, nil
 	}
+
+	pmeanArry, ok := pmean.([]interface{})
+	if ok {
+		mean := []float32{}
+		for _, e := range pmeanArry {
+			mean = append(mean, cast.ToFloat32(e))
+		}
+		return mean, nil
+	}
+
 	pmeanVal, ok := pmean.(string)
 	if !ok {
 		return nil, errors.New("expecting parameters type string")
