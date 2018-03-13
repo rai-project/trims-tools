@@ -13,7 +13,6 @@ import (
 	"github.com/spf13/cast"
 
 	"github.com/rai-project/downloadmanager"
-	"github.com/rai-project/micro18-tools/pkg/assets"
 	"github.com/rai-project/micro18-tools/pkg/config"
 	yaml "gopkg.in/yaml.v2"
 )
@@ -277,7 +276,7 @@ func DownloadModels(ctx context.Context) error {
 
 func FilterModels(filter string) (ModelManifests, error) {
 	if strings.ToLower(options.modelName) == "all" {
-		return assets.Models, nil
+		return Models, nil
 	}
 	models := ModelManifests{}
 	modelsNames := strings.Split(strings.ToLower(options.modelName), ",")
