@@ -41,16 +41,31 @@ var (
 func New(distribution string, params []float64) (*Generator, error) {
 	switch strings.ToLower(distribution) {
 	case "pareto":
+		if len(params) != 2 {
+			params = DefaultParetoParameters
+		}
 		return NewPareto(params[0], params[1]), nil
 	case "zipf":
 		return nil, errors.New("the zipf distribution is not implemented")
 	case "uniform":
+		if len(params) != 2 {
+			params = DefaultUniformParameters
+		}
 		return NewUniform(params[0], params[1]), nil
 	case "exp", "exponential":
+		if len(params) != 1 {
+			params = DefaultExponentialParameters
+		}
 		return NewExponential(params[0]), nil
 	case "weibull":
+		if len(params) != 2 {
+			params = DefaultWeibullParameters
+		}
 		return NewWeibull(params[0], params[1]), nil
 	case "poisson":
+		if len(params) != 1 {
+			params = DefaultPoissonParameters
+		}
 		return NewPoisson(params[0]), nil
 	}
 
