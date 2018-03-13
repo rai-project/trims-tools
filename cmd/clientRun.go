@@ -127,7 +127,7 @@ func init() {
 		cmd.Flags().BoolVar(&runClientEager, "eager", true, "eagerly initialize the client")
 		cmd.Flags().BoolVar(&runClientEagerAsync, "eager_async", false, "eagerly initialize the client but make it asynchronous")
 		cmd.Flags().BoolVar(&runClientProfileMemory, "profile_memory", true, "track the cudaMalloc and cudaFree calls")
-		cmd.Flags().BoolVar(&runClientUploadTraces, "trace_upload", true, "upload the traces to AWS S3 once complete")
+		cmd.Flags().BoolVar(&runClientUploadTraces, "trace_upload", false, "upload the traces to AWS S3 once complete")
 	}
 	clientRunCmd.Flags().BoolVar(&runClientOriginal, "original", false, "Run an unmodified version of the inference (without persistent storage)")
 }
