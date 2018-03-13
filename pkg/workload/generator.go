@@ -30,6 +30,12 @@ var (
 		"weibull",
 		"poisson",
 	}
+	DefaultParetoParameters      = []float64{1, 1.5}
+	DefaultZipfParameters        = []float64{}
+	DefaultUniformParameters     = []float64{0, 1}
+	DefaultExponentialParameters = []float64{}
+	DefaultWeibullParameters     = []float64{}
+	DefaultPoissonParameters     = []float64{}
 )
 
 func New(distribution string, params []float64) (*Generator, error) {

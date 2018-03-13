@@ -140,7 +140,7 @@ func init() {
 		clientCmd.AddCommand(cmd)
 		cmd.Flags().StringVar(&runClientModels, "models", "all", "List of models to use (comma seperated)")
 		cmd.Flags().BoolVar(&runClientProfileIO, "profile_io", true, "Profile I/O model read (this only makes sense when evaluating the original mxnet implementation)")
-		cmd.Flags().IntVar(&runClientModelIterations, "model_iterations", -1, "Number of iterations to run each model")
+		cmd.Flags().IntVar(&runClientModelIterations, "model_iterations", -1, "Maximum number of iterations to run each model")
 		cmd.Flags().IntVarP(&runClientNTimes, "iterations", "n", 1, "Number of iterations to run the client")
 		cmd.Flags().StringVar(&runClientModelDistribution, "distribution", "none", "Distribution for selecting models while running client")
 		cmd.Flags().StringVar(&runClientModelDistributionParameters, "distribution_params", "", "Distribution parameters for selecting models while running client")
