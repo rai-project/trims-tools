@@ -33,6 +33,7 @@ var rootCmd = &cobra.Command{
 			info, err := gpumem.New()
 			if err != nil {
 				log.WithError(err).Error("failed to create gpu memory info object")
+				return nil
 			}
 			memoryInfo = info
 		}
