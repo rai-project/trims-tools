@@ -16,7 +16,7 @@ Go version 1.8+ is required to compile RAI.
 Download the [GVM](https://github.com/moovweb/gvm) using
 
 ```
-bash << (curl -s -S -L https://raw.githubusercontent.com/moovweb/gvm/master/binscripts/gvm-installer)
+bash < <(curl -s -S -L https://raw.githubusercontent.com/moovweb/gvm/master/binscripts/gvm-installer)
 ```
 
 Add the following line to your `.bashrc`(or `.zshrc` if using zsh) to set up the GVM environment.
