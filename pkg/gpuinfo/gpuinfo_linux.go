@@ -151,17 +151,17 @@ func (m *System) Write(fmt string, output io.Writer) error {
 func (m *System) dsvHeader() []string {
 	return []string{
 		"device_idx",
-    "time_stamp",
-    "power",
-    "temperature",
-    "utilization"
+		"time_stamp",
+		"power",
+		"temperature",
+		"utilization",
 		"memory_used",
 		"human_memory_used",
-    "clock_core",
-    "clock_memory",
-    "pci_throughput_rx",
-    "pci_throughput_tx",
-    "num_processes",
+		"clock_core",
+		"clock_memory",
+		"pci_throughput_rx",
+		"pci_throughput_tx",
+		"num_processes",
 	}
 }
 
@@ -172,8 +172,8 @@ func (m *System) dsvRows() [][]string {
 		"---",
 		"---",
 		"---",
-    "---",
-    "---",
+		"---",
+		"---",
 		"---",
 		"---",
 		"---",
@@ -181,66 +181,66 @@ func (m *System) dsvRows() [][]string {
 		"---",
 	}
 	fullOutput := m.fullOutput
-  rows := [][]string{}
-  totalPower :=  []uint64{}
-  totalTemperature :=  []uint64{}
-  totalUtilization := []uint64{}
-  totalMemoryUsed := []uint64{}
-  totalClockCore :=  []uint64{}
-  totalClockMemory :=  []uint64{}
-  totalPCIThroughputRX := []uint64{}
+	rows := [][]string{}
+	totalPower := []uint64{}
+	totalTemperature := []uint64{}
+	totalUtilization := []uint64{}
+	totalMemoryUsed := []uint64{}
+	totalClockCore := []uint64{}
+	totalClockMemory := []uint64{}
+	totalPCIThroughputRX := []uint64{}
 	totalPCIThroughputTX := []uint64{}
 	totalNumProcesses := []uint64{}
 	totalEntries := []uint64{}
 	for _, dev := range m.devices {
-    currTotalPower :=  uint64(0)
-    currTotalTemperature :=  uint64(0)
-    currTotalUtilization := uint64(0)
-    currTotalMemoryUsed := uint64(0)
-    currTotalClockCore := uint64(0)
-    currTotalClockMemory := uint64(0)
-    currTotalPCIThroughputRX := uint64(0)
-    currTotalPCIThroughputTX := uint64(0)
-    currTotalNumProcesses := uint64(0)
+		currTotalPower := uint64(0)
+		currTotalTemperature := uint64(0)
+		currTotalUtilization := uint64(0)
+		currTotalMemoryUsed := uint64(0)
+		currTotalClockCore := uint64(0)
+		currTotalClockMemory := uint64(0)
+		currTotalPCIThroughputRX := uint64(0)
+		currTotalPCIThroughputTX := uint64(0)
+		currTotalNumProcesses := uint64(0)
 
-    devIdx := cast.ToString(dev.index)
+		devIdx := cast.ToString(dev.index)
 		for _, entry := range dev.entries {
-      power = entry.Power
-      temperature = entry.Temperature
-      utilization = entry.UtilizationInfo.GPU
-      memoryUsed = entry.nvmlMemoryInfo.GlobalUsed
-      clockCore = entry.ClockInfo.Core
-      clockMemory = entry.ClockInfo.Memory
-      PCIThroughputRX += entry.PCIStatusInfo.Throughput.RX
-      PCIThroughputTX += entry.PCIStatusInfo.Throughput.TX
-      numProcesses += len(entry.Processes)
+			power := entry.Power
+			temperature := entry.Temperature
+			utilization := entry.Utilization.GPU
+			memoryUsed := entry.Memory.GlobalUsed
+			clockCore := entry.Clocks.Core
+			clockMemory := entry.Clocks.Memory
+			PCIThroughputRX := entry.PCI.Throughput.RX
+			PCIThroughputTX := entry.PCI.Throughput.TX
+			numProcesses := len(entry.Processes)
 
-      currTotalPower += power
-      currTotalTemperature += temperature
-      currTotalUtilization += utilization
-      currTotalMemoryUsed += memoryUsed
-      currTotalClockCore += clockCore
-      currTotalClockMemory += clockMemory
-      currTotalPCIThroughputRX += PCIThroughputRX
-      currTotalPCIThroughputTX += PCIThroughputTX
-      currTotalNumProcesses += numProcesses
+			currTotalPower += power
+			currTotalTemperature += temperature
+			currTotalUtilization += utilization
+			currTotalMemoryUsed += memoryUsed
+			currTotalClockCore += clockCore
+			currTotalClockMemory += clockMemory
+			currTotalPCIThroughputRX += PCIThroughputRX
+			currTotalPCIThroughputTX += PCIThroughputTX
+			currTotalNumProcesses += numProcesses
 
 			if fullOutput {
 				rows = append(
 					rows,
 					[]string{
 						devIdx,
-            entry.TimeStamp.Format(time.RFC3339Nano),
-            cast.ToString(power)
-            cast.ToString(temperature)
-            cast.ToString(utilization)
-            cast.ToString(memoryUsed)
-            humanize.Bytes(memoryUsed),
-            cast.ToString(clockCore)
-            cast.ToString(clockMemory)
-            cast.ToString(PCIThroughputRX)
-            cast.ToString(PCIThroughputTX)
-            cast.ToString(numProcesses)
+						entry.TimeStamp.Format(time.RFC3339Nano),
+						cast.ToString(power),
+						cast.ToString(temperature),
+						cast.ToString(utilization),
+						cast.ToString(memoryUsed),
+						humanize.Bytes(memoryUsed),
+						cast.ToString(clockCore),
+						cast.ToString(clockMemory),
+						cast.ToString(PCIThroughputRX),
+						cast.ToString(PCIThroughputTX),
+						cast.ToString(numProcesses),
 						cast.ToString(memoryUsed),
 					},
 				)
@@ -255,7 +255,7 @@ func (m *System) dsvRows() [][]string {
 		totalPCIThroughputRX = append(totalPCIThroughputRX, currTotalPCIThroughputRX)
 		totalPCIThroughputTX = append(totalPCIThroughputTX, currTotalPCIThroughputTX)
 		totalNumProcesses = append(totalNumProcesses, currTotalNumProcesses)
-    totalEntries = append(totalEntries, uint64(len(dev.entries)))
+		totalEntries = append(totalEntries, uint64(len(dev.entries)))
 
 	}
 	// if fullOutput {
@@ -297,8 +297,8 @@ func (m *System) dsvRows() [][]string {
 				cast.ToString(averagePower),
 				cast.ToString(averageTemperature),
 				cast.ToString(averageUtilization),
-        cast.ToString(averageMemoryUsed),
-        humanize.Bytes(averageMemoryUsed),
+				cast.ToString(averageMemoryUsed),
+				humanize.Bytes(averageMemoryUsed),
 				cast.ToString(averageClockCore),
 				cast.ToString(averageClockMemory),
 				cast.ToString(averagePCIThroughputRX),
