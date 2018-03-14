@@ -154,9 +154,12 @@ func (m *System) dsvHeader() []string {
 		"time_stamp",
 		"power",
 		"temperature",
-		"utilization",
+		"gpu_utilization",
+		"memory_utilization",
 		"memory_used",
 		"human_memory_used",
+		"memory_free",
+		"human_memory_free",
 		"clock_core",
 		"clock_memory",
 		"pci_throughput_rx",
@@ -179,13 +182,18 @@ func (m *System) dsvRows() [][]string {
 		"---",
 		"---",
 		"---",
+		"---",
+		"---",
+		"---",
 	}
 	fullOutput := m.fullOutput
 	rows := [][]string{}
 	totalPower := []uint64{}
 	totalTemperature := []uint64{}
-	totalUtilization := []uint64{}
+	totalGPUUtilization := []uint64{}
+	totalMemoryUtilization := []uint64{}
 	totalMemoryUsed := []uint64{}
+	totalMemoryFree := []uint64{}
 	totalClockCore := []uint64{}
 	totalClockMemory := []uint64{}
 	totalPCIThroughputRX := []uint64{}
@@ -195,8 +203,10 @@ func (m *System) dsvRows() [][]string {
 	for _, dev := range m.devices {
 		currTotalPower := uint64(0)
 		currTotalTemperature := uint64(0)
-		currTotalUtilization := uint64(0)
+		currTotalGPUUtilization := uint64(0)
+		currTotalMemoryUtilization := uint64(0)
 		currTotalMemoryUsed := uint64(0)
+		currTotalMemoryFree := uint64(0)
 		currTotalClockCore := uint64(0)
 		currTotalClockMemory := uint64(0)
 		currTotalPCIThroughputRX := uint64(0)
@@ -207,8 +217,10 @@ func (m *System) dsvRows() [][]string {
 		for _, entry := range dev.entries {
 			power := entry.Power
 			temperature := entry.Temperature
-			utilization := entry.Utilization.GPU
-			memoryUsed := entry.Memory.GlobalUsed
+			gpuUtilization := entry.Utilization.GPU
+			memoryUtilization := entry.Utilization.Memory
+			memoryUsed := entry.Memory.Used
+			memoryFree := entry.Memory.Free
 			clockCore := entry.Clocks.Core
 			clockMemory := entry.Clocks.Memory
 			PCIThroughputRX := entry.PCI.Throughput.RX
@@ -217,8 +229,10 @@ func (m *System) dsvRows() [][]string {
 
 			currTotalPower += power
 			currTotalTemperature += temperature
-			currTotalUtilization += utilization
+			currTotalGPUUtilization += gpuUtilization
+			currTotalMemoryUtilization += memoryUtilization
 			currTotalMemoryUsed += memoryUsed
+			currTotalMemoryFree += memoryFree
 			currTotalClockCore += clockCore
 			currTotalClockMemory += clockMemory
 			currTotalPCIThroughputRX += PCIThroughputRX
@@ -233,23 +247,27 @@ func (m *System) dsvRows() [][]string {
 						entry.TimeStamp.Format(time.RFC3339Nano),
 						cast.ToString(power),
 						cast.ToString(temperature),
-						cast.ToString(utilization),
+						cast.ToString(gpuUtilization),
+						cast.ToString(memoryUtilization),
 						cast.ToString(memoryUsed),
 						humanize.Bytes(memoryUsed),
+						cast.ToString(memoryFree),
+						humanize.Bytes(memoryFree),
 						cast.ToString(clockCore),
 						cast.ToString(clockMemory),
 						cast.ToString(PCIThroughputRX),
 						cast.ToString(PCIThroughputTX),
 						cast.ToString(numProcesses),
-						cast.ToString(memoryUsed),
 					},
 				)
 			}
 		}
 		totalPower = append(totalPower, currTotalPower)
 		totalTemperature = append(totalTemperature, currTotalTemperature)
-		totalUtilization = append(totalUtilization, currTotalUtilization)
+		totalGPUUtilization = append(totalGPUUtilization, currTotalGPUUtilization)
+		totalMemoryUtilization = append(totalMemoryUtilization, currTotalMemoryUtilization)
 		totalMemoryUsed = append(totalMemoryUsed, currTotalMemoryUsed)
+		totalMemoryFree = append(totalMemoryFree, currTotalMemoryFree)
 		totalClockCore = append(totalClockCore, currTotalClockCore)
 		totalClockMemory = append(totalClockMemory, currTotalClockMemory)
 		totalPCIThroughputRX = append(totalPCIThroughputRX, currTotalPCIThroughputRX)
@@ -282,8 +300,10 @@ func (m *System) dsvRows() [][]string {
 		devIdx := cast.ToString(dev.index)
 		averagePower := uint64(float64(totalPower[ii]) / float64(totalEntries[ii]))
 		averageTemperature := uint64(float64(totalTemperature[ii]) / float64(totalEntries[ii]))
-		averageUtilization := uint64(float64(totalUtilization[ii]) / float64(totalEntries[ii]))
+		averageGPUUtilization := uint64(float64(totalGPUUtilization[ii]) / float64(totalEntries[ii]))
+		averageMemoryUtilization := uint64(float64(totalMemoryUtilization[ii]) / float64(totalEntries[ii]))
 		averageMemoryUsed := uint64(float64(totalMemoryUsed[ii]) / float64(totalEntries[ii]))
+		averageMemoryFree := uint64(float64(totalMemoryFree[ii]) / float64(totalEntries[ii]))
 		averageClockCore := uint64(float64(totalClockCore[ii]) / float64(totalEntries[ii]))
 		averageClockMemory := uint64(float64(totalClockMemory[ii]) / float64(totalEntries[ii]))
 		averagePCIThroughputRX := uint64(float64(totalPCIThroughputRX[ii]) / float64(totalEntries[ii]))
@@ -296,9 +316,12 @@ func (m *System) dsvRows() [][]string {
 				"average",
 				cast.ToString(averagePower),
 				cast.ToString(averageTemperature),
-				cast.ToString(averageUtilization),
+				cast.ToString(averageGPUUtilization),
+				cast.ToString(averageMemoryUtilization),
 				cast.ToString(averageMemoryUsed),
 				humanize.Bytes(averageMemoryUsed),
+				cast.ToString(averageMemoryFree),
+				humanize.Bytes(averageMemoryFree),
 				cast.ToString(averageClockCore),
 				cast.ToString(averageClockMemory),
 				cast.ToString(averagePCIThroughputRX),
