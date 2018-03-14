@@ -120,6 +120,12 @@ func (c Client) run() ([]*trace.Trace, error) {
 	wg.Wait()
 
 	if combined != nil {
+		// online one combined result
+		if len(combined.OtherData) <= 1 {
+			combined = nil
+		}
+	}
+	if combined != nil {
 		id := uuid.NewV4()
 		path := filepath.Join(config.Config.ProfileOutputDirectory, "combined-"+id+".json")
 		bts, err := json.Marshal(combined)
@@ -131,6 +137,8 @@ func (c Client) run() ([]*trace.Trace, error) {
 		if err := combined.Upload(); err != nil {
 			log.WithError(err).Error("failed to upload combined profile output")
 		}
+	}
+	if combined != nil {
 		res = append(res, combined)
 	}
 	return res, nil
@@ -225,6 +233,13 @@ func (c Client) runWorkload() ([]*trace.Trace, error) {
 		}(model)
 	}
 	wg.Wait()
+
+	if combined != nil {
+		// online one combined result
+		if len(combined.OtherData) <= 1 {
+			combined = nil
+		}
+	}
 	if combined != nil {
 		id := uuid.NewV4()
 		path := filepath.Join(config.Config.ProfileOutputDirectory, "combined-"+id+".json")
@@ -237,6 +252,8 @@ func (c Client) runWorkload() ([]*trace.Trace, error) {
 		if err := combined.Upload(); err != nil {
 			log.WithError(err).Error("failed to upload combined profile output")
 		}
+	}
+	if combined != nil {
 		res = append(res, combined)
 	}
 	return res, nil
