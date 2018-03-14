@@ -3,7 +3,9 @@
 This repository includes a set of tools that are useful for performing experiments for the Micro18 papers.
 The tools may be applicable for other types of projects which perform workload characterization and/or use the Chrome trace format.
 
-## Installing Go
+## Installing 
+
+### Installing Go
 
 The tool is developed using [golang](https://golang.org/) which needs to be installed for code to be compiled from source.
 You can install Golang either through [Go Version Manager](https://github.com/moovweb/gvm)(recommended) or from the instructions on the [golang site](https://golang.org/). We recommend the Go Version Manager.
@@ -59,7 +61,7 @@ CGO_FFLAGS="-g -O2"
 CGO_LDFLAGS="-g -O2"
 ```
 
-## Install the package
+### Install the package
 
 
 Navigate to where Go will expect to find the source for this repo. Make the path if it does not exist.
@@ -80,7 +82,7 @@ You should now be able to build the micro18-tools
 
     go build main.go
 
-## Config
+## Configurations
 
 The current client looks for the config in `~/.carml_config.yml`, but this can be overridden using the `--config=<<file_path>>` option.
 
@@ -180,6 +182,12 @@ The number of concurrent requests can be specified using the `--concurrent` opti
 By default this is set to 1.
 
 ## Server
+
+
+```
+micro18-tools server run -d
+```
+
 
 ...
 
