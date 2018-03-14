@@ -266,7 +266,7 @@ func (m *System) writeTable() error {
 func (dev *Device) recordInfo() {
 	info, err := dev.handle.Status()
 	if err != nil {
-		log.WithError(err).Error("failed to get device memory information")
+		log.WithError(err).Error("failed to get device status")
 		return
 	}
 	dev.mut.Lock()
