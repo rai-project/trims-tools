@@ -75,7 +75,7 @@ Navigate to where Go will expect to find the source for this repo. Make the path
 
 Clone this repository there.
 
-    git clone git@github.com:rai-project/micro18-tools.git
+    git clone https://github.com/rai-project/micro18-tools.git
     cd micro18-tools
 
 Install the dependencies
