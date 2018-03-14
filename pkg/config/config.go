@@ -3,6 +3,7 @@ package config
 import (
 	"os"
 	"path/filepath"
+	"time"
 
 	"github.com/Unknwon/com"
 	"github.com/k0kubun/pp"
@@ -13,37 +14,39 @@ import (
 )
 
 var (
-	HomeDir, _                    = homedir.Dir()
-	DefaultSrcPath                = "Automatic"
-	DefaultBasePath               = utils.GetEnvOr("UPR_BASE_DIR", filepath.Join(HomeDir, "carml", "data", "mxnet"))
-	DefaultServerRelativePath     = ""
-	DefaultServerBuildCmd         = "make"
-	DefaultServerRunCmd           = filepath.Join("bin", "uprd")
-	DefaultClientRelativePath     = filepath.Join("example", "image-classification", "predict-cpp")
-	DefaultClientBuildCmd         = "make"
-	DefaultClientRunCmd           = "./image-classification-predict"
-	DefaultBaseBucketURL          = "http://s3.amazonaws.com/micro18profiles"
-	DefaultUploadBucketName       = "traces"
-	DefaultProfileOutputDirectory = filepath.Join(HomeDir, "micro18_profiles")
+	HomeDir, _                        = homedir.Dir()
+	HostName, _                       = os.Hostname()
+	DefaultSrcPath                    = "Automatic"
+	DefaultBasePath                   = utils.GetEnvOr("UPR_BASE_DIR", filepath.Join(HomeDir, "carml", "data", "mxnet"))
+	DefaultServerRelativePath         = ""
+	DefaultServerBuildCmd             = "make"
+	DefaultServerRunCmd               = filepath.Join("bin", "uprd")
+	DefaultClientRelativePath         = filepath.Join("example", "image-classification", "predict-cpp")
+	DefaultClientBuildCmd             = "make"
+	DefaultClientRunCmd               = "./image-classification-predict"
+	DefaultBaseBucketURL              = "http://s3.amazonaws.com/micro18profiles"
+	DefaultUploadBucketName           = "traces"
+	DefaultProfileOutputBaseDirectory = filepath.Join(HomeDir, "micro18_profiles")
 )
 
 type microConfig struct {
-	BuildTimeoutSeconds    int64         `json:"build_timeout" yaml:"micro18.build_timeout" config:"micro18.build_timeout" default:600`
-	PollingInterval        int           `json:"polling_interval" yaml:"micro18.polling_interval" config:"micro18.polling_interval" default:100`
-	BaseSrcPath            string        `json:"src_path" yaml:"micro18.src_path" config:"micro18.src_path"`
-	BasePath               string        `json:"base_path" yaml:"micro18.base_path" config:"micro18.base_path"`
-	ServerRelativePath     string        `json:"server_relative_path" yaml:"micro18.server_relative_path" config:"micro18.server_relative_path"`
-	ServerPath             string        `json:"server_path" yaml:"-" config:"-"`
-	ServerBuildCmd         string        `json:"server_build_cmd" yaml:"micro18.server_build_cmd" config:"micro18.server_build_cmd"`
-	ServerRunCmd           string        `json:"server_run_cmd" yaml:"micro18.server_run_cmd" config:"micro18.server_run_cmd"`
-	ClientRelativePath     string        `json:"client_relative_path" yaml:"micro18.client_relative_path" config:"micro18.client_relative_path"`
-	ClientPath             string        `json:"client_path" yaml:"-" config:"-"`
-	ClientBuildCmd         string        `json:"client_build_cmd" yaml:"micro18.client_build_cmd" config:"micro18.client_build_cmd"`
-	ClientRunCmd           string        `json:"client_run_cmd" yaml:"micro18.client_run_cmd" config:"micro18.client_run_cmd"`
-	BaseBucketURL          string        `json:"base_bucket_url" yaml:"micro18.base_bucket_url" config:"micro18.base_bucket_url"`
-	UploadBucketName       string        `json:"upload_bucket_name" yaml:"micro18.upload_bucket_name" config:"micro18.upload_bucket_name"`
-	ProfileOutputDirectory string        `json:"profile_output_directory" yaml:"micro18.profile_output_directory" config:"micro18.profile_output_directory"`
-	done                   chan struct{} `json:"-" config:"-"`
+	BuildTimeoutSeconds        int64         `json:"build_timeout" yaml:"micro18.build_timeout" config:"micro18.build_timeout" default:600`
+	PollingInterval            int           `json:"polling_interval" yaml:"micro18.polling_interval" config:"micro18.polling_interval" default:100`
+	BaseSrcPath                string        `json:"src_path" yaml:"micro18.src_path" config:"micro18.src_path"`
+	BasePath                   string        `json:"base_path" yaml:"micro18.base_path" config:"micro18.base_path"`
+	ServerRelativePath         string        `json:"server_relative_path" yaml:"micro18.server_relative_path" config:"micro18.server_relative_path"`
+	ServerPath                 string        `json:"server_path" yaml:"-" config:"-"`
+	ServerBuildCmd             string        `json:"server_build_cmd" yaml:"micro18.server_build_cmd" config:"micro18.server_build_cmd"`
+	ServerRunCmd               string        `json:"server_run_cmd" yaml:"micro18.server_run_cmd" config:"micro18.server_run_cmd"`
+	ClientRelativePath         string        `json:"client_relative_path" yaml:"micro18.client_relative_path" config:"micro18.client_relative_path"`
+	ClientPath                 string        `json:"client_path" yaml:"-" config:"-"`
+	ClientBuildCmd             string        `json:"client_build_cmd" yaml:"micro18.client_build_cmd" config:"micro18.client_build_cmd"`
+	ClientRunCmd               string        `json:"client_run_cmd" yaml:"micro18.client_run_cmd" config:"micro18.client_run_cmd"`
+	BaseBucketURL              string        `json:"base_bucket_url" yaml:"micro18.base_bucket_url" config:"micro18.base_bucket_url"`
+	UploadBucketName           string        `json:"upload_bucket_name" yaml:"micro18.upload_bucket_name" config:"micro18.upload_bucket_name"`
+	ProfileOutputBaseDirectory string        `json:"profile_output_base_directory" yaml:"micro18.profile_output_directory" config:"micro18.profile_output_directory"`
+	ProfileOutputDirectory     string        `json:"profile_output_directory" yaml:"-" config:"-"`
+	done                       chan struct{} `json:"-" config:"-"`
 }
 
 var (
@@ -106,9 +109,13 @@ func (a *microConfig) Read() {
 	if a.BaseBucketURL == "" {
 		a.BaseBucketURL = DefaultBaseBucketURL
 	}
-	if a.ProfileOutputDirectory == "" {
-		a.ProfileOutputDirectory = DefaultProfileOutputDirectory
+	if a.ProfileOutputBaseDirectory == "" {
+		a.ProfileOutputBaseDirectory = DefaultProfileOutputBaseDirectory
 	}
+	if !com.IsDir(a.ProfileOutputBaseDirectory) {
+		os.MkdirAll(a.ProfileOutputBaseDirectory, os.ModePerm)
+	}
+	a.ProfileOutputDirectory = filepath.Join(a.ProfileOutputBaseDirectory, HostName, time.Now().Format("2006-01-02-15"))
 	if !com.IsDir(a.ProfileOutputDirectory) {
 		os.MkdirAll(a.ProfileOutputDirectory, os.ModePerm)
 	}

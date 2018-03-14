@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
-	"os"
 	"path/filepath"
 	"time"
 
@@ -30,14 +29,7 @@ func (s Server) Run() (*trace.Trace, error) {
 	}
 
 	id := uuid.NewV4()
-	profileDir := filepath.Join(config.Config.ProfileOutputDirectory, time.Now().Format("2006-Jan-_2-15"))
-	if !com.IsDir(profileDir) {
-		err := os.MkdirAll(profileDir, os.ModePerm)
-		if err != nil {
-			return nil, err
-		}
-	}
-	profileFilePath := filepath.Join(profileDir, fmt.Sprintf("server_%s.json", id))
+	profileFilePath := filepath.Join(config.Config.ProfileOutputDirectory, fmt.Sprintf("server_%s.json", id))
 	env := map[string]string{
 		"DATE":                   time.Now().Format(time.RFC3339Nano),
 		"UPR_RUN_ID":             id,

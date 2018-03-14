@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
-	"os"
 	"path/filepath"
 	"strconv"
 	"sync"
@@ -122,14 +121,7 @@ func (c Client) run() ([]*trace.Trace, error) {
 
 	if combined != nil {
 		id := uuid.NewV4()
-		profileDir := filepath.Join(config.Config.ProfileOutputDirectory, time.Now().Format("2006-Jan-_2-15"))
-		if !com.IsDir(profileDir) {
-			err := os.MkdirAll(profileDir, os.ModePerm)
-			if err != nil {
-				return nil, err
-			}
-		}
-		path := filepath.Join(profileDir, "combined-"+id+".json")
+		path := filepath.Join(config.Config.ProfileOutputDirectory, "combined-"+id+".json")
 		bts, err := json.Marshal(combined)
 		if err == nil {
 			ioutil.WriteFile(path, bts, 0644)
@@ -235,14 +227,7 @@ func (c Client) runWorkload() ([]*trace.Trace, error) {
 	wg.Wait()
 	if combined != nil {
 		id := uuid.NewV4()
-		profileDir := filepath.Join(config.Config.ProfileOutputDirectory, time.Now().Format("2006-Jan-_2-15"))
-		if !com.IsDir(profileDir) {
-			err := os.MkdirAll(profileDir, os.ModePerm)
-			if err != nil {
-				return nil, err
-			}
-		}
-		path := filepath.Join(profileDir, "combined-"+id+".json")
+		path := filepath.Join(config.Config.ProfileOutputDirectory, "combined-"+id+".json")
 		bts, err := json.Marshal(combined)
 		if err == nil {
 			ioutil.WriteFile(path, bts, 0644)
@@ -276,18 +261,11 @@ func (c Client) RunOnce(model assets.ModelManifest) (*trace.Trace, error) {
 	cannonicalName := model.MustCanonicalName()
 
 	id := uuid.NewV4()
-	profileDir := filepath.Join(config.Config.ProfileOutputDirectory, time.Now().Format("2006-Jan-_2-15"))
-	if !com.IsDir(profileDir) {
-		err := os.MkdirAll(profileDir, os.ModePerm)
-		if err != nil {
-			return nil, err
-		}
-	}
 	profileBaseName := fmt.Sprintf("%s_%s.json", cannonicalName, id)
 	if !options.original {
 		profileBaseName = "upr_" + profileBaseName
 	}
-	profileFilePath := filepath.Join(profileDir, profileBaseName)
+	profileFilePath := filepath.Join(config.Config.ProfileOutputDirectory, profileBaseName)
 	env := map[string]string{
 		"UPR_ENABLED":                 "true",
 		"UPR_RUN_ID":                  id,
