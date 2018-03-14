@@ -33,6 +33,7 @@ var rootCmd = &cobra.Command{
 	Use: "micro",
 	PersistentPreRunE: func(cmd *cobra.Command, args []string) error {
 		mconfig.Config.VisibleDevices = visibleDevices
+		os.Setenv("CUDA_VISIBLE_DEVICES", visibleDevices)
 		if monitorMemory && gpuinfo.IsSupported {
 			info, err := gpuinfo.New()
 			if err != nil {

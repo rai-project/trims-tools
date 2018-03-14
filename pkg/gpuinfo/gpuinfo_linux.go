@@ -7,7 +7,6 @@ import (
 	"encoding/json"
 	"io"
 	"os"
-	"strconv"
 	"strings"
 	"sync"
 	"time"
@@ -16,6 +15,7 @@ import (
 	"github.com/olekukonko/tablewriter"
 	"github.com/pkg/errors"
 	"github.com/rai-project/cudainfo"
+	mconfig "github.com/rai-project/micro18-tools/pkg/config"
 	nvml "github.com/rai-project/nvml-go"
 	"github.com/spf13/cast"
 	yaml "gopkg.in/yaml.v2"
@@ -23,7 +23,7 @@ import (
 
 type Device struct {
 	mut     sync.Mutex
-	index   int
+	index   uint
 	handle  *cudainfo.NVMLDevice
 	entries []cudainfo.DeviceStatus
 }
@@ -37,21 +37,35 @@ type System struct {
 	devices    []*Device
 }
 
+func isVisible(ii uint) bool {
+	visibleDevices := mconfig.Config.VisibleDevices
+	for _, dev := range strings.Split(visibleDevices, ",") {
+		idev := cast.ToUint(dev)
+		if ii == idev {
+			return true
+		}
+	}
+	return false
+}
+
 func New() (*System, error) {
 	devs, err := cudainfo.GetDeviceCount()
 	if err != nil {
 		return nil, errors.Wrapf(err, "cannot get nvml device count")
 	}
-	devices := make([]*Device, devs)
-	for ii := range devices {
+	devices := []*Device{}
+	for ii := uint(0); ii < devs; ii++ {
+		if !isVisible(ii) {
+			continue
+		}
 		handle, err := cudainfo.NewNvmlDevice(uint(ii))
 		if err != nil {
 			return nil, errors.Wrapf(err, "cannot get device handle for %d", ii)
 		}
-		devices[ii] = &Device{
+		devices = append(devices, &Device{
 			index:  ii,
 			handle: handle,
-		}
+		})
 	}
 	return &System{
 		done:    make(chan bool),
@@ -162,7 +176,7 @@ func (m *System) dsvRows() [][]string {
 	for _, dev := range m.devices {
 		currTotalUsed := uint64(0)
 		currTotalFree := uint64(0)
-		devIdx := strconv.Itoa(dev.index)
+		devIdx := cast.ToString(dev.index)
 		for _, entry := range dev.entries {
 			mem := entry.Memory
 			memoryUsed := mem.Used
@@ -193,7 +207,7 @@ func (m *System) dsvRows() [][]string {
 			rowDivider,
 		)
 		for ii, dev := range m.devices {
-			devIdx := strconv.Itoa(dev.index)
+			devIdx := cast.ToString(dev.index)
 			rows = append(
 				rows,
 				[]string{
@@ -212,7 +226,7 @@ func (m *System) dsvRows() [][]string {
 		)
 	}
 	for ii, dev := range m.devices {
-		devIdx := strconv.Itoa(dev.index)
+		devIdx := cast.ToString(dev.index)
 		averageUsed := uint64(float64(totalUsed[ii]) / float64(totalEntries[ii]))
 		averageFree := uint64(float64(totalFree[ii]) / float64(totalEntries[ii]))
 		rows = append(
