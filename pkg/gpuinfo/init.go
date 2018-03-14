@@ -1,4 +1,4 @@
-package gpumem
+package gpuinfo
 
 import (
 	"runtime"
@@ -8,12 +8,12 @@ import (
 )
 
 var (
-	log         = logger.New().WithField("pkg", "micro/gpumem")
+	log         = logger.New().WithField("pkg", "micro/gpuinfo")
 	IsSupported = runtime.GOOS == "linux"
 )
 
 func init() {
 	config.AfterInit(func() {
-		log = logger.New().WithField("pkg", "micro/gpumem")
+		log = logger.New().WithField("pkg", "micro/gpuinfo")
 	})
 }

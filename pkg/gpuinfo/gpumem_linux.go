@@ -1,6 +1,6 @@
 // +build linux
 
-package gpumem
+package gpuinfo
 
 import (
 	"encoding/csv"
@@ -15,22 +15,17 @@ import (
 	humanize "github.com/dustin/go-humanize"
 	"github.com/olekukonko/tablewriter"
 	"github.com/pkg/errors"
+	"github.com/rai-project/cudainfo"
 	nvml "github.com/rai-project/nvml-go"
 	"github.com/spf13/cast"
 	yaml "gopkg.in/yaml.v2"
 )
 
-type Entry struct {
-	timestamp  time.Time
-	MemoryUsed uint64
-	MemoryFree uint64
-}
-
 type Device struct {
 	mut     sync.Mutex
 	index   int
-	handle  nvml.DeviceHandle
-	entries []Entry
+	handle  *cudainfo.NVMLDevice
+	entries []cudainfo.DeviceStatus
 }
 
 type System struct {
@@ -43,13 +38,13 @@ type System struct {
 }
 
 func New() (*System, error) {
-	devs, err := nvml.DeviceCount()
+	devs, err := cudainfo.GetDeviceCount()
 	if err != nil {
 		return nil, errors.Wrapf(err, "cannot get nvml device count")
 	}
 	devices := make([]*Device, devs)
 	for ii := range devices {
-		handle, err := nvml.DeviceGetHandleByIndex(ii)
+		handle, err := cudainfo.NewNvmlDevice(ii)
 		if err != nil {
 			return nil, errors.Wrapf(err, "cannot get device handle for %d", ii)
 		}
@@ -169,18 +164,21 @@ func (m *System) dsvRows() [][]string {
 		currTotalFree := uint64(0)
 		devIdx := strconv.Itoa(dev.index)
 		for _, entry := range dev.entries {
-			currTotalUsed += entry.MemoryUsed
-			currTotalFree += entry.MemoryFree
+			mem := entry.Memory
+			memoryUsed := mem.Used
+			memoryFree := mem.Free
+			currTotalUsed += memoryUsed
+			currTotalFree += memoryFree
 			if fullOutput {
 				rows = append(
 					rows,
 					[]string{
 						devIdx,
 						entry.timestamp.Format(time.RFC3339Nano),
-						cast.ToString(entry.MemoryUsed),
-						humanize.Bytes(entry.MemoryUsed),
-						cast.ToString(entry.MemoryFree),
-						humanize.Bytes(entry.MemoryFree),
+						cast.ToString(memoryUsed),
+						humanize.Bytes(memoryUsed),
+						cast.ToString(memoryFree),
+						humanize.Bytes(memoryFree),
 					},
 				)
 			}
@@ -253,7 +251,13 @@ func (m *System) writeTable() error {
 
 func (dev *Device) recordInfo() {
 	timestamp := time.Now()
-	info, err := nvml.DeviceMemoryInformation(dev.handle)
+	info, err := dev.handle.Status()
+	if err != nil {
+		log.WithError(err).Error("failed to get device memory information")
+		return
+	}
+
+	meminfo, err := nvml.DeviceMemoryInformation(dev.handle)
 	if err != nil {
 		log.WithError(err).Error("failed to get device memory information")
 		return
@@ -262,11 +266,7 @@ func (dev *Device) recordInfo() {
 	defer dev.mut.Unlock()
 	dev.entries = append(
 		dev.entries,
-		Entry{
-			timestamp:  timestamp,
-			MemoryUsed: info.Used,
-			MemoryFree: info.Free,
-		},
+		*info,
 	)
 }
 

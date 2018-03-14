@@ -1,6 +1,6 @@
 // +build !linux
 
-package gpumem
+package gpuinfo
 
 import (
 	"errors"
