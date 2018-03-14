@@ -3,13 +3,12 @@
 This repository includes a set of tools that are useful for performing experiments for the Micro18 papers.
 The tools may be applicable for other types of projects which perform workload characterization and/or use the Chrome trace format.
 
-## Installing 
+## Installing
 
 ### Installing Go
 
 The tool is developed using [golang](https://golang.org/) which needs to be installed for code to be compiled from source.
 You can install Golang either through [Go Version Manager](https://github.com/moovweb/gvm)(recommended) or from the instructions on the [golang site](https://golang.org/). We recommend the Go Version Manager.
-
 
 The following are instruction on how to install Go 1.8 through Go version manager.
 Go version 1.8+ is required to compile RAI.
@@ -63,7 +62,6 @@ CGO_LDFLAGS="-g -O2"
 
 ### Install the package
 
-
 Navigate to where Go will expect to find the source for this repo. Make the path if it does not exist.
 
     mkdir -p $GOPATH/src/github.com/rai-project
@@ -77,7 +75,7 @@ Clone this repository there.
 Install the dependencies
 
     go get -v ./...
-    
+
 You should now be able to build the micro18-tools
 
     go build main.go
@@ -115,7 +113,17 @@ This option is only supported on linux and uses the nvml library.
 
 ### Combining Traces
 
-...
+```
+go run main.go trace combine /tmp/profiles/* -o /tmp/combined.json
+```
+
+There are options that can be passed in
+
+```
+      --adjust          Adjust the timeline to ignore categories, adjust event names, and zero out the trace (default true)
+  -o, --output string   Ther output path to the combined trace (default "combined.json")
+      --skip_first      Skip the first input argument
+```
 
 ### Uploading Traces
 
@@ -183,11 +191,9 @@ By default this is set to 1.
 
 ## Server
 
-
 ```
 micro18-tools server run -d
 ```
-
 
 ...
 

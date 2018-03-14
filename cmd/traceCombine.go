@@ -18,6 +18,8 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
+	"os"
+	"path/filepath"
 
 	"github.com/Unknwon/com"
 	"github.com/pkg/errors"
@@ -69,6 +71,9 @@ var traceCombineCmd = &cobra.Command{
 		if err != nil {
 			return errors.Wrap(err, "unable to marshal combined traces")
 		}
+		if !com.IsDir(filepath.Dir(traceCombineOutputFile)) {
+			os.MkdirAll(filepath.Dir(traceCombineOutputFile), os.ModePerm)
+		}
 		if err := ioutil.WriteFile(traceCombineOutputFile, bts, 0644); err != nil {
 			return errors.Wrapf(err, "unable to write combined traces to %s", traceCombineOutputFile)
 		}
@@ -79,7 +84,7 @@ var traceCombineCmd = &cobra.Command{
 
 func init() {
 	traceCmd.AddCommand(traceCombineCmd)
-	traceCombineCmd.Flags().StringVarP(&traceCombineOutputFile, "output", "o", "combined.json", "Combined trace output file")
-	traceCombineCmd.Flags().BoolVar(&traceCombineAdjust, "adjust", true, "Adjust the timeline to ignore categories")
-	traceCombineCmd.Flags().BoolVar(&traceCombineSkipFirst, "rest", false, "Skip the first timeline")
+	traceCombineCmd.Flags().StringVarP(&traceCombineOutputFile, "output", "o", "combined.json", "Ther output path to the combined trace")
+	traceCombineCmd.Flags().BoolVar(&traceCombineAdjust, "adjust", true, "Adjust the timeline to ignore categories, adjust event names, and zero out the trace")
+	traceCombineCmd.Flags().BoolVar(&traceCombineSkipFirst, "skip_first", false, "Skip the first input argument")
 }
