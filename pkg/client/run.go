@@ -5,11 +5,11 @@ import (
 	"fmt"
 	"io/ioutil"
 	"path/filepath"
-	"strconv"
 	"sync"
 	"time"
 
 	"github.com/Unknwon/com"
+	"github.com/spf13/cast"
 
 	"github.com/Jeffail/tunny"
 	"github.com/cheggaaa/pb"
@@ -294,15 +294,16 @@ func (c Client) RunOnce(model assets.ModelManifest) (*trace.Trace, error) {
 		"MXNET_ENGINE_TYPE":           "NaiveEngine",
 		"MXNET_GPU_WORKER_NTHREADS":   "1",
 		"UPR_PROFILE_TARGET":          profileFilePath,
-		"UPR_INPUT_CHANNELS":          strconv.Itoa(int(dims[0])),
-		"UPR_INPUT_HEIGHT":            strconv.Itoa(int(dims[1])),
-		"UPR_INPUT_WIDTH":             strconv.Itoa(int(dims[2])),
+		"UPR_INPUT_CHANNELS":          cast.ToString(dims[0]),
+		"UPR_INPUT_HEIGHT":            cast.ToString(dims[1]),
+		"UPR_INPUT_WIDTH":             cast.ToString(dims[2]),
 		"UPR_INPUT_MEAN_R":            fmt.Sprintf("%v", mean[0]),
 		"UPR_INPUT_MEAN_G":            fmt.Sprintf("%v", mean[1]),
 		"UPR_INPUT_MEAN_B":            fmt.Sprintf("%v", mean[2]),
 		"UPR_GIT_SHA":                 config.Version.GitCommit,
 		"UPR_GIT_BRANCH":              config.Version.GitBranch,
 		"UPR_GIT_Date":                config.Version.BuildDate,
+		"CUDA_VISIBLE_DEVICES":        cast.ToString(0),
 	}
 	if options.original {
 		env["UPR_ENABLED"] = "false"
