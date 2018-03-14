@@ -23,7 +23,7 @@ import (
 
 type Device struct {
 	mut     sync.Mutex
-	index   uint64
+	index   uint
 	handle  *cudainfo.NVMLDevice
 	entries []cudainfo.DeviceStatus
 }
@@ -37,7 +37,7 @@ type System struct {
 	devices    []*Device
 }
 
-func isVisible(ii uint64) bool {
+func isVisible(ii uint) bool {
 	visibleDevices := mconfig.Config.VisibleDevices
 	for _, dev := range strings.Split(visibleDevices, ",") {
 		idev := cast.ToUint(dev)
@@ -54,11 +54,11 @@ func New() (*System, error) {
 		return nil, errors.Wrapf(err, "cannot get nvml device count")
 	}
 	devices := []*Device{}
-	for ii := uint64(0); ii < devs; ii++ {
+	for ii := uint(0); ii < devs; ii++ {
 		if !isVisible(ii) {
 			continue
 		}
-		handle, err := cudainfo.NewNvmlDevice(uint64(ii))
+		handle, err := cudainfo.NewNvmlDevice(uint(ii))
 		if err != nil {
 			return nil, errors.Wrapf(err, "cannot get device handle for %d", ii)
 		}
@@ -238,7 +238,7 @@ func (m *System) dsvRows() [][]string {
 		currPeakPower := uint64(0)
 		currPeakTemperature := uint64(0)
 		currPeakGPUUtilization := uint64(0)
-		currPeaklMemoryUtilization := uint64(0)
+		currPeakMemoryUtilization := uint64(0)
 		currPeakMemoryUsed := uint64(0)
 		currPeakMemoryFree := uint64(0)
 		currPeakClockCore := uint64(0)
@@ -274,16 +274,16 @@ func (m *System) dsvRows() [][]string {
 			currTotalNumProcesses += numProcesses
 
 			currPeakPower = max(currPeakPower, power)
-			currPeakTemperature += max(currPeakTemperature, temperature)
-			currPeakGPUUtilization += max(currPeakGPUUtilization, gpuUtilization)
-			currPeakMemoryUtilization += max(currPeakMemoryUtilizationm, memoryUtilization)
-			currPeakMemoryUsed += max(currPeakMemoryUsed, memoryUsed)
-			currPeakMemoryFree += max(currPeakMemoryFree, memoryFree)
-			currPeakClockCore += max(currPeakClockCore, clockCore)
-			currPeakClockMemory += max(currPeakClockMemory, clockMemory)
-			currPeakPCIThroughputRX += max(currPeakPCIThroughputRX, PCIThroughputRX)
-			currPeakPCIThroughputTX += max(currPeakPCIThroughputTX, PCIThroughputTX)
-			currPeakNumProcesses += max(currPeakNumProcesses, numProcesses)
+			currPeakTemperature = max(currPeakTemperature, temperature)
+			currPeakGPUUtilization = max(currPeakGPUUtilization, gpuUtilization)
+			currPeakMemoryUtilization = max(currPeakMemoryUtilization, memoryUtilization)
+			currPeakMemoryUsed = max(currPeakMemoryUsed, memoryUsed)
+			currPeakMemoryFree = max(currPeakMemoryFree, memoryFree)
+			currPeakClockCore = max(currPeakClockCore, clockCore)
+			currPeakClockMemory = max(currPeakClockMemory, clockMemory)
+			currPeakPCIThroughputRX = max(currPeakPCIThroughputRX, PCIThroughputRX)
+			currPeakPCIThroughputTX = max(currPeakPCIThroughputTX, PCIThroughputTX)
+			currPeakNumProcesses = max(currPeakNumProcesses, numProcesses)
 
 			if fullOutput {
 				rows = append(
@@ -346,18 +346,18 @@ func (m *System) dsvRows() [][]string {
 				devIdx,
 				"peak",
 				cast.ToString(peakPower[ii]),
-				cast.ToString(averageTemperature[ii]),
-				cast.ToString(averageGPUUtilization[ii]),
-				cast.ToString(averageMemoryUtilization[ii]),
-				cast.ToString(averageMemoryUsed[ii]),
-				humanize.Bytes(averageMemoryUsed[ii]),
-				cast.ToString(averageMemoryFree[ii]),
-				humanize.Bytes(averageMemoryFree),
-				cast.ToString(averageClockCore[ii]),
-				cast.ToString(averageClockMemory[ii]),
-				cast.ToString(averagePCIThroughputRX[ii]),
-				cast.ToString(averagePCIThroughputTX[ii]),
-				cast.ToString(averageNumProcesses[ii]),
+				cast.ToString(peakTemperature[ii]),
+				cast.ToString(peakGPUUtilization[ii]),
+				cast.ToString(peakMemoryUtilization[ii]),
+				cast.ToString(peakMemoryUsed[ii]),
+				humanize.Bytes(peakMemoryUsed[ii]),
+				cast.ToString(peakMemoryFree[ii]),
+				humanize.Bytes(peakMemoryFree[ii]),
+				cast.ToString(peakClockCore[ii]),
+				cast.ToString(peakClockMemory[ii]),
+				cast.ToString(peakPCIThroughputRX[ii]),
+				cast.ToString(peakPCIThroughputTX[ii]),
+				cast.ToString(peakNumProcesses[ii]),
 			},
 		)
 	}
