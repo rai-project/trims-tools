@@ -186,6 +186,7 @@ func (m *System) dsvRows() [][]string {
 		"---",
 		"---",
 	}
+	_ = rowDivider
 	fullOutput := m.fullOutput
 	rows := [][]string{}
 	totalPower := []uint{}
@@ -225,7 +226,7 @@ func (m *System) dsvRows() [][]string {
 			clockMemory := entry.Clocks.Memory
 			PCIThroughputRX := entry.PCI.Throughput.RX
 			PCIThroughputTX := entry.PCI.Throughput.TX
-			numProcesses := len(entry.Processes)
+			numProcesses := uint64(len(entry.Processes))
 
 			currTotalPower += power
 			currTotalTemperature += temperature
