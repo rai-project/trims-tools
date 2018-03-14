@@ -131,6 +131,12 @@ There are options that can be passed in
 
 ## Client
 
+### Examples
+
+```
+go run main.go client run --model_iterations=100 --iterations=100 --concurrent=15 --distribution=pareto
+```
+
 ### Basic Run
 
 ```
