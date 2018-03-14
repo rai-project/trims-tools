@@ -81,5 +81,5 @@ func init() {
 	traceCmd.AddCommand(traceCombineCmd)
 	traceCombineCmd.Flags().StringVarP(&traceCombineOutputFile, "output", "o", "combined.json", "Combined trace output file")
 	traceCombineCmd.Flags().BoolVar(&traceCombineAdjust, "adjust", true, "Adjust the timeline to ignore categories")
-	traceCombineCmd.Flags().BoolVar(&traceCombineSkipFirst, "rest", true, "Skip the first timeline")
+	traceCombineCmd.Flags().BoolVar(&traceCombineSkipFirst, "rest", false, "Skip the first timeline")
 }
