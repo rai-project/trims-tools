@@ -365,7 +365,8 @@ func (tr Trace) UpdateEventNames() Trace {
 				uprEnabled := "upr_enabled=" + cast.ToString(tr.UPREnabled)
 				modelName := "model_name=" + otherData.ModelName
 				hostName := "host_name=" + otherData.Hostname
-				name = strings.Join([]string{uprEnabled, modelName, hostName}, ",")
+				iteration := "iteration=" + cast.ToString(tr.Iteration)
+				name = strings.Join([]string{uprEnabled, modelName, hostName, iteration}, ",")
 			}
 			event.Args = map[string]string{
 				"name":        name,
