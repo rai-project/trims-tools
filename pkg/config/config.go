@@ -16,6 +16,7 @@ import (
 var (
 	HomeDir, _                        = homedir.Dir()
 	HostName, _                       = os.Hostname()
+	DefaultVisibleDevices             = "0"
 	DefaultSrcPath                    = "Automatic"
 	DefaultBasePath                   = utils.GetEnvOr("UPR_BASE_DIR", filepath.Join(HomeDir, "carml", "data", "mxnet"))
 	DefaultServerRelativePath         = ""
@@ -30,6 +31,7 @@ var (
 )
 
 type microConfig struct {
+	VisibleDevices             string        `json:"cuda_visible_devices" yaml:"micro18.visible_devices" config:"micro18.visible_devices"`
 	BuildTimeoutSeconds        int64         `json:"build_timeout" yaml:"micro18.build_timeout" config:"micro18.build_timeout" default:600`
 	PollingInterval            int           `json:"polling_interval" yaml:"micro18.polling_interval" config:"micro18.polling_interval" default:100`
 	BaseSrcPath                string        `json:"src_path" yaml:"micro18.src_path" config:"micro18.src_path"`
@@ -118,6 +120,9 @@ func (a *microConfig) Read() {
 	a.ProfileOutputDirectory = filepath.Join(a.ProfileOutputBaseDirectory, HostName, time.Now().Format("2006-01-02-15"))
 	if !com.IsDir(a.ProfileOutputDirectory) {
 		os.MkdirAll(a.ProfileOutputDirectory, os.ModePerm)
+	}
+	if a.VisibleDevices == "" {
+		a.VisibleDevices = DefaultVisibleDevices
 	}
 }
 

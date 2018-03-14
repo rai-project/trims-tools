@@ -303,7 +303,7 @@ func (c Client) RunOnce(model assets.ModelManifest) (*trace.Trace, error) {
 		"UPR_GIT_SHA":                 config.Version.GitCommit,
 		"UPR_GIT_BRANCH":              config.Version.GitBranch,
 		"UPR_GIT_Date":                config.Version.BuildDate,
-		"CUDA_VISIBLE_DEVICES":        cast.ToString(0),
+		"CUDA_VISIBLE_DEVICES":        config.Config.VisibleDevices,
 	}
 	if options.original {
 		env["UPR_ENABLED"] = "false"

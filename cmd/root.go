@@ -12,24 +12,27 @@ import (
 	homedir "github.com/mitchellh/go-homedir"
 	"github.com/rai-project/config"
 	"github.com/rai-project/logger"
+	mconfig "github.com/rai-project/micro18-tools/pkg/config"
 	"github.com/rai-project/micro18-tools/pkg/gpuinfo"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 )
 
 var (
-	IsDebug       bool = true
-	IsVerbose     bool = true
-	CfgFile       string
-	monitorMemory bool
-	memoryInfo    *gpuinfo.System
-	log           *logrus.Entry = logrus.New().WithField("pkg", "micro/cmd")
+	IsDebug        bool = true
+	IsVerbose      bool = true
+	CfgFile        string
+	monitorMemory  bool
+	memoryInfo     *gpuinfo.System
+	visibleDevices string
+	log            *logrus.Entry = logrus.New().WithField("pkg", "micro/cmd")
 )
 
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
 	Use: "micro",
 	PersistentPreRunE: func(cmd *cobra.Command, args []string) error {
+		mconfig.Config.VisibleDevices = visibleDevices
 		if monitorMemory && gpuinfo.IsSupported {
 			info, err := gpuinfo.New()
 			if err != nil {
@@ -68,6 +71,7 @@ func init() {
 	// will be global for your application.
 	rootCmd.PersistentFlags().StringVar(&CfgFile, "config", "", "config file (default is $HOME/.carml_config.yaml)")
 	rootCmd.PersistentFlags().BoolVar(&monitorMemory, "monitor_memory", gpuinfo.IsSupported, "monitors the memory during evaluation and prints the memory information at the end")
+	rootCmd.PersistentFlags().StringVar(&visibleDevices, "visible_devices", "0", "comma seperated list of devices visible to both the server and client. This controls the CUDA_VISIBLE_DEVICES variable")
 
 	// Cobra also supports local flags, which will only run
 	// when this action is called directly.
