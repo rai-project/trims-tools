@@ -12,23 +12,23 @@ var (
 	UnsupportedError = errors.New("unsupported device. nvml is only supported on linux hosts")
 )
 
-type Memory struct {
+type System struct {
 }
 
-func New() (*Memory, error) {
+func New() (*System, error) {
 	return nil, UnsupportedError
 }
 
-func (m *Memory) Start(timestep time.Duration) error {
+func (m *System) Start(timestep time.Duration) error {
 	return UnsupportedError
 }
 
-func (*Memory) Stop() {
+func (*System) Stop() {
 }
 
-func (*Memory) Print() {
+func (*System) Print() {
 }
 
-func (*Memory) Write(fmt string, output io.Writer) error {
+func (*System) Write(fmt string, output io.Writer) error {
 	return nil
 }
