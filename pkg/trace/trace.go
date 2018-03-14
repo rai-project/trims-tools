@@ -3,6 +3,7 @@ package trace
 import (
 	"encoding/json"
 	"math"
+	"strings"
 	"time"
 
 	"hash/fnv"
@@ -10,6 +11,7 @@ import (
 	"github.com/Workiva/go-datastructures/augmentedtree"
 	"github.com/pkg/errors"
 	"github.com/rai-project/uuid"
+	"github.com/spf13/cast"
 	"github.com/ulule/deepcopier"
 )
 
@@ -234,6 +236,15 @@ func (x *Trace) UnmarshalJSON(data []byte) error {
 }
 
 func (x Trace) Adjust() (Trace, error) {
+	tr, err := x.DeleteIgnoredEvents()
+	if err != nil {
+		log.WithError(err).Error("failed to delete ignored events")
+		tr = x
+	}
+	return tr.UpdateEventNames().ZeroOut(), nil
+}
+
+func (x Trace) DeleteIgnoredEvents() (Trace, error) {
 	var minTimeStamp int64
 	var adjustedEvent TraceEvent
 	events := TraceEvents{}
@@ -248,7 +259,7 @@ func (x Trace) Adjust() (Trace, error) {
 		}
 	}
 	if adjustedEvent.Name == "" {
-		return x.ZeroOut()
+		return x, nil
 	}
 	// pp.Println(adjustedEvent)
 	for _, event := range x.TraceEvents {
@@ -289,10 +300,10 @@ func (x Trace) Adjust() (Trace, error) {
 		events = append(events, event)
 	}
 	x.TraceEvents = events
-	return x.ZeroOut()
+	return x, nil
 }
 
-func (x Trace) ZeroOut() (Trace, error) {
+func (x Trace) ZeroOut() Trace {
 	var minEvent TraceEvent
 	minTimeStamp := int64(math.MaxInt64)
 	for _, event := range x.TraceEvents { // assumes that there is only one thing to ignore
@@ -313,7 +324,7 @@ func (x Trace) ZeroOut() (Trace, error) {
 
 	td := minEvent.StartTime.Sub(x.StartTime)
 
-	return x.AddTimestampOffset(-minTimeStamp).AddDurationOffset(td), nil
+	return x.AddTimestampOffset(-minTimeStamp).AddDurationOffset(td)
 }
 
 func (x Trace) AddTimestampOffset(ts int64) Trace {
@@ -342,6 +353,29 @@ func (x Trace) AddDurationOffset(td time.Duration) Trace {
 	}
 	x.TraceEvents = events
 	return x
+}
+
+func (tr Trace) UpdateEventNames() Trace {
+	events := make([]TraceEvent, len(tr.TraceEvents))
+	for ii, event := range tr.TraceEvents {
+		if event.EventType == "M" {
+			name := tr.ID
+			if tr.OtherDataRaw != nil {
+				otherData := tr.OtherDataRaw
+				uprEnabled := "upr_enabled=" + cast.ToString(tr.UPREnabled)
+				modelName := "model_name=" + otherData.ModelName
+				hostName := "host_name=" + otherData.Hostname
+				name = strings.Join([]string{uprEnabled, modelName, hostName}, ",")
+			}
+			event.Args = map[string]string{
+				"name":        name,
+				"upr_enabled": cast.ToString(tr.UPREnabled),
+			}
+		}
+		events[ii] = event
+	}
+	tr.TraceEvents = events
+	return tr
 }
 
 func (x Trace) HashID() int64 {
