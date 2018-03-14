@@ -61,9 +61,6 @@ var traceCombineCmd = &cobra.Command{
 			}
 			traces = append(traces, trace)
 		}
-		if len(traces) == 1 {
-			return nil
-		}
 		combinedTrace := trace.Combine(traces[0], traces[1:]...)
 		bts, err := json.Marshal(combinedTrace)
 		if err != nil {
