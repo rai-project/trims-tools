@@ -3,7 +3,86 @@
 This repository includes a set of tools that are useful for performing experiments for the Micro18 papers.
 The tools may be applicable for other types of projects which perform workload characterization and/or use the Chrome trace format.
 
-## Config
+## Installing 
+
+### Installing Go
+
+The tool is developed using [golang](https://golang.org/) which needs to be installed for code to be compiled from source.
+You can install Golang either through [Go Version Manager](https://github.com/moovweb/gvm)(recommended) or from the instructions on the [golang site](https://golang.org/). We recommend the Go Version Manager.
+
+
+The following are instruction on how to install Go 1.8 through Go version manager.
+Go version 1.8+ is required to compile RAI.
+
+Download the [GVM](https://github.com/moovweb/gvm) using
+
+```
+bash << (curl -s -S -L https://raw.githubusercontent.com/moovweb/gvm/master/binscripts/gvm-installer)
+```
+
+Add the following line to your `.bashrc`(or `.zshrc` if using zsh) to set up the GVM environment.
+This is sometimes done for you by default.
+
+```
+[[ -s "$HOME/.gvm/scripts/gvm" ]] && source "$HOME/.gvm/scripts/gvm"
+```
+
+You can then install the Go 1.8 binary and set it as the default
+
+```
+gvm install go1.10 -B
+gvm use go1.10 --default
+```
+
+`gvm` will setup both your `$GOPATH` and `$GOROOT` and you can validate that the installation completed by invoking
+
+```sh
+$ go env
+GOARCH="amd64"
+GOBIN=""
+GOEXE=""
+GOHOSTARCH="amd64"
+GOHOSTOS="linux"
+GOOS="linux"
+GOPATH="/home/abduld/.gvm/pkgsets/go1.8/global"
+GORACE=""
+GOROOT="/home/abduld/.gvm/gos/go1.8"
+GOTOOLDIR="/home/abduld/.gvm/gos/go1.8/pkg/tool/linux_amd64"
+GCCGO="gccgo"
+CC="gcc"
+GOGCCFLAGS="-fPIC -m64 -pthread -fmessage-length=0 -fdebug-prefix-map=/tmp/go-build917072201=/tmp/go-build -gno-record-gcc-switches"
+CXX="g++"
+CGO_ENABLED="1"
+PKG_CONFIG="pkg-config"
+CGO_CFLAGS="-g -O2"
+CGO_CPPFLAGS=""
+CGO_CXXFLAGS="-g -O2"
+CGO_FFLAGS="-g -O2"
+CGO_LDFLAGS="-g -O2"
+```
+
+### Install the package
+
+
+Navigate to where Go will expect to find the source for this repo. Make the path if it does not exist.
+
+    mkdir -p $GOPATH/src/github.com/rai-project
+    cd $GOPATH/src/github.com/rai-project
+
+Clone this repository there.
+
+    git clone git@github.com:rai-project/micro18-tools.git
+    cd micro18-tools
+
+Install the dependencies
+
+    go get -v ./...
+    
+You should now be able to build the micro18-tools
+
+    go build main.go
+
+## Configurations
 
 The current client looks for the config in `~/.carml_config.yml`, but this can be overridden using the `--config=<<file_path>>` option.
 
@@ -103,6 +182,12 @@ The number of concurrent requests can be specified using the `--concurrent` opti
 By default this is set to 1.
 
 ## Server
+
+
+```
+micro18-tools server run -d
+```
+
 
 ...
 
