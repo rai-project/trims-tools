@@ -26,6 +26,12 @@ This is sometimes done for you by default.
 [[ -s "$HOME/.gvm/scripts/gvm" ]] && source "$HOME/.gvm/scripts/gvm"
 ```
 
+Ran your updated `.bashrc` file
+```
+source .bashrc
+```
+
+
 You can then install the Go 1.8 binary and set it as the default
 
 ```
