@@ -2,6 +2,7 @@ package trace
 
 import (
 	"encoding/json"
+	"math"
 	"time"
 
 	"hash/fnv"
@@ -46,8 +47,8 @@ type TraceEvent struct {
 	Name       string        `json:"name,omitempty"`
 	Category   string        `json:"cat,omitempty"`
 	EventType  string        `json:"ph,omitempty"`
-	Timestamp  int64         `json:"ts,omitempty"`  // displayTimeUnit
-	Duration   time.Duration `json:"dur,omitempty"` // displayTimeUnit
+	Timestamp  int64         `json:"ts"`  // displayTimeUnit
+	Duration   time.Duration `json:"dur"` // displayTimeUnit
 	ProcessID  int64         `json:"pid"`
 	ThreadID   int64         `json:"tid,omitempty"`
 	Args       interface{}   `json:"args,omitempty"`
@@ -247,7 +248,7 @@ func (x Trace) Adjust() (Trace, error) {
 		}
 	}
 	if adjustedEvent.Name == "" {
-		return x, nil
+		return x.ZeroOut()
 	}
 	// pp.Println(adjustedEvent)
 	for _, event := range x.TraceEvents {
@@ -288,7 +289,59 @@ func (x Trace) Adjust() (Trace, error) {
 		events = append(events, event)
 	}
 	x.TraceEvents = events
-	return x, nil
+	return x.ZeroOut()
+}
+
+func (x Trace) ZeroOut() (Trace, error) {
+	var minEvent TraceEvent
+	minTimeStamp := int64(math.MaxInt64)
+	for _, event := range x.TraceEvents { // assumes that there is only one thing to ignore
+		if event.Category == "ignore" {
+			continue
+		}
+		if event.EventType != "B" {
+			continue
+		}
+		if event.EventType == "E" {
+			continue
+		}
+		if minTimeStamp > event.Timestamp {
+			minTimeStamp = event.Timestamp
+			minEvent = event
+		}
+	}
+
+	td := minEvent.StartTime.Sub(x.StartTime)
+
+	return x.AddTimestampOffset(-minTimeStamp).AddDurationOffset(td), nil
+}
+
+func (x Trace) AddTimestampOffset(ts int64) Trace {
+	events := make([]TraceEvent, len(x.TraceEvents))
+	for ii, event := range x.TraceEvents {
+		if event.EventType == "B" || event.EventType == "E" {
+			event.Timestamp = event.Timestamp + ts
+			event.Start = event.Start + ts
+			event.End = event.End + ts
+		}
+		events[ii] = event
+	}
+	x.TraceEvents = events
+	return x
+}
+
+func (x Trace) AddDurationOffset(td time.Duration) Trace {
+	events := make([]TraceEvent, len(x.TraceEvents))
+	for ii, event := range x.TraceEvents {
+		if event.EventType == "B" || event.EventType == "E" {
+			event.Time = event.Time.Add(td)
+			event.StartTime = event.StartTime.Add(td)
+			event.EndTime = event.EndTime.Add(td)
+		}
+		events[ii] = event
+	}
+	x.TraceEvents = events
+	return x
 }
 
 func (x Trace) HashID() int64 {

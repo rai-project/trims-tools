@@ -57,7 +57,10 @@ var traceCombineCmd = &cobra.Command{
 				return errors.Wrapf(err, "unable to unmarshal the profile file from %s", path)
 			}
 			if traceCombineAdjust {
-				trace, _ = trace.Adjust()
+				trace, err = trace.Adjust()
+				if err != nil {
+					log.WithError(err).Error("failed to adjust trace")
+				}
 			}
 			traces = append(traces, trace)
 		}
