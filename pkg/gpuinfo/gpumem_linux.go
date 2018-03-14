@@ -44,7 +44,7 @@ func New() (*System, error) {
 	}
 	devices := make([]*Device, devs)
 	for ii := range devices {
-		handle, err := cudainfo.NewNvmlDevice(ii)
+		handle, err := cudainfo.NewNvmlDevice(uint(ii))
 		if err != nil {
 			return nil, errors.Wrapf(err, "cannot get device handle for %d", ii)
 		}
@@ -174,7 +174,7 @@ func (m *System) dsvRows() [][]string {
 					rows,
 					[]string{
 						devIdx,
-						entry.timestamp.Format(time.RFC3339Nano),
+						entry.TimeStamp.Format(time.RFC3339Nano),
 						cast.ToString(memoryUsed),
 						humanize.Bytes(memoryUsed),
 						cast.ToString(memoryFree),
@@ -250,14 +250,7 @@ func (m *System) writeTable() error {
 }
 
 func (dev *Device) recordInfo() {
-	timestamp := time.Now()
 	info, err := dev.handle.Status()
-	if err != nil {
-		log.WithError(err).Error("failed to get device memory information")
-		return
-	}
-
-	meminfo, err := nvml.DeviceMemoryInformation(dev.handle)
 	if err != nil {
 		log.WithError(err).Error("failed to get device memory information")
 		return
