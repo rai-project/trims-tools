@@ -20,20 +20,29 @@ var clientRunMemoryCmd = &cobra.Command{
 	Short:   "Run the client command and print out how much memory is used by internal layers.",
 	RunE: func(cmd *cobra.Command, args []string) error {
 		ctx := context.Background()
-		client := client.New(
-			client.Context(ctx),
-			client.OriginalMode(false),
-			client.DebugMode(runClientDebug),
-			client.ModelName(runClientModels),
-			client.IterationCount(1),
-			client.ProfileMemory(true),
-			client.UploadProfile(false),
-			client.ConcurrentRunCount(1),
-			client.ShowProgress(false),
-			client.PostProcess(true),
-			client.Stdout(ioutil.Discard),
-			client.Stderr(ioutil.Discard),
-		)
+		opts :=
+			[]client.Option{
+				client.Context(ctx),
+				client.OriginalMode(true),
+				client.DebugMode(runClientDebug),
+				client.ModelName(runClientModels),
+				client.IterationCount(1),
+				client.ProfileMemory(true),
+				client.UploadProfile(false),
+				client.ConcurrentRunCount(1),
+				client.ShowProgress(false),
+				client.ProfileIO(false),
+				client.PostProcess(true),
+				client.Stdout(ioutil.Discard),
+				client.Stderr(ioutil.Discard),
+			}
+		if runClientDebug {
+			opts = append(opts, []client.Option{
+				client.Stdout(os.Stdout),
+				client.Stderr(os.Stderr),
+			}...)
+		}
+		client := client.New(opts...)
 		traces, err := client.Run()
 		if err != nil {
 			return err

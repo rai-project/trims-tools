@@ -424,6 +424,11 @@ func (m *System) writeTable() error {
 }
 
 func (dev *Device) recordInfo() {
+	defer func() {
+		if r := recover(); r != nil {
+			return
+		}
+	}()
 	info, err := dev.handle.Status()
 	if err != nil {
 		log.WithError(err).Error("failed to get device status")

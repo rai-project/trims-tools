@@ -42,7 +42,7 @@ var rootCmd = &cobra.Command{
 				return nil
 			}
 			memoryInfo = info
-			memoryInfo.Start(5 * time.Millisecond)
+			memoryInfo.Start(50 * time.Millisecond)
 		}
 		return nil
 	},
