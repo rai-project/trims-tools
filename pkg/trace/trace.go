@@ -215,6 +215,8 @@ func (t Trace) Less(i, j int) bool { return t.TraceEvents.Less(i, j) }
 
 func (x *Trace) UnmarshalJSON(data []byte) error {
 	var jsonTrace JSONTrace
+	id := uuid.NewV4()
+
 	err := json.Unmarshal(data, &jsonTrace)
 	if err != nil {
 		log.WithError(err).Error("failed to unmarshal trace data")
@@ -226,9 +228,9 @@ func (x *Trace) UnmarshalJSON(data []byte) error {
 	if err := deepcopier.Copy(jsonTrace.OtherDataRaw).To(x.OtherDataRaw); err != nil {
 		return errors.Wrapf(err, "unable to copy other data model")
 	}
-	x.ID = uuid.NewV4()
+	x.ID = id
 	if x.OtherDataRaw != nil {
-		x.OtherDataRaw.ID = x.ID
+		x.OtherDataRaw.ID = id
 	}
 	if x.OtherDataRaw != nil {
 		x.StartTime, _ = time.Parse(time.RFC3339Nano, x.OtherDataRaw.StartAt)
@@ -242,7 +244,7 @@ func (x *Trace) UnmarshalJSON(data []byte) error {
 
 	x.OtherData = []*TraceOtherData{x.OtherDataRaw}
 	for ii := range x.TraceEvents {
-		x.TraceEvents[ii].TraceID = x.ID
+		x.TraceEvents[ii].TraceID = id
 	}
 
 	return nil

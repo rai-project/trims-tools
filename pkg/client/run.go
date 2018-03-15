@@ -69,28 +69,39 @@ func (c Client) run() ([]*trace.Trace, error) {
 		if options.showProgress {
 			defer progress.Increment()
 		}
-		trace, err := c.RunOnce(model)
+		profilePath, duration, err := c.RunOnce(model)
 		if err != nil {
 			return nil
 		}
-		if trace == nil {
+		if profilePath == "" {
 			return nil
 		}
+
 		wg.Add(1)
 		go func() {
 			defer wg.Done()
 			mut.Lock()
 			defer mut.Unlock()
-			cannonicalName := model.MustCanonicalName()
-			ii, ok := iterationCount[cannonicalName]
-			if !ok {
-				ii = 0
-				iterationCount[cannonicalName] = ii
-			} else {
-				iterationCount[cannonicalName] = ii + 1
+
+			trace, err := c.readProfile(profilePath, duration)
+			if err != nil {
+				return
 			}
-			trace.Iteration = int64(ii)
+			if trace == nil {
+				return
+			}
+
+			cannonicalName := model.MustCanonicalName()
+			iterCnt, ok := iterationCount[cannonicalName]
+			if !ok {
+				iterCnt = 0
+				iterationCount[cannonicalName] = iterCnt
+			} else {
+				iterationCount[cannonicalName] = iterCnt + 1
+			}
+			trace.Iteration = int64(iterCnt)
 			res = append(res, trace)
+
 			if combined == nil {
 				combined = trace
 				combined.ID = uuid.NewV4()
@@ -195,22 +206,31 @@ func (c Client) runWorkload() ([]*trace.Trace, error) {
 		if options.modelIterationCount != -1 && iterCnt >= options.modelIterationCount {
 			return nil
 		}
-		trace, err := c.RunOnce(model)
+		profilePath, duration, err := c.RunOnce(model)
 		if err != nil {
 			return nil
 		}
-		if trace == nil {
+		if profilePath == "" {
 			return nil
 		}
-
-		trace.Iteration = int64(iterCnt)
-		res = append(res, trace)
 
 		wg.Add(1)
 		go func() {
 			defer wg.Done()
 			mut.Lock()
 			defer mut.Unlock()
+
+			trace, err := c.readProfile(profilePath, duration)
+			if err != nil {
+				return
+			}
+			if trace == nil {
+				return
+			}
+
+			trace.Iteration = int64(iterCnt)
+			res = append(res, trace)
+
 			if combined == nil {
 				combined = trace
 				combined.ID = uuid.NewV4()
@@ -259,7 +279,7 @@ func (c Client) runWorkload() ([]*trace.Trace, error) {
 	return res, nil
 }
 
-func (c Client) RunOnce(model assets.ModelManifest) (*trace.Trace, error) {
+func (c Client) RunOnce(model assets.ModelManifest) (string, time.Duration, error) {
 	options := c.options
 
 	dims, err := model.GetImageDimensions()
@@ -273,7 +293,7 @@ func (c Client) RunOnce(model assets.ModelManifest) (*trace.Trace, error) {
 	}
 	if len(dims) != 3 {
 		err := errors.Errorf("expecting a 3 element vector for dimensions %v", dims)
-		return nil, err
+		return "", 0, err
 	}
 	cannonicalName := model.MustCanonicalName()
 
@@ -337,7 +357,7 @@ func (c Client) RunOnce(model assets.ModelManifest) (*trace.Trace, error) {
 		path := filepath.Join(config.Config.ClientPath, config.Config.ClientRunCmd)
 		err := errors.Errorf("failed to run cmd %s", path)
 		log.WithError(err).WithField("model_name", cannonicalName).WithField("dims", dims).Error("failed to run model")
-		return nil, err
+		return "", 0, err
 	}
 	if err != nil {
 		path := filepath.Join(config.Config.ClientPath, config.Config.ClientRunCmd)
@@ -347,11 +367,15 @@ func (c Client) RunOnce(model assets.ModelManifest) (*trace.Trace, error) {
 			lg = lg.WithError(err)
 		}
 		lg.Error("failed to run model")
-		return nil, err
+		return "", 0, err
 	}
 	if !options.postprocess {
-		return nil, nil
+		return "", 0, nil
 	}
+	return profileFilePath, timeToRun, nil
+}
+
+func (c *Client) readProfile(profileFilePath string, timeToRun time.Duration) (*trace.Trace, error) {
 	bts, err := ioutil.ReadFile(profileFilePath)
 	if err != nil {
 		err = errors.Wrapf(err, "unable to read profile file %s", profileFilePath)
@@ -367,7 +391,7 @@ func (c Client) RunOnce(model assets.ModelManifest) (*trace.Trace, error) {
 	if trace.OtherDataRaw != nil {
 		trace.OtherDataRaw.EndToEndProcessTime = timeToRun
 	}
-	if options.uploadProfile {
+	if c.options.uploadProfile {
 		if err := trace.Upload(); err != nil {
 			err = errors.Wrapf(err, "unable to upload profile file %s", profileFilePath)
 			log.WithField("cmd", config.Config.ClientRunCmd).WithError(err).Error("failed to upload profile output")
