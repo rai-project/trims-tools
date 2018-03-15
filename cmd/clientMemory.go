@@ -28,6 +28,7 @@ var clientRunMemoryCmd = &cobra.Command{
 			client.IterationCount(1),
 			client.ProfileMemory(true),
 			client.UploadProfile(false),
+			client.EagerInitialize(true),
 			client.ConcurrentRunCount(1),
 			client.ShowProgress(false),
 			client.PostProcess(true),
