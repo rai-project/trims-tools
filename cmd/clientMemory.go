@@ -33,6 +33,7 @@ var clientRunMemoryCmd = &cobra.Command{
 				client.ShowProgress(false),
 				client.ProfileIO(false),
 				client.PostProcess(true),
+				client.EagerInitialize(true),
 				client.Stdout(ioutil.Discard),
 				client.Stderr(ioutil.Discard),
 			}
