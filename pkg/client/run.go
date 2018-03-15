@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/Unknwon/com"
+"github.com/k0kubun/pp"
 	"github.com/spf13/cast"
 
 	"github.com/Jeffail/tunny"
@@ -306,6 +307,7 @@ func (c Client) RunOnce(model assets.ModelManifest) (string, time.Duration, erro
 	}
 	profileFilePath := filepath.Join(config.Config.ProfileOutputDirectory, profileBaseName)
 	env := map[string]string{
+		"HOME":                  config.HomeDir,
 		"UPR_RUN_ID":                  id,
 		"DATE":                        time.Now().Format(time.RFC3339Nano),
 		"UPR_MODEL_NAME":              cannonicalName,
@@ -314,6 +316,7 @@ func (c Client) RunOnce(model assets.ModelManifest) (string, time.Duration, erro
 		"OMP_NUM_THREADS":             "1",
 		"MXNET_ENGINE_TYPE":           "NaiveEngine",
 		"MXNET_GPU_WORKER_NTHREADS":   "1",
+		"UPR_BASE_DIR":          config.Config.BasePath + "/",
 		"UPR_PROFILE_TARGET":          profileFilePath,
 		"UPR_INPUT_CHANNELS":          cast.ToString(dims[0]),
 		"UPR_INPUT_HEIGHT":            cast.ToString(dims[1]),
@@ -351,6 +354,9 @@ func (c Client) RunOnce(model assets.ModelManifest) (string, time.Duration, erro
 	} else {
 		env["UPR_INITIALIZE_EAGER_ASYNC"] = "false"
 	}
+if false {
+pp.Println(env)
+}
 	tic := time.Now()
 	ran, err := utils.ExecCmd(
 		config.Config.ClientPath,
