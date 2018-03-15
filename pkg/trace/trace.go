@@ -105,14 +105,16 @@ type TraceOtherData struct {
 		Commit string `json:"commit"`
 		Date   string `json:"date"`
 	} `json:"git"`
-	Hostname     string `json:"hostname"`
-	IsClient     bool   `json:"is_client"`
-	ModelName    string `json:"model_name"`
-	ModelParams  string `json:"model_params"`
-	ModelPath    string `json:"model_path"`
-	StartAt      string `json:"start_at"`
-	SymbolParams string `json:"symbol_params"`
-	Username     string `json:"username"`
+	Hostname     string     `json:"hostname"`
+	IsClient     bool       `json:"is_client"`
+	ModelName    string     `json:"model_name"`
+	ModelParams  string     `json:"model_params"`
+	ModelPath    string     `json:"model_path"`
+	StartAt      string     `json:"start_at"`
+	SymbolParams string     `json:"symbol_params"`
+	Username     string     `json:"username"`
+	MinEvent     TraceEvent `json:"min_event"`
+	MaxEvent     TraceEvent `json:"max_event"`
 }
 
 type Trace struct {
@@ -241,6 +243,8 @@ func (x *Trace) UnmarshalJSON(data []byte) error {
 	maxEvent := x.MaxEvent()
 	x.OtherDataRaw.EndToEndTime = maxEvent.EndTime.Sub(minEvent.StartTime)
 	x.OtherDataRaw.EndToEndProcessTime = x.EndTime.Sub(x.StartTime)
+	x.OtherDataRaw.MaxEvent = maxEvent
+	x.OtherDataRaw.MinEvent = minEvent
 
 	x.OtherData = []*TraceOtherData{x.OtherDataRaw}
 	for ii := range x.TraceEvents {
