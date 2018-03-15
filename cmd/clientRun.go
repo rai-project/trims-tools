@@ -10,6 +10,7 @@ import (
 	"github.com/rai-project/micro18-tools/pkg/client"
 	mconfig "github.com/rai-project/micro18-tools/pkg/config"
 	"github.com/rai-project/micro18-tools/pkg/trace"
+	"github.com/rai-project/micro18-tools/pkg/utils"
 	"github.com/rai-project/uuid"
 	"github.com/spf13/cobra"
 )
@@ -67,7 +68,12 @@ var clientRunCompare = &cobra.Command{
 		if err != nil {
 			return err
 		}
+
+		progress := utils.NewProgress("comparing models", len(models))
+		defer progress.FinishPrint("finished comparing models")
+
 		for _, model := range models {
+			progress.Increment()
 			orig := makeClientRun(ctx, client.OriginalMode(true), client.ModelName(model.MustCanonicalName()))
 			origTraces, err := orig.Run()
 			if err != nil {
@@ -101,8 +107,8 @@ var clientRunCompare = &cobra.Command{
 				combinedTraces[name] = append(combinedTraces[name], origTraces...)
 				combinedTraces[name] = append(combinedTraces[name], modTraces...)
 			}
-
 		}
+		progress.Prefix("combining traces")
 		for name, traces := range combinedTraces {
 			if len(traces) == 0 {
 				continue
