@@ -324,6 +324,7 @@ func (c Client) RunOnce(model assets.ModelManifest) (*trace.Trace, error) {
 	if options.eagerInitializeAsync {
 		env["UPR_INITIALIZE_EAGER_ASYNC"] = "true"
 	}
+	tic := time.Now()
 	ran, err := utils.ExecCmd(
 		config.Config.ClientPath,
 		env,
@@ -331,6 +332,7 @@ func (c Client) RunOnce(model assets.ModelManifest) (*trace.Trace, error) {
 		options.stderr,
 		config.Config.ClientRunCmd,
 	)
+	timeToRun := time.Since(tic)
 	if !ran {
 		path := filepath.Join(config.Config.ClientPath, config.Config.ClientRunCmd)
 		err := errors.Errorf("failed to run cmd %s", path)
@@ -356,11 +358,14 @@ func (c Client) RunOnce(model assets.ModelManifest) (*trace.Trace, error) {
 		log.WithField("cmd", config.Config.ClientRunCmd).WithError(err).Error("failed to read profile output")
 		return nil, err
 	}
-	var trace trace.Trace
-	if err := json.Unmarshal(bts, &trace); err != nil {
+	trace := new(trace.Trace)
+	if err := json.Unmarshal(bts, trace); err != nil {
 		err = errors.Wrapf(err, "unable to unmarshal profile file %s", profileFilePath)
 		log.WithField("cmd", config.Config.ClientRunCmd).WithError(err).Error("failed to unmarshal profile output")
 		return nil, err
+	}
+	if trace.OtherDataRaw != nil {
+		trace.OtherDataRaw.EndToEndProcessTime = timeToRun
 	}
 	if options.uploadProfile {
 		if err := trace.Upload(); err != nil {
@@ -368,5 +373,5 @@ func (c Client) RunOnce(model assets.ModelManifest) (*trace.Trace, error) {
 			log.WithField("cmd", config.Config.ClientRunCmd).WithError(err).Error("failed to upload profile output")
 		}
 	}
-	return &trace, nil
+	return trace, nil
 }

@@ -93,12 +93,15 @@ type EventFrame struct {
 type TraceEvents []TraceEvent
 
 type TraceOtherData struct {
-	UPREnabled       bool   `json:"upr_enabled,omitempty"`
-	UPRBaseDirectory string `json:"UPR_BASE_DIR"`
-	EagerMode        bool   `json:"eager_mode"`
-	EagerModeAsync   bool   `json:"eager_mode_async"`
-	EndAt            string `json:"end_at"`
-	Git              struct {
+	ID                  string        `json:"id,omitempty"`
+	EndToEndProcessTime time.Duration `json:"end_to_end_process_time,omitempty"`
+	EndToEndTime        time.Duration `json:"end_to_end_time,omitempty"`
+	UPREnabled          bool          `json:"upr_enabled,omitempty"`
+	UPRBaseDirectory    string        `json:"UPR_BASE_DIR"`
+	EagerMode           bool          `json:"eager_mode"`
+	EagerModeAsync      bool          `json:"eager_mode_async"`
+	EndAt               string        `json:"end_at"`
+	Git                 struct {
 		Commit string `json:"commit"`
 		Date   string `json:"date"`
 	} `json:"git"`
@@ -224,14 +227,24 @@ func (x *Trace) UnmarshalJSON(data []byte) error {
 		return errors.Wrapf(err, "unable to copy other data model")
 	}
 	x.ID = uuid.NewV4()
-	x.OtherData = []*TraceOtherData{x.OtherDataRaw}
-	for ii := range x.TraceEvents {
-		x.TraceEvents[ii].TraceID = x.ID
+	if x.OtherDataRaw != nil {
+		x.OtherDataRaw.ID = x.ID
 	}
 	if x.OtherDataRaw != nil {
 		x.StartTime, _ = time.Parse(time.RFC3339Nano, x.OtherDataRaw.StartAt)
 		x.EndTime, _ = time.Parse(time.RFC3339Nano, x.OtherDataRaw.EndAt)
 	}
+
+	minEvent := x.MinEvent()
+	maxEvent := x.MaxEvent()
+	x.OtherDataRaw.EndToEndTime = maxEvent.EndTime.Sub(minEvent.StartTime)
+	x.OtherDataRaw.EndToEndProcessTime = x.EndTime.Sub(x.StartTime)
+
+	x.OtherData = []*TraceOtherData{x.OtherDataRaw}
+	for ii := range x.TraceEvents {
+		x.TraceEvents[ii].TraceID = x.ID
+	}
+
 	return nil
 }
 
@@ -303,7 +316,25 @@ func (x Trace) DeleteIgnoredEvents() (Trace, error) {
 	return x, nil
 }
 
-func (x Trace) ZeroOut() Trace {
+func (x Trace) MaxEvent() TraceEvent {
+	var maxEvent TraceEvent
+	maxTimeStamp := int64(math.MinInt64)
+	for _, event := range x.TraceEvents { // assumes that there is only one thing to ignore
+		if event.Category == "ignore" {
+			continue
+		}
+		if event.EventType != "E" {
+			continue
+		}
+		if maxTimeStamp > event.Timestamp {
+			maxTimeStamp = event.Timestamp
+			maxEvent = event
+		}
+	}
+	return maxEvent
+}
+
+func (x Trace) MinEvent() TraceEvent {
 	var minEvent TraceEvent
 	minTimeStamp := int64(math.MaxInt64)
 	for _, event := range x.TraceEvents { // assumes that there is only one thing to ignore
@@ -313,14 +344,17 @@ func (x Trace) ZeroOut() Trace {
 		if event.EventType != "B" {
 			continue
 		}
-		if event.EventType == "E" {
-			continue
-		}
 		if minTimeStamp > event.Timestamp {
 			minTimeStamp = event.Timestamp
 			minEvent = event
 		}
 	}
+	return minEvent
+}
+
+func (x Trace) ZeroOut() Trace {
+	minEvent := x.MinEvent()
+	minTimeStamp := minEvent.Timestamp
 
 	td := minEvent.StartTime.Sub(x.StartTime)
 
