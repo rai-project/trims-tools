@@ -86,9 +86,17 @@ var clientRunCompare = &cobra.Command{
 			}
 
 			firstTrace := *modTrace[0]
+			if tr, err := firstTrace.Adjust(); err == nil {
+				firstTrace = tr
+			}
+
 			restTraces := []trace.Trace{}
 			for _, tr := range append(modTrace[1:], origTrace...) {
 				if tr == nil {
+					continue
+				}
+				if adjustedTrace, err := tr.Adjust(); err == nil {
+					restTraces = append(restTraces, adjustedTrace)
 					continue
 				}
 				restTraces = append(restTraces, *tr)
