@@ -139,6 +139,7 @@ type JSONTrace struct {
 	Frames          map[string]EventFrame `json:"stackFrames"`
 	TimeUnit        string                `json:"timeUnit,omitempty"`
 	OtherDataRaw    TraceOtherData        `json:"otherData,omitempty"`
+	OtherData       []*TraceOtherData     `json:"otherDatas,omitempty"`
 }
 
 func (x *TraceEvent) UnmarshalJSON(data []byte) error {
