@@ -4,11 +4,8 @@ import (
 	"context"
 	"encoding/json"
 	"io/ioutil"
-	"os"
 	"path/filepath"
-	"time"
 
-	"github.com/Unknwon/com"
 	"github.com/rai-project/micro18-tools/pkg/assets"
 	"github.com/rai-project/micro18-tools/pkg/client"
 	mconfig "github.com/rai-project/micro18-tools/pkg/config"
@@ -100,14 +97,7 @@ var clientRunCompare = &cobra.Command{
 
 			if combined != nil {
 				id := uuid.NewV4()
-				profileDir := filepath.Join(mconfig.Config.ProfileOutputDirectory, time.Now().Format("2006-Jan-_2-15"))
-				if !com.IsDir(profileDir) {
-					err := os.MkdirAll(profileDir, os.ModePerm)
-					if err != nil {
-						return err
-					}
-				}
-				path := filepath.Join(profileDir, "compared-"+model.MustCanonicalName()+"-"+id+".json")
+				path := filepath.Join(mconfig.Config.ProfileOutputDirectory, "compared-"+model.MustCanonicalName()+"-"+id+".json")
 				bts, err := json.Marshal(combined)
 				if err == nil {
 					ioutil.WriteFile(path, bts, 0644)
