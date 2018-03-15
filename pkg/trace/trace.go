@@ -332,7 +332,7 @@ func (x Trace) MaxEvent() TraceEvent {
 		if event.EventType != "E" {
 			continue
 		}
-		if maxTimeStamp > event.Timestamp {
+		if maxTimeStamp < event.Timestamp {
 			maxTimeStamp = event.Timestamp
 			maxEvent = event
 		}
