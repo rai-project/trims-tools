@@ -226,15 +226,28 @@ func (x *Trace) UnmarshalJSON(data []byte) error {
 	if err := deepcopier.Copy(jsonTrace).To(x); err != nil {
 		return errors.Wrapf(err, "unable to copy model")
 	}
-	x.OtherDataRaw = new(TraceOtherData)
-	if err := deepcopier.Copy(jsonTrace.OtherDataRaw).To(x.OtherDataRaw); err != nil {
-		return errors.Wrapf(err, "unable to copy other data model")
-	}
 	id := jsonTrace.ID
 	if id == "" {
 		id = uuid.NewV4()
 	}
 	x.ID = id
+	for ii := range x.TraceEvents {
+		x.TraceEvents[ii].TraceID = id
+	}
+	if len(jsonTrace.OtherData) != 0 {
+		x.OtherData = make([]*TraceOtherData, len(jsonTrace.OtherData))
+		for ii := range jsonTrace.OtherData {
+			x.OtherData[ii] = new(TraceOtherData)
+			if err := deepcopier.Copy(jsonTrace.OtherData[ii]).To(x.OtherData[ii]); err != nil {
+				return errors.Wrapf(err, "unable to copy other data model %d", ii)
+			}
+		}
+		return nil
+	}
+	x.OtherDataRaw = new(TraceOtherData)
+	if err := deepcopier.Copy(jsonTrace.OtherDataRaw).To(x.OtherDataRaw); err != nil {
+		return errors.Wrapf(err, "unable to copy other data model")
+	}
 	if x.OtherDataRaw != nil {
 		x.OtherDataRaw.ID = id
 	}
@@ -251,9 +264,6 @@ func (x *Trace) UnmarshalJSON(data []byte) error {
 	x.OtherDataRaw.MinEvent = minEvent
 
 	x.OtherData = []*TraceOtherData{x.OtherDataRaw}
-	for ii := range x.TraceEvents {
-		x.TraceEvents[ii].TraceID = id
-	}
 
 	return nil
 }
