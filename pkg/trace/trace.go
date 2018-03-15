@@ -115,6 +115,7 @@ type TraceOtherData struct {
 	Username     string     `json:"username"`
 	MinEvent     TraceEvent `json:"min_event"`
 	MaxEvent     TraceEvent `json:"max_event"`
+	Iteration    int64      `json:"iteration,omitempty"`
 }
 
 type Trace struct {
@@ -424,10 +425,10 @@ func (tr Trace) UpdateEventNames() Trace {
 				}
 			}
 			if otherData != nil {
-				uprEnabled := "upr_enabled=" + cast.ToString(tr.UPREnabled)
+				uprEnabled := "upr_enabled=" + cast.ToString(otherData.UPREnabled)
 				modelName := "model_name=" + otherData.ModelName
 				hostName := "host_name=" + otherData.Hostname
-				iteration := "iteration=" + cast.ToString(tr.Iteration)
+				iteration := "iteration=" + cast.ToString(otherData.Iteration)
 				name = strings.Join([]string{uprEnabled, modelName, hostName, iteration}, ",")
 			}
 			event.Args = map[string]string{

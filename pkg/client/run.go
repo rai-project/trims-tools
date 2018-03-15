@@ -100,6 +100,7 @@ func (c Client) run() ([]*trace.Trace, error) {
 				iterationCount[cannonicalName] = iterCnt + 1
 			}
 			trace.Iteration = int64(iterCnt)
+			trace.OtherDataRaw.Iteration = int64(iterCnt)
 			res = append(res, trace)
 
 			if combined == nil {
@@ -229,6 +230,7 @@ func (c Client) runWorkload() ([]*trace.Trace, error) {
 			}
 
 			trace.Iteration = int64(iterCnt)
+			trace.OtherDataRaw.Iteration = int64(iterCnt)
 			res = append(res, trace)
 
 			if combined == nil {
