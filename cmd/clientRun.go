@@ -29,6 +29,7 @@ var (
 	runClientModelIterations             int
 	runClientProfileMemory               bool
 	runClientUploadTraces                bool
+	runClientCombinedAll                 bool
 )
 
 func makeClientRun(ctx context.Context, extraOpts ...client.Option) *client.Client {
@@ -60,6 +61,7 @@ var clientRunCompare = &cobra.Command{
 	Short:   "Run the client command and produce profile files",
 	RunE: func(cmd *cobra.Command, args []string) error {
 		ctx := context.Background()
+		combinedTraces := map[string][]*trace.Trace{}
 
 		models, err := assets.FilterModels(runClientModels)
 		if err != nil {
@@ -67,31 +69,52 @@ var clientRunCompare = &cobra.Command{
 		}
 		for _, model := range models {
 			orig := makeClientRun(ctx, client.OriginalMode(true), client.ModelName(model.MustCanonicalName()))
-			origTrace, err := orig.Run()
+			origTraces, err := orig.Run()
 			if err != nil {
 				log.WithError(err).Error("failed to run client with upr enabled")
 				continue
 			}
 
 			mod := makeClientRun(ctx, client.OriginalMode(false), client.ModelName(model.MustCanonicalName()))
-			modTrace, err := mod.Run()
+			modTraces, err := mod.Run()
 			if err != nil {
 				log.WithError(err).Error("failed to run client with upr disabled")
 				continue
 			}
 
-			if len(modTrace) == 0 {
+			if len(modTraces) == 0 {
 				log.WithField("model_name", model.MustCanonicalName()).Error("no traces captured")
 				continue
 			}
 
-			firstTrace := *modTrace[0]
+			if runClientCombinedAll {
+				if _, ok := combinedTraces["all"]; !ok {
+					combinedTraces["all"] = []*trace.Trace{}
+				}
+				combinedTraces["all"] = append(combinedTraces["all"], origTraces...)
+				combinedTraces["all"] = append(combinedTraces["all"], modTraces...)
+			} else {
+				name := model.MustCanonicalName()
+				if _, ok := combinedTraces[name]; !ok {
+					combinedTraces[name] = []*trace.Trace{}
+				}
+				combinedTraces[name] = append(combinedTraces[name], origTraces...)
+				combinedTraces[name] = append(combinedTraces[name], modTraces...)
+			}
+
+		}
+		for name, traces := range combinedTraces {
+			if len(traces) == 0 {
+				continue
+			}
+
+			firstTrace := *traces[0]
 			if tr, err := firstTrace.Adjust(); err == nil {
 				firstTrace = tr
 			}
 
 			restTraces := []trace.Trace{}
-			for _, tr := range append(modTrace[1:], origTrace...) {
+			for _, tr := range traces[1:] {
 				if tr == nil {
 					continue
 				}
@@ -105,7 +128,7 @@ var clientRunCompare = &cobra.Command{
 
 			if combined != nil {
 				id := uuid.NewV4()
-				path := filepath.Join(mconfig.Config.ProfileOutputDirectory, "compared-"+model.MustCanonicalName()+"-"+id+".json")
+				path := filepath.Join(mconfig.Config.ProfileOutputDirectory, "compared-"+name+"-"+id+".json")
 				bts, err := json.Marshal(combined)
 				if err == nil {
 					ioutil.WriteFile(path, bts, 0644)
@@ -151,4 +174,5 @@ func init() {
 		cmd.Flags().BoolVar(&runClientUploadTraces, "trace_upload", false, "upload the traces to AWS S3 once complete")
 	}
 	clientRunCmd.Flags().BoolVar(&runClientOriginal, "original", false, "Run an unmodified version of the inference (without persistent storage)")
+	clientRunCompare.Flags().BoolVar(&runClientCombinedAll, "combined_all", true, "Combine all results into a single trace")
 }
