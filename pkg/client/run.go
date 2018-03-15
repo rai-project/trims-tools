@@ -304,7 +304,6 @@ func (c Client) RunOnce(model assets.ModelManifest) (string, time.Duration, erro
 	}
 	profileFilePath := filepath.Join(config.Config.ProfileOutputDirectory, profileBaseName)
 	env := map[string]string{
-		"UPR_ENABLED":                 "true",
 		"UPR_RUN_ID":                  id,
 		"DATE":                        time.Now().Format(time.RFC3339Nano),
 		"UPR_MODEL_NAME":              cannonicalName,
@@ -332,6 +331,8 @@ func (c Client) RunOnce(model assets.ModelManifest) (string, time.Duration, erro
 	}
 	if options.profileMemory {
 		env["UPR_ENABLE_MEMORY_PROFILE"] = "true"
+	} else {
+		env["UPR_ENABLE_MEMORY_PROFILE"] = "false"
 	}
 	if options.debug {
 		env["GLOG_logtostderr"] = "1"
@@ -340,9 +341,13 @@ func (c Client) RunOnce(model assets.ModelManifest) (string, time.Duration, erro
 	}
 	if options.eagerInitialize {
 		env["UPR_INITIALIZE_EAGER"] = "true"
+	} else {
+		env["UPR_INITIALIZE_EAGER"] = "false"
 	}
 	if options.eagerInitializeAsync {
 		env["UPR_INITIALIZE_EAGER_ASYNC"] = "true"
+	} else {
+		env["UPR_INITIALIZE_EAGER_ASYNC"] = "false"
 	}
 	tic := time.Now()
 	ran, err := utils.ExecCmd(
