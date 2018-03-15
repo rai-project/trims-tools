@@ -42,6 +42,7 @@ func (s Server) Run() (*trace.Trace, error) {
 		"UPR_GIT_BRANCH":         config.Version.GitBranch,
 		"UPR_GIT_Date":           config.Version.BuildDate,
 		"CUDA_VISIBLE_DEVICES":   config.Config.VisibleDevices,
+		"UPR_BASE_DIR":          config.Config.BasePath + "/",
 	}
 	if options.debug {
 		env["GLOG_logtostderr"] = "1"
