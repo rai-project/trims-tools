@@ -217,7 +217,6 @@ func (t Trace) Less(i, j int) bool { return t.TraceEvents.Less(i, j) }
 
 func (x *Trace) UnmarshalJSON(data []byte) error {
 	var jsonTrace JSONTrace
-	id := uuid.NewV4()
 
 	err := json.Unmarshal(data, &jsonTrace)
 	if err != nil {
@@ -229,6 +228,10 @@ func (x *Trace) UnmarshalJSON(data []byte) error {
 	x.OtherDataRaw = new(TraceOtherData)
 	if err := deepcopier.Copy(jsonTrace.OtherDataRaw).To(x.OtherDataRaw); err != nil {
 		return errors.Wrapf(err, "unable to copy other data model")
+	}
+	id := jsonTrace.ID
+	if id == "" {
+		id = uuid.NewV4()
 	}
 	x.ID = id
 	if x.OtherDataRaw != nil {
@@ -400,8 +403,16 @@ func (tr Trace) UpdateEventNames() Trace {
 	for ii, event := range tr.TraceEvents {
 		if event.EventType == "M" {
 			name := tr.ID
-			if tr.OtherDataRaw != nil {
-				otherData := tr.OtherDataRaw
+			otherData := tr.OtherDataRaw
+			if otherData == nil || otherData.ModelName == "" {
+				for _, e := range tr.OtherData {
+					if e.ID == e.ID {
+						otherData = e
+						break
+					}
+				}
+			}
+			if otherData != nil {
 				uprEnabled := "upr_enabled=" + cast.ToString(tr.UPREnabled)
 				modelName := "model_name=" + otherData.ModelName
 				hostName := "host_name=" + otherData.Hostname
