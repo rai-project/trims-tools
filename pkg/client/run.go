@@ -9,7 +9,7 @@ import (
 	"time"
 
 	"github.com/Unknwon/com"
-"github.com/k0kubun/pp"
+	"github.com/k0kubun/pp"
 	"github.com/spf13/cast"
 
 	"github.com/Jeffail/tunny"
@@ -307,27 +307,28 @@ func (c Client) RunOnce(model assets.ModelManifest) (string, time.Duration, erro
 	}
 	profileFilePath := filepath.Join(config.Config.ProfileOutputDirectory, profileBaseName)
 	env := map[string]string{
-		"HOME":                  config.HomeDir,
-		"UPR_RUN_ID":                  id,
-		"DATE":                        time.Now().Format(time.RFC3339Nano),
-		"UPR_MODEL_NAME":              cannonicalName,
-		"UPR_CLIENT":                  "1",
-		"MXNET_CPU_PRIORITY_NTHREADS": "1",
-		"OMP_NUM_THREADS":             "1",
-		"MXNET_ENGINE_TYPE":           "NaiveEngine",
-		"MXNET_GPU_WORKER_NTHREADS":   "1",
-		"UPR_BASE_DIR":          config.Config.BasePath + "/",
-		"UPR_PROFILE_TARGET":          profileFilePath,
-		"UPR_INPUT_CHANNELS":          cast.ToString(dims[0]),
-		"UPR_INPUT_HEIGHT":            cast.ToString(dims[1]),
-		"UPR_INPUT_WIDTH":             cast.ToString(dims[2]),
-		"UPR_INPUT_MEAN_R":            fmt.Sprintf("%v", mean[0]),
-		"UPR_INPUT_MEAN_G":            fmt.Sprintf("%v", mean[1]),
-		"UPR_INPUT_MEAN_B":            fmt.Sprintf("%v", mean[2]),
-		"UPR_GIT_SHA":                 config.Version.GitCommit,
-		"UPR_GIT_BRANCH":              config.Version.GitBranch,
-		"UPR_GIT_Date":                config.Version.BuildDate,
-		"CUDA_VISIBLE_DEVICES":        config.Config.VisibleDevices,
+		"HOME":                         config.HomeDir,
+		"UPR_RUN_ID":                   id,
+		"DATE":                         time.Now().Format(time.RFC3339Nano),
+		"UPR_MODEL_NAME":               cannonicalName,
+		"UPR_CLIENT":                   "1",
+		"MXNET_CPU_PRIORITY_NTHREADS":  "1",
+		"OMP_NUM_THREADS":              "1",
+		"MXNET_ENGINE_TYPE":            "NaiveEngine",
+		"MXNET_GPU_WORKER_NTHREADS":    "1",
+		"UPR_BASE_DIR":                 config.Config.BasePath + "/",
+		"UPR_PROFILE_TARGET":           profileFilePath,
+		"UPR_INPUT_CHANNELS":           cast.ToString(dims[0]),
+		"UPR_INPUT_HEIGHT":             cast.ToString(dims[1]),
+		"UPR_INPUT_WIDTH":              cast.ToString(dims[2]),
+		"UPR_INPUT_MEAN_R":             fmt.Sprintf("%v", mean[0]),
+		"UPR_INPUT_MEAN_G":             fmt.Sprintf("%v", mean[1]),
+		"UPR_INPUT_MEAN_B":             fmt.Sprintf("%v", mean[2]),
+		"UPR_GIT_SHA":                  config.Version.GitCommit,
+		"UPR_GIT_BRANCH":               config.Version.GitBranch,
+		"UPR_GIT_Date":                 config.Version.BuildDate,
+		"CUDA_VISIBLE_DEVICES":         config.Config.VisibleDevices,
+		"MXNET_CUDNN_AUTOTUNE_DEFAULT": "false",
 	}
 	if options.original {
 		env["UPR_ENABLED"] = "false"
@@ -354,9 +355,9 @@ func (c Client) RunOnce(model assets.ModelManifest) (string, time.Duration, erro
 	} else {
 		env["UPR_INITIALIZE_EAGER_ASYNC"] = "false"
 	}
-if false {
-pp.Println(env)
-}
+	if false {
+		pp.Println(env)
+	}
 	tic := time.Now()
 	ran, err := utils.ExecCmd(
 		config.Config.ClientPath,
