@@ -31,18 +31,19 @@ func (s Server) Run() (*trace.Trace, error) {
 	id := uuid.NewV4()
 	profileFilePath := filepath.Join(config.Config.ProfileOutputDirectory, fmt.Sprintf("server_%s.json", id))
 	env := map[string]string{
-		"DATE":                   time.Now().Format(time.RFC3339Nano),
-		"UPR_RUN_ID":             id,
-		"MXNET_ENGINE_TYPE":      "ThreadedEngine",
-		"UPR_PROFILE_TARGET":     profileFilePath,
-		"UPRD_EVICTION_POLICY":   fmt.Sprint(options.evictionPolicy),
-		"UPRD_ESTIMATION_RATE":   fmt.Sprint(options.modelEstimationRate),
-		"UPRD_MEMORY_PERCENTAGE": fmt.Sprint(options.memoryPercentage),
-		"UPR_GIT_SHA":            config.Version.GitCommit,
-		"UPR_GIT_BRANCH":         config.Version.GitBranch,
-		"UPR_GIT_Date":           config.Version.BuildDate,
-		"CUDA_VISIBLE_DEVICES":   config.Config.VisibleDevices,
-		"UPR_BASE_DIR":          config.Config.BasePath + "/",
+		"DATE":                         time.Now().Format(time.RFC3339Nano),
+		"UPR_RUN_ID":                   id,
+		"MXNET_ENGINE_TYPE":            "ThreadedEngine",
+		"UPR_PROFILE_TARGET":           profileFilePath,
+		"UPRD_EVICTION_POLICY":         fmt.Sprint(options.evictionPolicy),
+		"UPRD_ESTIMATION_RATE":         fmt.Sprint(options.modelEstimationRate),
+		"UPRD_MEMORY_PERCENTAGE":       fmt.Sprint(options.memoryPercentage),
+		"UPR_GIT_SHA":                  config.Version.GitCommit,
+		"UPR_GIT_BRANCH":               config.Version.GitBranch,
+		"UPR_GIT_Date":                 config.Version.BuildDate,
+		"CUDA_VISIBLE_DEVICES":         config.Config.VisibleDevices,
+		"UPR_BASE_DIR":                 config.Config.BasePath + "/",
+		"MXNET_CUDNN_AUTOTUNE_DEFAULT": "false",
 	}
 	if options.debug {
 		env["GLOG_logtostderr"] = "1"
