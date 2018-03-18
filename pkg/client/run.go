@@ -257,7 +257,13 @@ func (c Client) runWorkload() ([]*trace.Trace, error) {
 	execPool := tunny.NewFunc(options.concurrentRunCount, runModel)
 	defer execPool.Close()
 
+	ii := 0
+
 	for model := range modelGen.ModelGenerator(models) {
+		ii++
+		if ii == options.iterationCount {
+			break
+		}
 		wg.Add(1)
 		// if options.showProgress {
 		//progress.Prefix(fmt.Sprintf("running client model %s", model.MustCanonicalName()))
