@@ -92,9 +92,21 @@ type EventFrame struct {
 
 type TraceEvents []TraceEvent
 
+type TraceServerInfo struct {
+	EvictionPolicty  string  `json:"eviction_policy,omitempty"`
+	EstimationRate   float32 `json:"estimation_rate,omitempty"`
+	MemoryPercentage float32 `json:"memory_percentage,omitempty"`
+	PersistCPU       bool    `json:"persist_cpu,omitempty"`
+}
+
+type GitInfo struct {
+	Commit string `json:"commit"`
+	Date   string `json:"date"`
+}
+
 type TraceOtherData struct {
 	ID                  string                 `json:"run_id,omitempty"`
-	ServerInfo          map[string]interface{} `json:"server,omitempty"`
+	ServerInfo          TraceServerInfo        `json:"server,omitempty"`
 	EndToEndProcessTime time.Duration          `json:"end_to_end_process_time,omitempty"`
 	EndToEndTime        time.Duration          `json:"end_to_end_time,omitempty"`
 	UPREnabled          bool                   `json:"upr_enabled,omitempty"`
@@ -102,22 +114,19 @@ type TraceOtherData struct {
 	EagerMode           bool                   `json:"eager_mode"`
 	EagerModeAsync      bool                   `json:"eager_mode_async"`
 	EndAt               string                 `json:"end_at"`
-	Git                 struct {
-		Commit string `json:"commit"`
-		Date   string `json:"date"`
-	} `json:"git"`
-	Hostname     string                 `json:"hostname"`
-	IsClient     bool                   `json:"is_client"`
-	ModelName    string                 `json:"model_name"`
-	ModelParams  string                 `json:"model_params"`
-	ModelPath    string                 `json:"model_path"`
-	StartAt      string                 `json:"start_at"`
-	SymbolParams string                 `json:"symbol_params"`
-	Username     string                 `json:"username"`
-	MinEvent     TraceEvent             `json:"min_event"`
-	MaxEvent     TraceEvent             `json:"max_event"`
-	Iteration    int64                  `json:"iteration,omitempty"`
-	Input        map[string]interface{} `json:"input,omitempty"`
+	Git                 GitInfo                `json:"git"`
+	Hostname            string                 `json:"hostname"`
+	IsClient            bool                   `json:"is_client"`
+	ModelName           string                 `json:"model_name"`
+	ModelParams         string                 `json:"model_params"`
+	ModelPath           string                 `json:"model_path"`
+	StartAt             string                 `json:"start_at"`
+	SymbolParams        string                 `json:"symbol_params"`
+	Username            string                 `json:"username"`
+	MinEvent            TraceEvent             `json:"min_event"`
+	MaxEvent            TraceEvent             `json:"max_event"`
+	Iteration           int64                  `json:"iteration,omitempty"`
+	Input               map[string]interface{} `json:"input,omitempty"`
 }
 
 type Trace struct {
