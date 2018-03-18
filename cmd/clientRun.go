@@ -6,9 +6,11 @@ import (
 	"io/ioutil"
 	"path/filepath"
 
+	"github.com/pkg/errors"
 	"github.com/rai-project/micro18-tools/pkg/assets"
 	"github.com/rai-project/micro18-tools/pkg/client"
 	mconfig "github.com/rai-project/micro18-tools/pkg/config"
+	"github.com/rai-project/micro18-tools/pkg/server"
 	"github.com/rai-project/micro18-tools/pkg/trace"
 	"github.com/rai-project/micro18-tools/pkg/utils"
 	"github.com/rai-project/uuid"
@@ -60,6 +62,12 @@ var clientRunCompare = &cobra.Command{
 	Use:     "run-compare",
 	Aliases: []string{"compare"},
 	Short:   "Run the client command and produce profile files",
+	PreRunE: func(cmd *cobra.Command, args []string) error {
+		if !server.IsRunning() {
+			return errors.New("the uprd server is not running. make sure you've started the server before starting the client")
+		}
+		return nil
+	},
 	RunE: func(cmd *cobra.Command, args []string) error {
 		ctx := context.Background()
 		combinedTraces := map[string][]*trace.Trace{}
@@ -150,6 +158,12 @@ var clientRunCompare = &cobra.Command{
 var clientRunCmd = &cobra.Command{
 	Use:   "run",
 	Short: "Run the client command and produce profile files",
+	PreRunE: func(cmd *cobra.Command, args []string) error {
+		if !server.IsRunning() {
+			return errors.New("the uprd server is not running. make sure you've started the server before starting the client")
+		}
+		return nil
+	},
 	RunE: func(cmd *cobra.Command, args []string) error {
 		ctx := context.Background()
 		client := makeClientRun(ctx)
