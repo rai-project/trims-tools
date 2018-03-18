@@ -28,6 +28,7 @@ var (
 	DefaultBaseBucketURL              = "http://s3.amazonaws.com/micro18profiles"
 	DefaultUploadBucketName           = "traces"
 	DefaultProfileOutputBaseDirectory = filepath.Join(HomeDir, "micro18_profiles")
+	DefaultServerInfoPath             = filepath.Join(HomeDir, ".micro18_server.json")
 )
 
 type microConfig struct {
@@ -48,6 +49,7 @@ type microConfig struct {
 	UploadBucketName           string        `json:"upload_bucket_name" yaml:"micro18.upload_bucket_name" config:"micro18.upload_bucket_name"`
 	ProfileOutputBaseDirectory string        `json:"profile_output_base_directory" yaml:"micro18.profile_output_directory" config:"micro18.profile_output_directory"`
 	ProfileOutputDirectory     string        `json:"profile_output_directory" yaml:"-" config:"-"`
+	ServerInfoPath             string        `json:"server_info_path" config:"micro18.server_info_path"`
 	done                       chan struct{} `json:"-" config:"-"`
 }
 
@@ -123,6 +125,9 @@ func (a *microConfig) Read() {
 	}
 	if a.VisibleDevices == "" {
 		a.VisibleDevices = DefaultVisibleDevices
+	}
+	if a.ServerInfoPath == "" {
+		a.ServerInfoPath = DefaultServerInfoPath
 	}
 }
 

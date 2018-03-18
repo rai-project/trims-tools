@@ -8,6 +8,7 @@ import (
 
 type Options struct {
 	ctx                 context.Context
+	id                  string
 	debug               bool
 	evictionPolicy      string
 	modelEstimationRate float32
@@ -23,6 +24,7 @@ type Option func(*Options)
 var (
 	DefaultOptions = Options{
 		ctx:                 context.Background(),
+		id:                  "",
 		debug:               false,
 		evictionPolicy:      "lru",
 		modelEstimationRate: 1.0,
@@ -37,6 +39,12 @@ var (
 func Context(ctx context.Context) Option {
 	return func(o *Options) {
 		o.ctx = ctx
+	}
+}
+
+func ID(s string) Option {
+	return func(o *Options) {
+		o.id = s
 	}
 }
 

@@ -8,12 +8,32 @@ import (
 	"time"
 
 	"github.com/Unknwon/com"
+	ps "github.com/mitchellh/go-ps"
 	"github.com/pkg/errors"
 	"github.com/rai-project/micro18-tools/pkg/config"
 	"github.com/rai-project/micro18-tools/pkg/trace"
 	"github.com/rai-project/micro18-tools/pkg/utils"
 	"github.com/rai-project/uuid"
+	"github.com/spf13/cast"
 )
+
+func IsRunning() bool {
+	exe := config.Config.ServerRunCmd
+	procs, err := ps.Processes()
+	if err != nil {
+		return false
+	}
+	for _, p := range procs {
+		if p.Executable() == exe {
+			return true
+		}
+	}
+	return false
+}
+
+func (s Server) IsRunning() bool {
+	return IsRunning()
+}
 
 func (s Server) Run() (*trace.Trace, error) {
 	options := s.options
@@ -28,7 +48,10 @@ func (s Server) Run() (*trace.Trace, error) {
 		return nil, err
 	}
 
-	id := uuid.NewV4()
+	id := options.id
+	if id == "" {
+		id = uuid.NewV4()
+	}
 	profileFilePath := filepath.Join(config.Config.ProfileOutputDirectory, fmt.Sprintf("server_%s.json", id))
 	env := map[string]string{
 		"DATE":                         time.Now().Format(time.RFC3339Nano),
@@ -44,6 +67,7 @@ func (s Server) Run() (*trace.Trace, error) {
 		"CUDA_VISIBLE_DEVICES":         config.Config.VisibleDevices,
 		"UPR_BASE_DIR":                 config.Config.BasePath + "/",
 		"MXNET_CUDNN_AUTOTUNE_DEFAULT": "false",
+		"UPRD_PERSIST_CPU":             cast.ToString(options.persistCPU),
 	}
 	if options.debug {
 		env["GLOG_logtostderr"] = "1"

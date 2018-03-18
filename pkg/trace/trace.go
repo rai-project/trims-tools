@@ -2,14 +2,18 @@ package trace
 
 import (
 	"encoding/json"
+	"io/ioutil"
 	"math"
 	"strings"
 	"time"
+
+	"github.com/Unknwon/com"
 
 	"hash/fnv"
 
 	"github.com/Workiva/go-datastructures/augmentedtree"
 	"github.com/pkg/errors"
+	"github.com/rai-project/micro18-tools/pkg/config"
 	"github.com/rai-project/uuid"
 	"github.com/spf13/cast"
 	"github.com/ulule/deepcopier"
@@ -93,10 +97,12 @@ type EventFrame struct {
 type TraceEvents []TraceEvent
 
 type TraceServerInfo struct {
-	EvictionPolicty  string  `json:"eviction_policy,omitempty"`
-	EstimationRate   float32 `json:"estimation_rate,omitempty"`
-	MemoryPercentage float32 `json:"memory_percentage,omitempty"`
-	PersistCPU       bool    `json:"persist_cpu"`
+	ID               string    `json:"server_id,omitempty"`
+	StartTime        time.Time `json:"server_start_time,omitempty"`
+	EvictionPolicty  string    `json:"eviction_policy,omitempty"`
+	EstimationRate   float32   `json:"estimation_rate,omitempty"`
+	MemoryPercentage float32   `json:"memory_percentage,omitempty"`
+	PersistCPU       bool      `json:"persist_cpu"`
 }
 
 type GitInfo struct {
@@ -237,6 +243,15 @@ func (x *Trace) UnmarshalJSON(data []byte) error {
 	}
 	if err := deepcopier.Copy(jsonTrace).To(x); err != nil {
 		return errors.Wrapf(err, "unable to copy model")
+	}
+	if jsonTrace.OtherDataRaw.IsClient && x.OtherDataRaw != nil {
+		serverInfoPath := config.Config.ServerInfoPath
+		if com.IsFile(serverInfoPath) {
+			bts, err := ioutil.ReadFile(serverInfoPath)
+			if err == nil {
+				json.Unmarshal(bts, &x.OtherDataRaw.ServerInfo)
+			}
+		}
 	}
 	id := jsonTrace.ID
 	if id == "" {
