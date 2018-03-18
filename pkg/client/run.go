@@ -34,7 +34,7 @@ func (c Client) Run() ([]*trace.Trace, error) {
 			config.Config.ClientRunCmd, config.Config.ClientPath)
 	}
 
-	if options.modelDistribution == "none" {
+	if options.modelDistribution == "none" || options.modelDistribution == "" {
 		return c.run()
 	}
 	return c.runWorkload()
