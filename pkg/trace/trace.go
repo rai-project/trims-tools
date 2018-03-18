@@ -230,7 +230,7 @@ func (x *Trace) UnmarshalJSON(data []byte) error {
 		return errors.Wrapf(err, "unable to copy model")
 	}
 	id := jsonTrace.ID
-	if id == "" && jsonTrace.OtherDataRaw != nil {
+	if id == "" {
 		id = jsonTrace.OtherDataRaw.ID
 	}
 	if id == "" {
