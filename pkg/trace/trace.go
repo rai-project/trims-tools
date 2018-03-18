@@ -96,7 +96,7 @@ type TraceServerInfo struct {
 	EvictionPolicty  string  `json:"eviction_policy,omitempty"`
 	EstimationRate   float32 `json:"estimation_rate,omitempty"`
 	MemoryPercentage float32 `json:"memory_percentage,omitempty"`
-	PersistCPU       bool    `json:"persist_cpu,omitempty"`
+	PersistCPU       bool    `json:"persist_cpu"`
 }
 
 type GitInfo struct {
