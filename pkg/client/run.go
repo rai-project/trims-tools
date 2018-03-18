@@ -337,7 +337,7 @@ func (c Client) RunOnce(model assets.ModelManifest) (string, time.Duration, erro
 		"UPR_GIT_BRANCH":               config.Version.GitBranch,
 		"UPR_GIT_Date":                 config.Version.BuildDate,
 		"CUDA_VISIBLE_DEVICES":         config.Config.VisibleDevices,
-		"MXNET_CUDNN_AUTOTUNE_DEFAULT": "false",
+		"MXNET_CUDNN_AUTOTUNE_DEFAULT": "0",
 	}
 	if options.original {
 		env["UPR_ENABLED"] = "false"

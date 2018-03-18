@@ -66,7 +66,7 @@ func (s Server) Run() (*trace.Trace, error) {
 		"UPR_GIT_Date":                 config.Version.BuildDate,
 		"CUDA_VISIBLE_DEVICES":         config.Config.VisibleDevices,
 		"UPR_BASE_DIR":                 config.Config.BasePath + "/",
-		"MXNET_CUDNN_AUTOTUNE_DEFAULT": "false",
+		"MXNET_CUDNN_AUTOTUNE_DEFAULT": "0",
 		"UPRD_PERSIST_CPU":             cast.ToString(options.persistCPU),
 	}
 	if options.debug {
