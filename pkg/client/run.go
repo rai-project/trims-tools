@@ -261,6 +261,11 @@ func (c Client) runWorkload() ([]*trace.Trace, error) {
 		//progress.Prefix(fmt.Sprintf("running client model %s", model.MustCanonicalName()))
 		// }
 		go func(model assets.ModelManifest) {
+			defer func() {
+				if r := recover(); r != nil {
+					return
+				}
+			}()
 			execPool.Process(model)
 		}(model)
 	}
