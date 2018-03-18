@@ -182,7 +182,7 @@ func (c Client) runWorkload() ([]*trace.Trace, error) {
 
 	var progress *pb.ProgressBar
 	if options.showProgress {
-		progress = utils.NewProgress("running client models", len(models)*options.iterationCount)
+		progress = utils.NewProgress("running client models", options.iterationCount)
 		defer progress.FinishPrint("finished running client")
 	}
 
@@ -260,10 +260,10 @@ func (c Client) runWorkload() ([]*trace.Trace, error) {
 	ii := 0
 
 	for model := range modelGen.ModelGenerator(models) {
-		ii++
 		if ii == options.iterationCount {
 			break
 		}
+		ii++
 		wg.Add(1)
 		// if options.showProgress {
 		//progress.Prefix(fmt.Sprintf("running client model %s", model.MustCanonicalName()))
