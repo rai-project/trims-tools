@@ -120,6 +120,7 @@ func (c Client) run() ([]*trace.Trace, error) {
 	}
 
 	execPool := tunny.NewFunc(options.concurrentRunCount, runModel)
+	defer execPool.Close()
 
 	for _, model := range models {
 		// if options.showProgress {
@@ -254,6 +255,7 @@ func (c Client) runWorkload() ([]*trace.Trace, error) {
 	}
 
 	execPool := tunny.NewFunc(options.concurrentRunCount, runModel)
+	defer execPool.Close()
 
 	for model := range modelGen.ModelGenerator(models) {
 		wg.Add(1)
