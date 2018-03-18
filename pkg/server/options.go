@@ -15,6 +15,7 @@ type Options struct {
 	uploadProfile       bool
 	stderr              io.Writer
 	stdout              io.Writer
+	persistCPU          bool
 }
 
 type Option func(*Options)
@@ -29,6 +30,7 @@ var (
 		uploadProfile:       true,
 		stderr:              os.Stderr,
 		stdout:              os.Stdout,
+		persistCPU:          true,
 	}
 )
 
@@ -53,6 +55,12 @@ func DebugMode(b bool) Option {
 func EvictionPolicy(n string) Option {
 	return func(o *Options) {
 		o.evictionPolicy = n
+	}
+}
+
+func PersistCPU(b bool) Option {
+	return func(o *Options) {
+		o.persistCPU = b
 	}
 }
 

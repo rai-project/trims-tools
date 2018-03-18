@@ -12,6 +12,7 @@ var (
 	runServerEvictionPolicy      string
 	runServerModelEstimationRate float32
 	runServerMemoryPercentage    float32
+	runServerPersistCPU          bool
 )
 
 func makeServerRun(ctx context.Context) *server.Server {
@@ -21,6 +22,7 @@ func makeServerRun(ctx context.Context) *server.Server {
 		server.EvictionPolicy(runServerEvictionPolicy),
 		server.ModelEstimationRate(runServerModelEstimationRate),
 		server.MemoryPercentage(runServerMemoryPercentage),
+		server.PersistCPU(runServerPersistCPU),
 	)
 }
 
@@ -47,6 +49,7 @@ func init() {
 	serverRunCmd.Flags().StringVar(&runServerEvictionPolicy, "eviction", "lru", "Eviction policy used by the server")
 	serverRunCmd.Flags().Float32Var(&runServerModelEstimationRate, "model_estimation_rate", 1.0, "File size multiplier used to determine how much memory would be used by a model")
 	serverRunCmd.Flags().Float32Var(&runServerMemoryPercentage, "memory_percentage", 0.8, "Percentage of GPU memory that can be used to persist models")
+	serverRunCmd.Flags().BoolVar(&runServerPersistCPU, "persist_cpu", true, "Persist memory on CPU to avoid rereading the data from disk after eviction")
 
 	serverCmd.AddCommand(serverRunCmd)
 }
