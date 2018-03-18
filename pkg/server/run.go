@@ -27,6 +27,9 @@ func IsRunning() bool {
 		if p.Executable() == exe {
 			return true
 		}
+		if p.Executable() == "uprd" {
+			return true
+		}
 	}
 	return false
 }
