@@ -244,15 +244,6 @@ func (x *Trace) UnmarshalJSON(data []byte) error {
 	if err := deepcopier.Copy(jsonTrace).To(x); err != nil {
 		return errors.Wrapf(err, "unable to copy model")
 	}
-	if jsonTrace.OtherDataRaw.IsClient && x.OtherDataRaw != nil {
-		serverInfoPath := config.Config.ServerInfoPath
-		if com.IsFile(serverInfoPath) {
-			bts, err := ioutil.ReadFile(serverInfoPath)
-			if err == nil {
-				json.Unmarshal(bts, &x.OtherDataRaw.ServerInfo)
-			}
-		}
-	}
 	id := jsonTrace.ID
 	if id == "" {
 		id = jsonTrace.OtherDataRaw.ID
@@ -278,13 +269,21 @@ func (x *Trace) UnmarshalJSON(data []byte) error {
 	if err := deepcopier.Copy(jsonTrace.OtherDataRaw).To(x.OtherDataRaw); err != nil {
 		return errors.Wrapf(err, "unable to copy other data model")
 	}
-	if x.OtherDataRaw != nil {
-		x.OtherDataRaw.ID = id
+	if jsonTrace.OtherDataRaw.IsClient {
+		serverInfoPath := config.Config.ServerInfoPath
+		if com.IsFile(serverInfoPath) {
+			bts, err := ioutil.ReadFile(serverInfoPath)
+			if err == nil {
+				var info TraceServerInfo
+				if err := json.Unmarshal(bts, &info); err == nil {
+					x.OtherDataRaw.ServerInfo = info
+				}
+			}
+		}
 	}
-	if x.OtherDataRaw != nil {
-		x.StartTime, _ = time.Parse(time.RFC3339Nano, x.OtherDataRaw.StartAt)
-		x.EndTime, _ = time.Parse(time.RFC3339Nano, x.OtherDataRaw.EndAt)
-	}
+	x.OtherDataRaw.ID = id
+	x.StartTime, _ = time.Parse(time.RFC3339Nano, x.OtherDataRaw.StartAt)
+	x.EndTime, _ = time.Parse(time.RFC3339Nano, x.OtherDataRaw.EndAt)
 
 	minEvent := x.MinEvent()
 	maxEvent := x.MaxEvent()

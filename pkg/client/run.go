@@ -102,6 +102,11 @@ func (c Client) run() ([]*trace.Trace, error) {
 			}
 			trace.Iteration = int64(iterCnt)
 			trace.OtherDataRaw.Iteration = int64(iterCnt)
+
+			if bts, err := json.Marshal(trace); err == nil {
+				ioutil.WriteFile(profilePath, bts, 0644)
+			}
+
 			res = append(res, trace)
 
 			if combined == nil {
@@ -232,6 +237,10 @@ func (c Client) runWorkload() ([]*trace.Trace, error) {
 
 			trace.Iteration = int64(iterCnt)
 			trace.OtherDataRaw.Iteration = int64(iterCnt)
+
+			if bts, err := json.Marshal(trace); err == nil {
+				ioutil.WriteFile(profilePath, bts, 0644)
+			}
 			res = append(res, trace)
 
 			if combined == nil {
