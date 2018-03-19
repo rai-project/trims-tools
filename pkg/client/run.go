@@ -418,12 +418,13 @@ func (c Client) RunOnce(model assets.ModelManifest) (string, time.Duration, erro
 		return "", 0, err
 	}
 	if !options.postprocess {
-		return "", 0, nil
+		return "", timeToRun, nil
 	}
 	return profileFilePath, timeToRun, nil
 }
 
 func (c *Client) readProfile(profileFilePath string, timeToRun time.Duration) (*trace.Trace, error) {
+	pp.Println(timeToRun)
 	bts, err := ioutil.ReadFile(profileFilePath)
 	if err != nil {
 		err = errors.Wrapf(err, "unable to read profile file %s", profileFilePath)
@@ -437,6 +438,7 @@ func (c *Client) readProfile(profileFilePath string, timeToRun time.Duration) (*
 		return nil, err
 	}
 	if trace.OtherDataRaw != nil {
+		pp.Println(timeToRun)
 		trace.OtherDataRaw.EndToEndProcessTime = timeToRun
 	}
 	if len(trace.OtherData) != 0 {

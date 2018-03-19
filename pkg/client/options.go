@@ -44,7 +44,7 @@ var (
 		debug:                   false,
 		eagerInitialize:         true,
 		eagerInitializeAsync:    false,
-		postprocess:             false,
+		postprocess:             true,
 		modelName:               "all",
 		uploadProfile:           true,
 		modelDistribution:       "none",
