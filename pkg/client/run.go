@@ -114,6 +114,9 @@ func (c Client) run() ([]*trace.Trace, error) {
 			}
 			trace.Iteration = int64(iterCnt)
 			trace.OtherDataRaw.Iteration = int64(iterCnt)
+			if trace.OtherDataRaw != nil {
+				pp.Println(trace.OtherDataRaw.EndToEndProcessTime)
+			}
 			trace.OtherData = nil
 			if bts, err := json.Marshal(trace); err == nil {
 				ioutil.WriteFile(profilePath, bts, 0644)
@@ -250,6 +253,9 @@ func (c Client) runWorkload() ([]*trace.Trace, error) {
 
 			trace.Iteration = int64(iterCnt)
 			trace.OtherDataRaw.Iteration = int64(iterCnt)
+			if trace.OtherDataRaw != nil {
+				pp.Println(trace.OtherDataRaw.EndToEndProcessTime)
+			}
 			trace.OtherData = nil
 			if bts, err := json.Marshal(trace); err == nil {
 				ioutil.WriteFile(profilePath, bts, 0644)
@@ -424,7 +430,6 @@ func (c Client) RunOnce(model assets.ModelManifest) (string, time.Duration, erro
 }
 
 func (c *Client) readProfile(profileFilePath string, timeToRun time.Duration) (*trace.Trace, error) {
-	pp.Println(timeToRun)
 	bts, err := ioutil.ReadFile(profileFilePath)
 	if err != nil {
 		err = errors.Wrapf(err, "unable to read profile file %s", profileFilePath)
@@ -438,7 +443,6 @@ func (c *Client) readProfile(profileFilePath string, timeToRun time.Duration) (*
 		return nil, err
 	}
 	if trace.OtherDataRaw != nil {
-		pp.Println(timeToRun)
 		trace.OtherDataRaw.EndToEndProcessTime = timeToRun
 	}
 	if len(trace.OtherData) != 0 {
