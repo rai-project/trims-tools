@@ -160,13 +160,13 @@ micro18-tools client compare opts...
 #### Specifying Profile Output Directory
 
 ```
-go run main.go client run  --original=true --profile_output=<<SOMETHING>>
+go run main.go client run --profile_output=<<SOMETHING>>
 ```
 
 #### Specifying Experiment Description
 
 ```
-go run main.go client run  --original=true --experiment_description="description of your experiment"
+go run main.go client run --experiment_description="description of your experiment"
 ```
 
 #### Eager Initialization
