@@ -6,8 +6,12 @@ import (
 	"io/ioutil"
 	"os"
 	"path/filepath"
+	"runtime"
+	"sync"
 
+	"github.com/Jeffail/tunny"
 	"github.com/Unknwon/com"
+	zglob "github.com/mattn/go-zglob"
 	"github.com/pkg/errors"
 	"github.com/rai-project/micro18-tools/pkg/trace"
 	"github.com/spf13/cobra"
@@ -20,17 +24,31 @@ var (
 // traceSummarizeCmd represents the traceSummarize command
 var traceSummarizeCmd = &cobra.Command{
 	Use:   "summarize",
-	Short: "A brief description of your command",
+	Short: "Summarizes the traces within a directory or list of files",
 	Args:  cobra.MinimumNArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
-		if len(args) == 0 {
-			return errors.Errorf("not profiles were specified")
-		}
 		var res []*trace.TraceSummary
+		files := []string{}
 		for _, path := range args {
-			if !com.IsFile(path) {
-				return errors.Errorf("the profile file %s was not found", path)
+			if com.IsDir(path) {
+				matches, err := zglob.Glob(filepath.Join(path, "**", "*.json"))
+				if err == nil {
+					files = append(files, matches...)
+				}
+				matches, err = zglob.Glob(filepath.Join(path, "*.json"))
+				if err == nil {
+					files = append(files, matches...)
+				}
+			} else {
+				files = append(files, path)
 			}
+		}
+		var mut sync.Mutex
+		var wg sync.WaitGroup
+
+		processFile := func(path0 interface{}) interface{} {
+			defer wg.Done()
+			path := path0.(string)
 			bts, err := ioutil.ReadFile(path)
 			if err != nil {
 				return errors.Wrapf(err, "unable to read the profile file from %s", path)
@@ -43,8 +61,25 @@ var traceSummarizeCmd = &cobra.Command{
 			if err != nil {
 				return err
 			}
+			mut.Lock()
+			defer mut.Unlock()
 			res = append(res, ts)
+			return err
 		}
+
+		processPool := tunny.NewFunc(runtime.NumCPU(), processFile)
+		defer processPool.Close()
+
+		for _, path := range files {
+			if !com.IsFile(path) {
+				return errors.Errorf("the profile file %s was not found", path)
+			}
+			wg.Add(1)
+			go func(path string) {
+				processPool.Process(path)
+			}(path)
+		}
+		wg.Wait()
 		bts, err := json.Marshal(res)
 		if err != nil {
 			return errors.Wrap(err, "unable to marshal query results")
@@ -62,5 +97,5 @@ var traceSummarizeCmd = &cobra.Command{
 
 func init() {
 	traceCmd.AddCommand(traceSummarizeCmd)
-	traceSummarizeCmd.Flags().StringVarP(&traceSummarizeOutputFile, "output", "o", "summary.json", "Ther output path to the trace summary")
+	traceSummarizeCmd.Flags().StringVarP(&traceSummarizeOutputFile, "output", "o", "summary.json", "The output path to the trace summary")
 }
