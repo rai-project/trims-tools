@@ -110,6 +110,19 @@ type GitInfo struct {
 	Date   string `json:"date"`
 }
 
+type TraceSummary struct {
+	ID                    string          `json:"run_id,omitempty"`
+	ServerInfo            TraceServerInfo `json:"server,omitempty"`
+	EndToEndProcessTime   time.Duration   `json:"end_to_end_process_time,omitempty"`
+	EndToEndTime          time.Duration   `json:"end_to_end_time,omitempty"`
+	UPREnabled            bool            `json:"upr_enabled,omitempty"`
+	EagerMode             bool            `json:"eager_mode"`
+	EagerModeAsync        bool            `json:"eager_mode_async"`
+	Hostname              string          `json:"hostname"`
+	ModelName             string          `json:"model_name"`
+	ExperimentDescription string          `json:"experiment_description,omitempty"`
+}
+
 type TraceOtherData struct {
 	ID                    string                 `json:"run_id,omitempty"`
 	ServerInfo            TraceServerInfo        `json:"server,omitempty"`
@@ -301,6 +314,18 @@ func (x *Trace) UnmarshalJSON(data []byte) error {
 	x.OtherData = []*TraceOtherData{x.OtherDataRaw}
 
 	return nil
+}
+
+func (x Trace) Summarize() (*TraceSummary, error) {
+	data := x.OtherDataRaw
+	if data == nil {
+		return nil, errors.New("expecting OtherDataRaw to be in the trace. summary does not work on combined output")
+	}
+	summary := new(TraceSummary)
+	if err := deepcopier.Copy(data).To(summary); err != nil {
+		return nil, errors.Wrap(err, "unable to copy summarize trace")
+	}
+	return summary, nil
 }
 
 func (x Trace) Adjust() (Trace, error) {
