@@ -51,6 +51,7 @@ type microConfig struct {
 	ProfileOutputDirectory     string        `json:"profile_output_directory" yaml:"-" config:"-"`
 	ExperimentDescription      string        `json:"experiment_description" yaml:"-" config:"-"`
 	ServerInfoPath             string        `json:"server_info_path" config:"micro18.server_info_path"`
+	UPREnabled                 bool          `json:"upr_enabled" config:"-"`
 	done                       chan struct{} `json:"-" config:"-"`
 }
 
@@ -130,6 +131,7 @@ func (a *microConfig) Read() {
 	if a.ServerInfoPath == "" {
 		a.ServerInfoPath = DefaultServerInfoPath
 	}
+	a.UPREnabled = true
 }
 
 func (a microConfig) Verify() {

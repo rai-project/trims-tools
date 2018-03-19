@@ -36,7 +36,7 @@ func (c Client) Run() ([]*trace.Trace, error) {
 	}
 
 	fmt.Println(color.GreenString("✱ Running client and placing profile in " + config.Config.ProfileOutputDirectory))
-	if com.IsFile(config.Config.ServerInfoPath) {
+	if com.IsFile(config.Config.ServerInfoPath) && config.Config.UPREnabled {
 		bts, err := ioutil.ReadFile(config.Config.ServerInfoPath)
 		if err == nil {
 			var info trace.TraceServerInfo

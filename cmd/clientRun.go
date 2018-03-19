@@ -66,6 +66,9 @@ var clientRunCompare = &cobra.Command{
 		if !runClientOriginal && !server.IsRunning() {
 			return errors.New("the uprd server is not running. make sure you've started the server before starting the client")
 		}
+		if runClientOriginal {
+			mconfig.Config.UPREnabled = false
+		}
 		return nil
 	},
 	RunE: func(cmd *cobra.Command, args []string) error {
@@ -161,6 +164,9 @@ var clientRunCmd = &cobra.Command{
 	PreRunE: func(cmd *cobra.Command, args []string) error {
 		if !runClientOriginal && !server.IsRunning() {
 			return errors.New("the uprd server is not running. make sure you've started the server before starting the client")
+		}
+		if runClientOriginal {
+			mconfig.Config.UPREnabled = false
 		}
 		return nil
 	},
