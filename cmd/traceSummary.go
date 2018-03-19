@@ -14,6 +14,7 @@ import (
 	zglob "github.com/mattn/go-zglob"
 	"github.com/pkg/errors"
 	"github.com/rai-project/micro18-tools/pkg/trace"
+	"github.com/rai-project/micro18-tools/pkg/utils"
 	"github.com/spf13/cobra"
 )
 
@@ -46,6 +47,9 @@ var traceSummarizeCmd = &cobra.Command{
 		var mut sync.Mutex
 		var wg sync.WaitGroup
 
+		progress := utils.NewProgress("summarizing traces", len(files))
+		defer progress.FinishPrint("finished summarizing traces and places the result in " + traceSummarizeOutputFile)
+
 		processFile := func(path0 interface{}) interface{} {
 			defer wg.Done()
 			path := path0.(string)
@@ -63,6 +67,7 @@ var traceSummarizeCmd = &cobra.Command{
 			}
 			mut.Lock()
 			defer mut.Unlock()
+			progress.Increment()
 			res = append(res, ts)
 			return err
 		}
