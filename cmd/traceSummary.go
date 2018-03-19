@@ -27,6 +27,21 @@ var traceSummarizeCmd = &cobra.Command{
 	Use:   "summarize",
 	Short: "Summarizes the traces within a directory or list of files",
 	Args:  cobra.MinimumNArgs(1),
+	PreRunE: func(cmd *cobra.Command, args []string) error {
+		if traceSummarizeOutputFile == "" {
+			fst := args[0]
+			if com.IsDir(fst) {
+				traceSummarizeOutputFile = filepath.Join(fst, "summary.json")
+			} else {
+				if cwd, err := os.Getwd(); err != nil {
+					traceSummarizeOutputFile = filepath.Join(cwd, "summary.json")
+				} else {
+					traceSummarizeOutputFile = "summary.json"
+				}
+			}
+		}
+		return nil
+	},
 	RunE: func(cmd *cobra.Command, args []string) error {
 		var res []*trace.TraceSummary
 		files := []string{}
@@ -34,13 +49,18 @@ var traceSummarizeCmd = &cobra.Command{
 			if com.IsDir(path) {
 				matches, err := zglob.Glob(filepath.Join(path, "**", "*.json"))
 				if err == nil {
-					files = append(files, matches...)
+					for _, m := range matches {
+						if m == traceSummarizeOutputFile {
+							continue
+						}
+						files = append(files, m)
+					}
 				}
 				// matches, err = zglob.Glob(filepath.Join(path, "*.json"))
 				// if err == nil {
 				// 	files = append(files, matches...)
 				// }
-			} else {
+			} else if path != traceSummarizeOutputFile {
 				files = append(files, path)
 			}
 		}
@@ -102,5 +122,5 @@ var traceSummarizeCmd = &cobra.Command{
 
 func init() {
 	traceCmd.AddCommand(traceSummarizeCmd)
-	traceSummarizeCmd.Flags().StringVarP(&traceSummarizeOutputFile, "output", "o", "summary.json", "The output path to the trace summary")
+	traceSummarizeCmd.Flags().StringVarP(&traceSummarizeOutputFile, "output", "o", "", "The output path to the trace summary")
 }
