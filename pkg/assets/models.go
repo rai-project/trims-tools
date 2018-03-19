@@ -49,8 +49,8 @@ type ModelManifest struct {
 	Model                ModelAssets           `protobuf:"bytes,16,opt,name=model" json:"model,omitempty" yaml:"model,omitempty"`
 	Attributes           map[string]string     `protobuf:"bytes,17,rep,name=attributes" json:"attributes,omitempty" yaml:"attributes,omitempty" protobuf_key:"bytes,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value,proto3"`
 	Hidden               bool                  `protobuf:"varint,18,opt,name=hidden,proto3" json:"hidden,omitempty" yaml:"hidden,omitempty"`
-	InputImageDimensions *[]uint32             `json:"-" yaml:"-,omitempty"`
-	InputMean            *[]float32            `json:"-" yaml:"-,omitempty"`
+	InputImageDimensions *[]uint32             `json:"-" yaml:"-"`
+	InputMean            *[]float32            `json:"-" yaml:"-"`
 }
 
 type ModelManifests []ModelManifest
