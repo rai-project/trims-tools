@@ -149,6 +149,7 @@ type TraceOtherData struct {
 	Iteration             int64                  `json:"iteration,omitempty"`
 	Input                 map[string]interface{} `json:"input,omitempty"`
 	ExperimentDescription string                 `json:"experiment_description,omitempty"`
+	IsProcessed           bool                   `json:"is_processed,omitempty"`
 }
 
 type Trace struct {
@@ -289,7 +290,13 @@ func (x *Trace) UnmarshalJSON(data []byte) error {
 	if err := deepcopier.Copy(jsonTrace.OtherDataRaw).To(x.OtherDataRaw); err != nil {
 		return errors.Wrapf(err, "unable to copy other data model")
 	}
-	x.OtherDataRaw.ServerInfo = TraceServerInfo{}
+	if x.OtherDataRaw.IsProcessed {
+		return nil
+	}
+	x.OtherDataRaw.IsProcessed = true
+	if !jsonTrace.OtherDataRaw.IsClient {
+		x.OtherDataRaw.ServerInfo = TraceServerInfo{}
+	}
 	if jsonTrace.OtherDataRaw.IsClient && config.Config.UPREnabled {
 		serverInfoPath := config.Config.ServerInfoPath
 		if com.IsFile(serverInfoPath) {
@@ -297,7 +304,9 @@ func (x *Trace) UnmarshalJSON(data []byte) error {
 			if err == nil {
 				var info TraceServerInfo
 				if err := json.Unmarshal(bts, &info); err == nil {
-					x.OtherDataRaw.ServerInfo = info
+					if x.StartTime.Sub(info.StartTime) > 0 {
+						x.OtherDataRaw.ServerInfo = info
+					}
 				}
 			}
 		}

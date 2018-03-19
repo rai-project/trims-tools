@@ -131,7 +131,7 @@ func (a *microConfig) Read() {
 	if a.ServerInfoPath == "" {
 		a.ServerInfoPath = DefaultServerInfoPath
 	}
-	a.UPREnabled = true
+	a.UPREnabled = false
 }
 
 func (a microConfig) Verify() {
