@@ -49,6 +49,7 @@ type microConfig struct {
 	UploadBucketName           string        `json:"upload_bucket_name" yaml:"micro18.upload_bucket_name" config:"micro18.upload_bucket_name"`
 	ProfileOutputBaseDirectory string        `json:"profile_output_base_directory" yaml:"micro18.profile_output_directory" config:"micro18.profile_output_directory"`
 	ProfileOutputDirectory     string        `json:"profile_output_directory" yaml:"-" config:"-"`
+	ExperimentDescription      string        `json:"experiment_description" yaml:"-" config:"-"`
 	ServerInfoPath             string        `json:"server_info_path" config:"micro18.server_info_path"`
 	done                       chan struct{} `json:"-" config:"-"`
 }

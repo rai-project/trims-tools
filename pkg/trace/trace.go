@@ -111,42 +111,44 @@ type GitInfo struct {
 }
 
 type TraceOtherData struct {
-	ID                  string                 `json:"run_id,omitempty"`
-	ServerInfo          TraceServerInfo        `json:"server,omitempty"`
-	EndToEndProcessTime time.Duration          `json:"end_to_end_process_time,omitempty"`
-	EndToEndTime        time.Duration          `json:"end_to_end_time,omitempty"`
-	UPREnabled          bool                   `json:"upr_enabled,omitempty"`
-	UPRBaseDirectory    string                 `json:"UPR_BASE_DIR"`
-	EagerMode           bool                   `json:"eager_mode"`
-	EagerModeAsync      bool                   `json:"eager_mode_async"`
-	EndAt               string                 `json:"end_at"`
-	Git                 GitInfo                `json:"git"`
-	Hostname            string                 `json:"hostname"`
-	IsClient            bool                   `json:"is_client"`
-	ModelName           string                 `json:"model_name"`
-	ModelParams         string                 `json:"model_params"`
-	ModelPath           string                 `json:"model_path"`
-	StartAt             string                 `json:"start_at"`
-	SymbolParams        string                 `json:"symbol_params"`
-	Username            string                 `json:"username"`
-	MinEvent            TraceEvent             `json:"min_event"`
-	MaxEvent            TraceEvent             `json:"max_event"`
-	Iteration           int64                  `json:"iteration,omitempty"`
-	Input               map[string]interface{} `json:"input,omitempty"`
+	ID                    string                 `json:"run_id,omitempty"`
+	ServerInfo            TraceServerInfo        `json:"server,omitempty"`
+	EndToEndProcessTime   time.Duration          `json:"end_to_end_process_time,omitempty"`
+	EndToEndTime          time.Duration          `json:"end_to_end_time,omitempty"`
+	UPREnabled            bool                   `json:"upr_enabled,omitempty"`
+	UPRBaseDirectory      string                 `json:"UPR_BASE_DIR"`
+	EagerMode             bool                   `json:"eager_mode"`
+	EagerModeAsync        bool                   `json:"eager_mode_async"`
+	EndAt                 string                 `json:"end_at"`
+	Git                   GitInfo                `json:"git"`
+	Hostname              string                 `json:"hostname"`
+	IsClient              bool                   `json:"is_client"`
+	ModelName             string                 `json:"model_name"`
+	ModelParams           string                 `json:"model_params"`
+	ModelPath             string                 `json:"model_path"`
+	StartAt               string                 `json:"start_at"`
+	SymbolParams          string                 `json:"symbol_params"`
+	Username              string                 `json:"username"`
+	MinEvent              TraceEvent             `json:"min_event"`
+	MaxEvent              TraceEvent             `json:"max_event"`
+	Iteration             int64                  `json:"iteration,omitempty"`
+	Input                 map[string]interface{} `json:"input,omitempty"`
+	ExperimentDescription string                 `json:"experiment_description,omitempty"`
 }
 
 type Trace struct {
-	ID              string                `json:"id,omitempty"`
-	UPREnabled      bool                  `json:"upr_enabled,omitempty"`
-	Iteration       int64                 `json:"iteration,omitempty"`
-	StartTime       time.Time             `json:"start_time,omitempty"`
-	EndTime         time.Time             `json:"end_time,omitempty"`
-	TraceEvents     TraceEvents           `json:"traceEvents,omitempty"`
-	DisplayTimeUnit string                `json:"displayTimeUnit,omitempty"`
-	Frames          map[string]EventFrame `json:"stackFrames"`
-	TimeUnit        string                `json:"timeUnit,omitempty"`
-	OtherDataRaw    *TraceOtherData       `json:"otherData,omitempty"`
-	OtherData       []*TraceOtherData     `json:"otherDatas,omitempty"`
+	ID                    string                `json:"id,omitempty"`
+	ExperimentDescription string                `json:"experiment_description,omitempty"`
+	UPREnabled            bool                  `json:"upr_enabled,omitempty"`
+	Iteration             int64                 `json:"iteration,omitempty"`
+	StartTime             time.Time             `json:"start_time,omitempty"`
+	EndTime               time.Time             `json:"end_time,omitempty"`
+	TraceEvents           TraceEvents           `json:"traceEvents,omitempty"`
+	DisplayTimeUnit       string                `json:"displayTimeUnit,omitempty"`
+	Frames                map[string]EventFrame `json:"stackFrames"`
+	TimeUnit              string                `json:"timeUnit,omitempty"`
+	OtherDataRaw          *TraceOtherData       `json:"otherData,omitempty"`
+	OtherData             []*TraceOtherData     `json:"otherDatas,omitempty"`
 }
 
 type JSONTrace struct {
@@ -251,7 +253,10 @@ func (x *Trace) UnmarshalJSON(data []byte) error {
 	if id == "" {
 		id = uuid.NewV4()
 	}
+	experimentDescription := config.Config.ExperimentDescription
+
 	x.ID = id
+	x.ExperimentDescription = experimentDescription
 	for ii := range x.TraceEvents {
 		x.TraceEvents[ii].TraceID = id
 	}
@@ -282,6 +287,7 @@ func (x *Trace) UnmarshalJSON(data []byte) error {
 		}
 	}
 	x.OtherDataRaw.ID = id
+	x.OtherDataRaw.ExperimentDescription = experimentDescription
 	x.StartTime, _ = time.Parse(time.RFC3339Nano, x.OtherDataRaw.StartAt)
 	x.EndTime, _ = time.Parse(time.RFC3339Nano, x.OtherDataRaw.EndAt)
 

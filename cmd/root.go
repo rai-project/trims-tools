@@ -19,13 +19,15 @@ import (
 )
 
 var (
-	IsDebug        bool = true
-	IsVerbose      bool = true
-	CfgFile        string
-	monitorMemory  bool
-	memoryInfo     *gpuinfo.System
-	visibleDevices string
-	log            *logrus.Entry = logrus.New().WithField("pkg", "micro/cmd")
+	IsDebug               bool = true
+	IsVerbose             bool = true
+	CfgFile               string
+	monitorMemory         bool
+	memoryInfo            *gpuinfo.System
+	visibleDevices        string
+	profileOutput         string
+	experimentDescription string
+	log                   *logrus.Entry = logrus.New().WithField("pkg", "micro/cmd")
 )
 
 // rootCmd represents the base command when called without any subcommands
@@ -44,6 +46,13 @@ var rootCmd = &cobra.Command{
 			memoryInfo = info
 			memoryInfo.Start(50 * time.Millisecond)
 		}
+		if profileOutput != "" {
+			mconfig.Config.ProfileOutputDirectory = filepath.Join(mconfig.Config.ProfileOutputDirectory, mconfig.HostName, profileOutput)
+			if !com.IsDir(mconfig.Config.ProfileOutputDirectory) {
+				os.MkdirAll(mconfig.Config.ProfileOutputDirectory, os.ModePerm)
+			}
+		}
+		mconfig.Config.ExperimentDescription = experimentDescription
 		return nil
 	},
 	PersistentPostRunE: func(cmd *cobra.Command, args []string) error {
@@ -71,6 +80,8 @@ func init() {
 	// Cobra supports persistent flags, which, if defined here,
 	// will be global for your application.
 	rootCmd.PersistentFlags().StringVar(&CfgFile, "config", "", "config file (default is $HOME/.carml_config.yaml)")
+	rootCmd.PersistentFlags().StringVar(&profileOutput, "profile_output", "", "output directory for the profiles")
+	rootCmd.PersistentFlags().StringVar(&experimentDescription, "experiment_description", "", "description of the experiement run")
 	rootCmd.PersistentFlags().BoolVar(&monitorMemory, "monitor_memory", gpuinfo.IsSupported, "monitors the memory during evaluation and prints the memory information at the end")
 	rootCmd.PersistentFlags().StringVar(&visibleDevices, "visible_devices", "0", "comma seperated list of devices visible to both the server and client. This controls the CUDA_VISIBLE_DEVICES variable")
 
