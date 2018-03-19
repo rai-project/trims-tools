@@ -84,7 +84,7 @@ func init() {
 	// Cobra supports persistent flags, which, if defined here,
 	// will be global for your application.
 	rootCmd.PersistentFlags().StringVar(&CfgFile, "config", "", "config file (default is $HOME/.carml_config.yaml)")
-	rootCmd.PersistentFlags().BoolVar(&profileOutputOverwrite, "profile_output_overwrite", true, "delete output directory for the profiles if it exists")
+	rootCmd.PersistentFlags().BoolVar(&profileOutputOverwrite, "profile_output_overwrite", false, "delete output directory for the profiles if it exists")
 	rootCmd.PersistentFlags().StringVar(&profileOutput, "profile_output", "", "output directory for the profiles")
 	rootCmd.PersistentFlags().StringVar(&experimentDescription, "experiment_description", "", "description of the experiement run")
 	rootCmd.PersistentFlags().BoolVar(&monitorMemory, "monitor_memory", gpuinfo.IsSupported, "monitors the memory during evaluation and prints the memory information at the end")

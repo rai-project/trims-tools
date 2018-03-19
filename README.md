@@ -163,6 +163,8 @@ micro18-tools client compare opts...
 go run main.go client run --profile_output=<<SOMETHING>>
 ```
 
+You can use the `--profile_output_overwrite=true` to delete and overwrite the existing profile output directory.
+
 #### Specifying Experiment Description
 
 ```
