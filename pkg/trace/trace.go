@@ -7,6 +7,8 @@ import (
 	"strings"
 	"time"
 
+	"github.com/fatih/structs"
+
 	"github.com/Unknwon/com"
 
 	"hash/fnv"
@@ -287,6 +289,7 @@ func (x *Trace) UnmarshalJSON(data []byte) error {
 	if err := deepcopier.Copy(jsonTrace.OtherDataRaw).To(x.OtherDataRaw); err != nil {
 		return errors.Wrapf(err, "unable to copy other data model")
 	}
+	x.OtherDataRaw.ServerInfo = TraceServerInfo{}
 	if jsonTrace.OtherDataRaw.IsClient && config.Config.UPREnabled {
 		serverInfoPath := config.Config.ServerInfoPath
 		if com.IsFile(serverInfoPath) {
@@ -306,10 +309,18 @@ func (x *Trace) UnmarshalJSON(data []byte) error {
 
 	minEvent := x.MinEvent()
 	maxEvent := x.MaxEvent()
-	x.OtherDataRaw.EndToEndTime = maxEvent.EndTime.Sub(minEvent.StartTime) / 1000
-	x.OtherDataRaw.EndToEndProcessTime = x.EndTime.Sub(x.StartTime)
-	x.OtherDataRaw.MaxEvent = maxEvent
-	x.OtherDataRaw.MinEvent = minEvent
+	if x.OtherDataRaw.EndToEndTime == 0 {
+		x.OtherDataRaw.EndToEndTime = maxEvent.EndTime.Sub(minEvent.StartTime)
+	}
+	if x.OtherDataRaw.EndToEndProcessTime == 0 {
+		x.OtherDataRaw.EndToEndProcessTime = x.EndTime.Sub(x.StartTime)
+	}
+	if structs.IsZero(x.OtherDataRaw.MaxEvent) {
+		x.OtherDataRaw.MaxEvent = maxEvent
+	}
+	if structs.IsZero(x.OtherDataRaw.MinEvent) {
+		x.OtherDataRaw.MinEvent = minEvent
+	}
 
 	x.OtherData = []*TraceOtherData{x.OtherDataRaw}
 
