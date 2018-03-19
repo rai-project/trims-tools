@@ -287,7 +287,7 @@ func (x *Trace) UnmarshalJSON(data []byte) error {
 	if err := deepcopier.Copy(jsonTrace.OtherDataRaw).To(x.OtherDataRaw); err != nil {
 		return errors.Wrapf(err, "unable to copy other data model")
 	}
-	if jsonTrace.OtherDataRaw.IsClient {
+	if jsonTrace.OtherDataRaw.IsClient && config.Config.UPREnabled {
 		serverInfoPath := config.Config.ServerInfoPath
 		if com.IsFile(serverInfoPath) {
 			bts, err := ioutil.ReadFile(serverInfoPath)
@@ -306,7 +306,7 @@ func (x *Trace) UnmarshalJSON(data []byte) error {
 
 	minEvent := x.MinEvent()
 	maxEvent := x.MaxEvent()
-	x.OtherDataRaw.EndToEndTime = maxEvent.EndTime.Sub(minEvent.StartTime)
+	x.OtherDataRaw.EndToEndTime = maxEvent.EndTime.Sub(minEvent.StartTime) / 1000
 	x.OtherDataRaw.EndToEndProcessTime = x.EndTime.Sub(x.StartTime)
 	x.OtherDataRaw.MaxEvent = maxEvent
 	x.OtherDataRaw.MinEvent = minEvent
