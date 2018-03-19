@@ -63,7 +63,7 @@ var clientRunCompare = &cobra.Command{
 	Aliases: []string{"compare"},
 	Short:   "Run the client command and produce profile files",
 	PreRunE: func(cmd *cobra.Command, args []string) error {
-		if !server.IsRunning() {
+		if !runClientOriginal && !server.IsRunning() {
 			return errors.New("the uprd server is not running. make sure you've started the server before starting the client")
 		}
 		return nil
@@ -159,7 +159,7 @@ var clientRunCmd = &cobra.Command{
 	Use:   "run",
 	Short: "Run the client command and produce profile files",
 	PreRunE: func(cmd *cobra.Command, args []string) error {
-		if !server.IsRunning() {
+		if !runClientOriginal && !server.IsRunning() {
 			return errors.New("the uprd server is not running. make sure you've started the server before starting the client")
 		}
 		return nil
