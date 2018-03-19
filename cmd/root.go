@@ -19,15 +19,16 @@ import (
 )
 
 var (
-	IsDebug               bool = true
-	IsVerbose             bool = true
-	CfgFile               string
-	monitorMemory         bool
-	memoryInfo            *gpuinfo.System
-	visibleDevices        string
-	profileOutput         string
-	experimentDescription string
-	log                   *logrus.Entry = logrus.New().WithField("pkg", "micro/cmd")
+	IsDebug                bool = true
+	IsVerbose              bool = true
+	profileOutputOverwrite bool
+	CfgFile                string
+	monitorMemory          bool
+	memoryInfo             *gpuinfo.System
+	visibleDevices         string
+	profileOutput          string
+	experimentDescription  string
+	log                    *logrus.Entry = logrus.New().WithField("pkg", "micro/cmd")
 )
 
 // rootCmd represents the base command when called without any subcommands
@@ -48,6 +49,9 @@ var rootCmd = &cobra.Command{
 		}
 		if profileOutput != "" {
 			mconfig.Config.ProfileOutputDirectory = filepath.Join(mconfig.Config.ProfileOutputBaseDirectory, mconfig.HostName, profileOutput)
+			if profileOutputOverwrite && com.IsDir(mconfig.Config.ProfileOutputDirectory) {
+				os.RemoveAll(mconfig.Config.ProfileOutputDirectory)
+			}
 			if !com.IsDir(mconfig.Config.ProfileOutputDirectory) {
 				os.MkdirAll(mconfig.Config.ProfileOutputDirectory, os.ModePerm)
 			}
@@ -80,6 +84,7 @@ func init() {
 	// Cobra supports persistent flags, which, if defined here,
 	// will be global for your application.
 	rootCmd.PersistentFlags().StringVar(&CfgFile, "config", "", "config file (default is $HOME/.carml_config.yaml)")
+	rootCmd.PersistentFlags().BoolVar(&profileOutputOverwrite, "profile_output_overwrite", true, "delete output directory for the profiles if it exists")
 	rootCmd.PersistentFlags().StringVar(&profileOutput, "profile_output", "", "output directory for the profiles")
 	rootCmd.PersistentFlags().StringVar(&experimentDescription, "experiment_description", "", "description of the experiement run")
 	rootCmd.PersistentFlags().BoolVar(&monitorMemory, "monitor_memory", gpuinfo.IsSupported, "monitors the memory during evaluation and prints the memory information at the end")
