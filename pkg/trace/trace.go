@@ -123,6 +123,8 @@ type TraceSummary struct {
 	Hostname              string          `json:"hostname"`
 	ModelName             string          `json:"model_name"`
 	ExperimentDescription string          `json:"experiment_description,omitempty"`
+	StartTime             time.Time       `json:"start_time"`
+	EndTime               time.Time       `json:"end_time"`
 }
 
 type TraceOtherData struct {
@@ -345,6 +347,8 @@ func (x Trace) Summarize() (*TraceSummary, error) {
 	if err := deepcopier.Copy(data).To(summary); err != nil {
 		return nil, errors.Wrap(err, "unable to copy summarize trace")
 	}
+	summary.StartTime = x.StartTime
+	summary.EndTime = x.EndTime
 	return summary, nil
 }
 
