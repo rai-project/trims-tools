@@ -47,7 +47,7 @@ var rootCmd = &cobra.Command{
 			memoryInfo.Start(50 * time.Millisecond)
 		}
 		if profileOutput != "" {
-			mconfig.Config.ProfileOutputDirectory = filepath.Join(mconfig.Config.ProfileOutputDirectory, mconfig.HostName, profileOutput)
+			mconfig.Config.ProfileOutputDirectory = filepath.Join(mconfig.Config.ProfileOutputBaseDirectory, mconfig.HostName, profileOutput)
 			if !com.IsDir(mconfig.Config.ProfileOutputDirectory) {
 				os.MkdirAll(mconfig.Config.ProfileOutputDirectory, os.ModePerm)
 			}

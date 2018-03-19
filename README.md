@@ -27,10 +27,10 @@ This is sometimes done for you by default.
 ```
 
 Ran your updated `.bashrc` file
+
 ```
 source .bashrc
 ```
-
 
 You can then install the Go 1.8 binary and set it as the default
 
@@ -156,6 +156,18 @@ micro18-tools client compare opts...
 ```
 
 ### Client Options
+
+#### Specifying Profile Output Directory
+
+```
+go run main.go client run  --original=true --profile_output=<<SOMETHING>>
+```
+
+#### Specifying Experiment Description
+
+```
+go run main.go client run  --original=true --experiment_description="description of your experiment"
+```
 
 #### Eager Initialization
 
