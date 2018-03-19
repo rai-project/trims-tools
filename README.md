@@ -131,6 +131,12 @@ There are options that can be passed in
       --skip_first      Skip the first input argument
 ```
 
+### Summarizing Traces
+
+```
+go run main.go trace summarize ~/micro18_profiles/minsky1/2000_iterations_with_10con_with_0.8mem -o ~/micro18_profiles/minsky1/2000_iterations_with_10con_with_0.8mem/summary.json
+```
+
 ### Uploading Traces
 
 ...
