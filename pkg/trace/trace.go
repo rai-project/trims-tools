@@ -115,7 +115,7 @@ type TraceSummary struct {
 	ServerInfo            TraceServerInfo `json:"server,omitempty"`
 	EndToEndProcessTime   time.Duration   `json:"end_to_end_process_time,omitempty"`
 	EndToEndTime          time.Duration   `json:"end_to_end_time,omitempty"`
-	UPREnabled            bool            `json:"upr_enabled,omitempty"`
+	UPREnabled            bool            `json:"upr_enabled"`
 	EagerMode             bool            `json:"eager_mode"`
 	EagerModeAsync        bool            `json:"eager_mode_async"`
 	Hostname              string          `json:"hostname"`
@@ -128,7 +128,7 @@ type TraceOtherData struct {
 	ServerInfo            TraceServerInfo        `json:"server,omitempty"`
 	EndToEndProcessTime   time.Duration          `json:"end_to_end_process_time,omitempty"`
 	EndToEndTime          time.Duration          `json:"end_to_end_time,omitempty"`
-	UPREnabled            bool                   `json:"upr_enabled,omitempty"`
+	UPREnabled            bool                   `json:"upr_enabled"`
 	UPRBaseDirectory      string                 `json:"UPR_BASE_DIR"`
 	EagerMode             bool                   `json:"eager_mode"`
 	EagerModeAsync        bool                   `json:"eager_mode_async"`
@@ -152,7 +152,7 @@ type TraceOtherData struct {
 type Trace struct {
 	ID                    string                `json:"id,omitempty"`
 	ExperimentDescription string                `json:"experiment_description,omitempty"`
-	UPREnabled            bool                  `json:"upr_enabled,omitempty"`
+	UPREnabled            bool                  `json:"upr_enabled"`
 	Iteration             int64                 `json:"iteration,omitempty"`
 	StartTime             time.Time             `json:"start_time,omitempty"`
 	EndTime               time.Time             `json:"end_time,omitempty"`
