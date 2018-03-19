@@ -35,10 +35,10 @@ var traceSummarizeCmd = &cobra.Command{
 				if err == nil {
 					files = append(files, matches...)
 				}
-				matches, err = zglob.Glob(filepath.Join(path, "*.json"))
-				if err == nil {
-					files = append(files, matches...)
-				}
+				// matches, err = zglob.Glob(filepath.Join(path, "*.json"))
+				// if err == nil {
+				// 	files = append(files, matches...)
+				// }
 			} else {
 				files = append(files, path)
 			}
