@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/Unknwon/com"
+	"github.com/fatih/color"
 	"github.com/k0kubun/pp"
 	"github.com/spf13/cast"
 
@@ -32,6 +33,17 @@ func (c Client) Run() ([]*trace.Trace, error) {
 	if !com.IsFile(cmdPath) {
 		return nil, errors.Errorf("the client command %s was not found in %s. make sure that the code compiled correctly",
 			config.Config.ClientRunCmd, config.Config.ClientPath)
+	}
+
+	fmt.Println(color.GreenString("✱ Running client and placing profile in " + config.Config.ProfileOutputDirectory))
+	if com.IsFile(config.Config.ServerInfoPath) {
+		bts, err := ioutil.ReadFile(config.Config.ServerInfoPath)
+		if err == nil {
+			var info trace.TraceServerInfo
+			if err := json.Unmarshal(bts, &info); err == nil {
+				fmt.Println(color.GreenString("✱ The server id for the run is " + info.ID))
+			}
+		}
 	}
 
 	if options.modelDistribution == "none" || options.modelDistribution == "" {

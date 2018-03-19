@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/Unknwon/com"
+	"github.com/fatih/color"
 	ps "github.com/mitchellh/go-ps"
 	"github.com/pkg/errors"
 	"github.com/rai-project/micro18-tools/pkg/config"
@@ -50,6 +51,8 @@ func (s Server) Run() (*trace.Trace, error) {
 	if ok, err := IsValidEvictionPolicy(options.evictionPolicy); !ok {
 		return nil, err
 	}
+
+	fmt.Println(color.GreenString("✱ Running server and placing profile in " + config.Config.ProfileOutputDirectory))
 
 	id := options.id
 	if id == "" {
