@@ -439,6 +439,17 @@ func (c *Client) readProfile(profileFilePath string, timeToRun time.Duration) (*
 	if trace.OtherDataRaw != nil {
 		trace.OtherDataRaw.EndToEndProcessTime = timeToRun
 	}
+	if len(trace.OtherData) != 0 {
+		for _, o := range trace.OtherData {
+			if o == nil {
+				continue
+			}
+			if o.ID != trace.ID {
+				continue
+			}
+			o.EndToEndProcessTime = timeToRun
+		}
+	}
 	if c.options.uploadProfile {
 		if err := trace.Upload(); err != nil {
 			err = errors.Wrapf(err, "unable to upload profile file %s", profileFilePath)
