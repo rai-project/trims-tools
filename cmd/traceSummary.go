@@ -2,7 +2,6 @@ package cmd
 
 import (
 	"encoding/json"
-	"fmt"
 	"io/ioutil"
 	"os"
 	"path/filepath"
@@ -64,6 +63,7 @@ var traceSummarizeCmd = &cobra.Command{
 				files = append(files, path)
 			}
 		}
+
 		var mut sync.Mutex
 		var wg sync.WaitGroup
 
@@ -92,7 +92,7 @@ var traceSummarizeCmd = &cobra.Command{
 			return err
 		}
 
-		processPool := tunny.NewFunc(runtime.NumCPU(), processFile)
+		processPool := tunny.NewFunc(2*runtime.NumCPU(), processFile)
 		defer processPool.Close()
 
 		for _, path := range files {
@@ -115,7 +115,6 @@ var traceSummarizeCmd = &cobra.Command{
 		if err := ioutil.WriteFile(traceSummarizeOutputFile, bts, 0644); err != nil {
 			return errors.Wrapf(err, "unable to write query results to %s", traceSummarizeOutputFile)
 		}
-		fmt.Println("output is written to " + traceSummarizeOutputFile)
 		return nil
 	},
 }
