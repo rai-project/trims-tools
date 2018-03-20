@@ -421,6 +421,9 @@ func (x *TraceSummary) fillEvents(tr Trace) {
 			case "forward":
 				se.ForwardPredict = event.Summarize()
 				continue
+			case "predict":
+				se.Predict = event.Summarize()
+				continue
 			case "get_output_shape":
 				se.GetPredictOutputShape = event.Summarize()
 				continue
