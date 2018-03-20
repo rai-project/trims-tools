@@ -137,6 +137,12 @@ There are options that can be passed in
 go run main.go trace summarize ~/micro18_profiles/minsky1/2000_iterations_with_10con_with_0.8mem -o ~/micro18_profiles/minsky1/2000_iterations_with_10con_with_0.8mem/summary.json
 ```
 
+There are options that can be passed in
+
+```
+     --detailed       The output should contain more detailed event information
+```
+
 ### Uploading Traces
 
 ...
