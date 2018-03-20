@@ -17,6 +17,7 @@ type Options struct {
 	stderr              io.Writer
 	stdout              io.Writer
 	persistCPU          bool
+	writeProfile        bool
 }
 
 type Option func(*Options)
@@ -33,6 +34,7 @@ var (
 		stderr:              os.Stderr,
 		stdout:              os.Stdout,
 		persistCPU:          true,
+		writeProfile:        false,
 	}
 )
 
@@ -45,6 +47,12 @@ func Context(ctx context.Context) Option {
 func ID(s string) Option {
 	return func(o *Options) {
 		o.id = s
+	}
+}
+
+func WriteProfile(b bool) Option {
+	return func(o *Options) {
+		o.writeProfile = b
 	}
 }
 

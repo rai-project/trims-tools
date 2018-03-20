@@ -62,6 +62,7 @@ func (s Server) Run() (*trace.Trace, error) {
 	env := map[string]string{
 		"DATE":                         time.Now().Format(time.RFC3339Nano),
 		"UPR_RUN_ID":                   id,
+		"UPR_ENABLED":                  "true",
 		"MXNET_ENGINE_TYPE":            "ThreadedEngine",
 		"UPR_PROFILE_TARGET":           profileFilePath,
 		"UPRD_EVICTION_POLICY":         fmt.Sprint(options.evictionPolicy),
@@ -79,6 +80,11 @@ func (s Server) Run() (*trace.Trace, error) {
 		env["GLOG_logtostderr"] = "1"
 		env["GLOG_v"] = "0"
 		env["GLOG_stderrthreshold"] = "0"
+	}
+	if options.writeProfile {
+		env["UPRD_WRITE_PROFILE"] = "true"
+	} else {
+		env["UPRD_WRITE_PROFILE"] = "false"
 	}
 
 	// log.WithField("server_path", config.Config.ServerPath).WithField("run_cmd", config.Config.ServerRunCmd).Debug("running server")
