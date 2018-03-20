@@ -87,7 +87,7 @@ func init() {
 	rootCmd.PersistentFlags().BoolVar(&profileOutputOverwrite, "profile_output_overwrite", false, "delete output directory for the profiles if it exists")
 	rootCmd.PersistentFlags().StringVar(&profileOutput, "profile_output", "", "output directory for the profiles")
 	rootCmd.PersistentFlags().StringVar(&experimentDescription, "experiment_description", "", "description of the experiement run")
-	rootCmd.PersistentFlags().BoolVar(&monitorMemory, "monitor_memory", gpuinfo.IsSupported, "monitors the memory during evaluation and prints the memory information at the end")
+	rootCmd.PersistentFlags().BoolVar(&monitorMemory, "monitor_memory", false && gpuinfo.IsSupported, "monitors the memory during evaluation and prints the memory information at the end")
 	rootCmd.PersistentFlags().StringVar(&visibleDevices, "visible_devices", "0", "comma seperated list of devices visible to both the server and client. This controls the CUDA_VISIBLE_DEVICES variable")
 
 	// Cobra also supports local flags, which will only run
