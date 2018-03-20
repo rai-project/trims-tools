@@ -19,6 +19,7 @@ import (
 
 var (
 	traceSummarizeOutputFile string
+	traceSummarizeDetailed   bool
 )
 
 // traceSummarizeCmd represents the traceSummarize command
@@ -81,7 +82,7 @@ var traceSummarizeCmd = &cobra.Command{
 			if err := json.Unmarshal(bts, &tr); err != nil {
 				return errors.Wrapf(err, "unable to unmarshal the profile file from %s", path)
 			}
-			ts, err := tr.Summarize()
+			ts, err := tr.Summarize(traceSummarizeDetailed)
 			if err != nil {
 				return err
 			}
@@ -122,4 +123,5 @@ var traceSummarizeCmd = &cobra.Command{
 func init() {
 	traceCmd.AddCommand(traceSummarizeCmd)
 	traceSummarizeCmd.Flags().StringVarP(&traceSummarizeOutputFile, "output", "o", "", "The output path to the trace summary")
+	traceSummarizeCmd.Flags().BoolVar(&traceSummarizeDetailed, "detailed", true, "The output should contain more detailed event information")
 }

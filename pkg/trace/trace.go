@@ -112,18 +112,41 @@ type GitInfo struct {
 	Date   string `json:"date"`
 }
 
+type TraceSummaryEvent struct {
+	Name      string        `json:"name,omitempty"`
+	Category  string        `json:"category,omitempty"`
+	StartTime time.Time     `json:"start_time_t,omitempty"`
+	Duration  time.Duration `json:"duration,omitempty"` // displayTimeUnit
+}
+
+// "load_params", "create", "set_input", "forward", "get_output_shape", "get_output", "free"
+type TraceSummaryEvents struct {
+	CreatePrediction      *TraceSummaryEvent `json:"create_prediction,omitempty"`
+	LoadModel             *TraceSummaryEvent `json:"load_model,omitempty"`
+	GRPCOpen              *TraceSummaryEvent `json:"grpc_open,omitempty"`
+	NDArrayConvert        *TraceSummaryEvent `json:"ndarray_convert,omitempty"`
+	Predict               *TraceSummaryEvent `json:"predict,omitempty"`
+	ReadParams            *TraceSummaryEvent `json:"read_params,omitempty"`
+	SetPredictInput       *TraceSummaryEvent `json:"set_predict_input,omitempty"`
+	ForwardPredict        *TraceSummaryEvent `json:"forward_predict,omitempty"`
+	GetPredictOutputShape *TraceSummaryEvent `json:"get_output_shape,omitempty"`
+	GetPredictOutput      *TraceSummaryEvent `json:"get_output,omitempty"`
+	FreePredictor         *TraceSummaryEvent `json:"free_predictor,omitempty"`
+}
+
 type TraceSummary struct {
-	ID                    string          `json:"run_id,omitempty"`
-	ServerInfo            TraceServerInfo `json:"server,omitempty"`
-	EndToEndProcessTime   time.Duration   `json:"end_to_end_process_time,omitempty"`
-	EndToEndTime          time.Duration   `json:"end_to_end_time,omitempty"`
-	UPREnabled            bool            `json:"upr_enabled"`
-	EagerMode             bool            `json:"eager_mode"`
-	EagerModeAsync        bool            `json:"eager_mode_async"`
-	Hostname              string          `json:"hostname"`
-	ModelName             string          `json:"model_name"`
-	ExperimentDescription string          `json:"experiment_description,omitempty"`
-	InitTime              time.Time       `json:"init_time,omitempty"`
+	ID                    string              `json:"run_id,omitempty"`
+	ServerInfo            TraceServerInfo     `json:"server,omitempty"`
+	EndToEndProcessTime   time.Duration       `json:"end_to_end_process_time,omitempty"`
+	EndToEndTime          time.Duration       `json:"end_to_end_time,omitempty"`
+	UPREnabled            bool                `json:"upr_enabled"`
+	EagerMode             bool                `json:"eager_mode"`
+	EagerModeAsync        bool                `json:"eager_mode_async"`
+	Hostname              string              `json:"hostname"`
+	ModelName             string              `json:"model_name"`
+	ExperimentDescription string              `json:"experiment_description,omitempty"`
+	InitTime              time.Time           `json:"init_time,omitempty"`
+	Events                *TraceSummaryEvents `json:"events,omitempty"`
 }
 
 type TraceOtherData struct {
@@ -337,20 +360,107 @@ func (x *Trace) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-func (x Trace) Summarize() (*TraceSummary, error) {
+func (x Trace) Summarize(isFull bool) (*TraceSummary, error) {
 	data := x.OtherDataRaw
 	if data == nil {
 		return nil, errors.New("expecting OtherDataRaw to be in the trace. summary does not work on combined output")
 	}
-	summary := new(TraceSummary)
-	if err := deepcopier.Copy(data).To(summary); err != nil {
-		return nil, errors.Wrap(err, "unable to copy summarize trace")
+	summary, err := data.Summarize()
+	if err != nil {
+		return nil, err
 	}
 	initTime, err := time.Parse(time.RFC3339Nano, data.StartAt)
 	if err == nil {
 		summary.InitTime = initTime
 	}
+	if isFull {
+		summary.fillEvents(x)
+	}
 	return summary, nil
+}
+
+func (x TraceOtherData) Summarize() (*TraceSummary, error) {
+	summary := new(TraceSummary)
+	if err := deepcopier.Copy(x).To(summary); err != nil {
+		return nil, errors.Wrap(err, "unable to copy summarize trace")
+	}
+	return summary, nil
+}
+
+func (x TraceEvent) Summarize() *TraceSummaryEvent {
+	return &TraceSummaryEvent{
+		Name:      x.Name,
+		Category:  x.Category,
+		StartTime: x.StartTime,
+		Duration:  x.Duration,
+	}
+}
+
+func (x *TraceSummary) fillEvents(tr Trace) {
+	if x.Events == nil {
+		x.Events = new(TraceSummaryEvents)
+	}
+	se := x.Events
+	events := tr.TraceEvents
+	for _, event := range events {
+		if event.EventType != "B" {
+			continue
+		}
+		switch event.Category {
+		case "prediction":
+			switch event.Name {
+			case "load_params":
+				se.ReadParams = event.Summarize()
+				continue
+			case "create":
+				se.CreatePrediction = event.Summarize()
+				continue
+			case "set_input":
+				se.SetPredictInput = event.Summarize()
+				continue
+			case "forward":
+				se.ForwardPredict = event.Summarize()
+				continue
+			case "get_output_shape":
+				se.GetPredictOutputShape = event.Summarize()
+				continue
+			case "get_output":
+				se.GetPredictOutput = event.Summarize()
+				continue
+			case "free":
+				se.FreePredictor = event.Summarize()
+				continue
+			default:
+				continue
+			}
+		case "serialization":
+			switch event.Name {
+			case "convering_to_nd_array":
+				se.NDArrayConvert = event.Summarize()
+				continue
+			default:
+				continue
+			}
+		case "grpc":
+			switch event.Name {
+			case "open":
+				se.GRPCOpen = event.Summarize()
+				continue
+			default:
+				continue
+			}
+		case "load":
+			switch event.Name {
+			case "load_model":
+				se.LoadModel = event.Summarize()
+				continue
+			default:
+				continue
+			}
+		default:
+			// ignore
+		}
+	}
 }
 
 func (x Trace) Adjust() (Trace, error) {
