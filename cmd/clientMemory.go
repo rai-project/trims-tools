@@ -44,7 +44,7 @@ var clientRunMemoryCmd = &cobra.Command{
 			}...)
 		}
 		client := client.New(opts...)
-		traces, err := client.Run()
+		traces, err := client.Run(true)
 		if err != nil {
 			return err
 		}

@@ -86,14 +86,14 @@ var clientRunCompare = &cobra.Command{
 		for _, model := range models {
 			progress.Increment()
 			orig := makeClientRun(ctx, client.OriginalMode(true), client.ModelName(model.MustCanonicalName()))
-			origTraces, err := orig.Run()
+			origTraces, err := orig.Run(false)
 			if err != nil {
 				log.WithError(err).Error("failed to run client with upr enabled")
 				continue
 			}
 
 			mod := makeClientRun(ctx, client.OriginalMode(false), client.ModelName(model.MustCanonicalName()))
-			modTraces, err := mod.Run()
+			modTraces, err := mod.Run(false)
 			if err != nil {
 				log.WithError(err).Error("failed to run client with upr disabled")
 				continue
@@ -173,7 +173,7 @@ var clientRunCmd = &cobra.Command{
 	RunE: func(cmd *cobra.Command, args []string) error {
 		ctx := context.Background()
 		client := makeClientRun(ctx)
-		_, err := client.Run()
+		_, err := client.Run(true)
 		return err
 	},
 }

@@ -26,7 +26,7 @@ import (
 	"github.com/rai-project/micro18-tools/pkg/utils"
 )
 
-func (c Client) Run() ([]*trace.Trace, error) {
+func (c Client) Run(logInfo bool) ([]*trace.Trace, error) {
 	options := c.options
 
 	cmdPath := filepath.Join(config.Config.ClientPath, config.Config.ClientRunCmd)
@@ -35,13 +35,15 @@ func (c Client) Run() ([]*trace.Trace, error) {
 			config.Config.ClientRunCmd, config.Config.ClientPath)
 	}
 
-	fmt.Println(color.GreenString("✱ Running client and placing profile in " + config.Config.ProfileOutputDirectory))
-	if com.IsFile(config.Config.ServerInfoPath) && config.Config.UPREnabled {
-		bts, err := ioutil.ReadFile(config.Config.ServerInfoPath)
-		if err == nil {
-			var info trace.TraceServerInfo
-			if err := json.Unmarshal(bts, &info); err == nil {
-				fmt.Println(color.GreenString("✱ The server id for the run is " + info.ID))
+	if logInfo {
+		fmt.Println(color.GreenString("✱ Running client and placing profile in " + config.Config.ProfileOutputDirectory))
+		if com.IsFile(config.Config.ServerInfoPath) && config.Config.UPREnabled {
+			bts, err := ioutil.ReadFile(config.Config.ServerInfoPath)
+			if err == nil {
+				var info trace.TraceServerInfo
+				if err := json.Unmarshal(bts, &info); err == nil {
+					fmt.Println(color.GreenString("✱ The server id for the run is " + info.ID))
+				}
 			}
 		}
 	}
