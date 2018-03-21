@@ -76,6 +76,6 @@ mod = mx.mod.Module(sym)
 mod.bind(data_shapes=[('data', (1,3,224,224))], label_shapes=[('softmax_label', (1,))])
 mod.init_params()
 
-prefix = '/models/alexnet_%d_%d_%d.' % ker, fil, hid
+prefix = '/models/alexnet_%d_%d_%d.' %(ker, fil, hid)
 mod.save_params(prefix+"params")
 sym.save(prefix+"json")
