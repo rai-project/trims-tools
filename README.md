@@ -244,3 +244,9 @@ micro18-tools download assets
 ```
 
 This will download it to the directory specified by `micro18.base_path` in the config file.
+
+### Generate Large Models
+
+```
+docker run -it -v `pwd`/large_models:/models mxnet/python python /models/alexnet.py
+```
