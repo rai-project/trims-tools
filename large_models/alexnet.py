@@ -29,35 +29,35 @@ def get_symbol(num_classes, dtype='float32', **kwargs):
         input_data = mx.sym.Cast(data=input_data, dtype=np.float16)
     # stage 1
     conv1 = mx.sym.Convolution(name='conv1',
-        data=input_data, kernel=(11, 11), stride=(4, 4), num_filter=96)
+        data=input_data, kernel=(ker*11, ker*11), stride=(4, 4), num_filter=fil*96)
     relu1 = mx.sym.Activation(data=conv1, act_type="relu")
     lrn1 = mx.sym.LRN(data=relu1, alpha=0.0001, beta=0.75, knorm=2, nsize=5)
     pool1 = mx.sym.Pooling(
         data=lrn1, pool_type="max", kernel=(3, 3), stride=(2,2))
     # stage 2
     conv2 = mx.sym.Convolution(name='conv2',
-        data=pool1, kernel=(5, 5), pad=(2, 2), num_filter=256)
+        data=pool1, kernel=(ker*5, ker*5), pad=(2, 2), num_filter=fil*256)
     relu2 = mx.sym.Activation(data=conv2, act_type="relu")
     lrn2 = mx.sym.LRN(data=relu2, alpha=0.0001, beta=0.75, knorm=2, nsize=5)
     pool2 = mx.sym.Pooling(data=lrn2, kernel=(3, 3), stride=(2, 2), pool_type="max")
     # stage 3
     conv3 = mx.sym.Convolution(name='conv3',
-        data=pool2, kernel=(3, 3), pad=(1, 1), num_filter=384)
+        data=pool2, kernel=(ker*3, ker*3), pad=(1, 1), num_filter=fil*384)
     relu3 = mx.sym.Activation(data=conv3, act_type="relu")
     conv4 = mx.sym.Convolution(name='conv4',
-        data=relu3, kernel=(3, 3), pad=(1, 1), num_filter=384)
+        data=relu3, kernel=(ker*3, ker*3), pad=(1, 1), num_filter=fil*384)
     relu4 = mx.sym.Activation(data=conv4, act_type="relu")
     conv5 = mx.sym.Convolution(name='conv5',
-        data=relu4, kernel=(3, 3), pad=(1, 1), num_filter=256)
+        data=relu4, kernel=(ker*3, ker*3), pad=(1, 1), num_filter=fil*256)
     relu5 = mx.sym.Activation(data=conv5, act_type="relu")
     pool3 = mx.sym.Pooling(data=relu5, kernel=(3, 3), stride=(2, 2), pool_type="max")
     # stage 4
     flatten = mx.sym.Flatten(data=pool3)
-    fc1 = mx.sym.FullyConnected(name='fc1', data=flatten, num_hidden=4096)
+    fc1 = mx.sym.FullyConnected(name='fc1', data=flatten, num_hidden=hid*4096)
     relu6 = mx.sym.Activation(data=fc1, act_type="relu")
     dropout1 = mx.sym.Dropout(data=relu6, p=0.5)
     # stage 5
-    fc2 = mx.sym.FullyConnected(name='fc2', data=dropout1, num_hidden=4096)
+    fc2 = mx.sym.FullyConnected(name='fc2', data=dropout1, num_hidden=hid*4096)
     relu7 = mx.sym.Activation(data=fc2, act_type="relu")
     dropout2 = mx.sym.Dropout(data=relu7, p=0.5)
     # stage 6
@@ -67,13 +67,15 @@ def get_symbol(num_classes, dtype='float32', **kwargs):
     softmax = mx.sym.SoftmaxOutput(data=fc3, name='softmax')
     return softmax
 
-mult = 1
+ker = 1
+fil = 1
+hid = 1
 
 sym = get_symbol(1000)
 mod = mx.mod.Module(sym)
 mod.bind(data_shapes=[('data', (1,3,224,224))], label_shapes=[('softmax_label', (1,))])
 mod.init_params()
 
-prefix = '/models/alexnet_%d.' % mult
+prefix = '/models/alexnet_%d_%d_%d.' % ker, fil, hid
 mod.save_params(prefix+"params")
-sym.save(prefix+"symbol")
+sym.save(prefix+"json")
