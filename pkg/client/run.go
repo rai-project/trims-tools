@@ -396,6 +396,7 @@ func (c Client) RunOnce(model assets.ModelManifest) (string, time.Duration, erro
 	}
 	tic := time.Now()
 	ran, err := utils.ExecCmd(
+		nil,
 		config.Config.ClientPath,
 		env,
 		options.stdout,

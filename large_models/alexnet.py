@@ -11,7 +11,7 @@ from mxnet import sym
 mx.random.seed(1)
 ctx = mx.cpu()
 
-mult = 2
+mult = 4
 
 alex_net = gluon.nn.Sequential()
 with alex_net.name_scope():

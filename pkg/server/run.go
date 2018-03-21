@@ -39,7 +39,7 @@ func (s Server) IsRunning() bool {
 	return IsRunning()
 }
 
-func (s Server) Run() (*trace.Trace, error) {
+func (s *Server) Run() (*trace.Trace, error) {
 	options := s.options
 
 	cmdPath := filepath.Join(config.Config.ServerPath, config.Config.ServerRunCmd)
@@ -89,6 +89,7 @@ func (s Server) Run() (*trace.Trace, error) {
 
 	// log.WithField("server_path", config.Config.ServerPath).WithField("run_cmd", config.Config.ServerRunCmd).Debug("running server")
 	ran, err := utils.ExecCmd(
+		&s.cmd,
 		config.Config.ServerPath,
 		env,
 		options.stdout,
@@ -129,4 +130,12 @@ func (s Server) Run() (*trace.Trace, error) {
 	}
 
 	return &trace, nil
+}
+
+func (s Server) Stop() error {
+	if s.cmd == nil {
+		return errors.New("command not started")
+	}
+	proc := s.cmd.Process
+	return proc.Kill()
 }

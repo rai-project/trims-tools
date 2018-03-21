@@ -3,6 +3,7 @@ package server
 import (
 	"io"
 	"os"
+	"os/exec"
 
 	"github.com/rai-project/micro18-tools/pkg/builder"
 	"github.com/rai-project/micro18-tools/pkg/watcher"
@@ -10,6 +11,7 @@ import (
 
 type Server struct {
 	output  io.Reader
+	cmd     *exec.Cmd
 	builder *builder.Builder
 	watcher *watcher.Watcher
 	options Options
