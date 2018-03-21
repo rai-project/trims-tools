@@ -248,5 +248,5 @@ This will download it to the directory specified by `micro18.base_path` in the c
 ### Generate Large Models
 
 ```
-docker run -it -v `pwd`/large_models:/models mxnet/python python /models/alexnet.py
+docker run -it -v `pwd`/large_models:/models mxnet/python:0.11.0 python /models/alexnet.py
 ```

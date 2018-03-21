@@ -70,12 +70,13 @@ def get_symbol(num_classes, dtype='float32', **kwargs):
 ker = 1
 fil = 1
 hid = 1
+input_mult = 6
 
 sym = get_symbol(1000)
 mod = mx.mod.Module(sym)
-mod.bind(data_shapes=[('data', (1,3,224,224))], label_shapes=[('softmax_label', (1,))])
+mod.bind(data_shapes=[('data', (1,3,input_mult*224,input_mult*224))], label_shapes=[('softmax_label', (1,))])
 mod.init_params()
 
-prefix = '/models/alexnet_%d_%d_%d.' %(ker, fil, hid)
+prefix = '/models/alexnet_%d.' %(input_mult)
 mod.save_params(prefix+"params")
 sym.save(prefix+"json")
