@@ -249,12 +249,18 @@ func (model ModelManifest) Download(ctx context.Context) (err error) {
 }
 
 func (ms ModelManifests) Download(ctx context.Context) error {
-	for _, model := range ms {
-		log.WithField("name", model.Name).Info("downloading model")
-		if err := model.Download(ctx); err != nil {
-			log.WithError(err).WithField("name", model.Name).Info("failed to download model")
-		}
+	var wg sync.WaitGroup
+	wg.Add(len(ms))
+	for ii := range ms {
+		go func(ii int) {
+			defer wg.Done()
+			model := ms[ii]
+			if err := model.Download(ctx); err != nil {
+				log.WithError(err).WithField("name", model.Name).Info("failed to download model")
+			}
+		}(ii)
 	}
+	wg.Wait()
 	log.Info("Successfully downloaded all models.")
 	return nil
 }
