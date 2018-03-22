@@ -18,12 +18,9 @@ import (
 )
 
 type ModelAssets struct {
-	BaseUrl         string `protobuf:"bytes,1,opt,name=base_url,json=baseUrl,proto3" json:"base_url,omitempty" yaml:"base_url,omitempty"`
-	WeightsPath     string `protobuf:"bytes,2,opt,name=weights_path,json=weightsPath,proto3" json:"weights_path,omitempty" yaml:"weights_path,omitempty"`
-	GraphPath       string `protobuf:"bytes,3,opt,name=graph_path,json=graphPath,proto3" json:"graph_path,omitempty" yaml:"graph_path,omitempty"`
-	IsArchive       bool   `protobuf:"varint,4,opt,name=is_archive,json=isArchive,proto3" json:"is_archive,omitempty" yaml:"is_archive,omitempty"`
-	WeightsChecksum string `protobuf:"bytes,5,opt,name=weights_checksum,json=weightsChecksum,proto3" json:"weights_checksum,omitempty" yaml:"weights_checksum,omitempty"`
-	GraphChecksum   string `protobuf:"bytes,6,opt,name=graph_checksum,json=graphChecksum,proto3" json:"graph_checksum,omitempty" yaml:"graph_checksum,omitempty"`
+	BaseUrl     string `protobuf:"bytes,1,opt,name=base_url,json=baseUrl,proto3" json:"base_url,omitempty" yaml:"base_url,omitempty"`
+	WeightsPath string `protobuf:"bytes,2,opt,name=weights_path,json=weightsPath,proto3" json:"weights_path,omitempty" yaml:"weights_path,omitempty"`
+	GraphPath   string `protobuf:"bytes,3,opt,name=graph_path,json=graphPath,proto3" json:"graph_path,omitempty" yaml:"graph_path,omitempty"`
 }
 
 type ModelManifest_Type struct {
@@ -251,20 +248,10 @@ func (model ModelManifest) Download(ctx context.Context) (err error) {
 		}
 		return
 	}
-	checksum := model.Model.GraphChecksum
-	if checksum == "" {
-		err = errors.New("Need graph file checksum in the model manifest")
-		return err
-	}
-	if _, err = downloadmanager.DownloadFile(model.GetGraphUrl(), model.GetGraphPath(), downloadmanager.MD5Sum(checksum)); err != nil {
+	if _, err = downloadmanager.DownloadFile(model.GetGraphUrl(), model.GetGraphPath()); err != nil {
 		return
 	}
-
-	checksum = model.Model.WeightsChecksum
-	if checksum == "" {
-		return errors.New("Need weights file checksum in the model manifest")
-	}
-	if _, err = downloadmanager.DownloadFile(model.GetWeightsUrl(), model.GetWeightsPath(), downloadmanager.MD5Sum(checksum)); err != nil {
+	if _, err = downloadmanager.DownloadFile(model.GetWeightsUrl(), model.GetWeightsPath()); err != nil {
 		return
 	}
 	if featuresURL := model.GetFeaturesUrl(); featuresURL != "" {
