@@ -121,16 +121,10 @@ func (model ModelManifest) GetFeaturesPath() string {
 }
 
 func (model ModelManifest) GetWeightsUrl() string {
-	if model.Model.IsArchive {
-		return model.Model.BaseUrl
-	}
 	return model.baseURL() + model.Model.WeightsPath
 }
 
 func (model ModelManifest) GetGraphUrl() string {
-	if model.Model.IsArchive {
-		return model.Model.BaseUrl
-	}
 	return model.baseURL() + model.Model.GraphPath
 }
 
@@ -239,15 +233,6 @@ func (model ModelManifest) Download(ctx context.Context) (err error) {
 		}
 		log.WithField("name", model.Name).Info("model downloaded")
 	}()
-	if model.Model.IsArchive {
-		baseURL := model.Model.BaseUrl
-		_, err = downloadmanager.DownloadInto(baseURL, model.WorkDir(), downloadmanager.Context(ctx))
-		if err != nil {
-			err = errors.Wrapf(err, "failed to download model archive from %v", model.Model.BaseUrl)
-			return
-		}
-		return
-	}
 	if _, err = downloadmanager.DownloadFile(model.GetGraphUrl(), model.GetGraphPath()); err != nil {
 		return
 	}
