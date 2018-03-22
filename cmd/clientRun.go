@@ -53,6 +53,7 @@ func makeClientRun(ctx context.Context, extraOpts ...client.Option) *client.Clie
 			client.ModelDistribution(runClientModelDistribution, runClientModelDistributionParameters),
 			client.ProfileMemory(runClientProfileMemory),
 			client.UploadProfile(runClientUploadTraces),
+			client.LargeModels(runClientLargeModels),
 		},
 		extraOpts...,
 	)

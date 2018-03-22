@@ -36,6 +36,7 @@ var clientRunMemoryCmd = &cobra.Command{
 				client.EagerInitialize(true),
 				client.Stdout(ioutil.Discard),
 				client.Stderr(ioutil.Discard),
+				client.LargeModels(runClientLargeModels),
 			}
 		if runClientDebug {
 			opts = append(opts, []client.Option{
@@ -59,5 +60,6 @@ func init() {
 	clientRunMemoryCmd.Flags().StringVar(&runClientModels, "models", "all", "List of models to use (comma seperated)")
 	clientRunMemoryCmd.Flags().BoolVarP(&runClientDebug, "debug", "d", false, "Print debug messages from the client")
 	clientRunMemoryCmd.Flags().StringVarP(&runClientMemoryOutputFormat, "format", "f", "table", "Output format to print the memory information")
+	clientRunMemoryCmd.Flags().BoolVar(&runClientLargeModels, "large_models", false, "run the large models")
 	clientCmd.AddCommand(clientRunMemoryCmd)
 }
