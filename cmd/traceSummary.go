@@ -6,6 +6,7 @@ import (
 	"os"
 	"path/filepath"
 	"runtime"
+	"strings"
 	"sync"
 
 	"github.com/Jeffail/tunny"
@@ -99,6 +100,15 @@ var traceSummarizeCmd = &cobra.Command{
 		for _, path := range files {
 			if !com.IsFile(path) {
 				return errors.Errorf("the profile file %s was not found", path)
+			}
+			if strings.Contains(path, "combined-") {
+				continue
+			}
+			if strings.Contains(path, "compared-") {
+				continue
+			}
+			if strings.Contains(path, "summary-") {
+				continue
 			}
 			wg.Add(1)
 			go func(path string) {
