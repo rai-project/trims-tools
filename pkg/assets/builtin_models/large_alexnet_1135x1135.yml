@@ -1,4 +1,4 @@
-name: large_alexnet_1362x1362 # name of your model
+name: large_alexnet_1135x1135 # name of your model
 framework:
   name: MXNet # framework for the model
   version: 0.11.0 # framework version contraint
@@ -35,7 +35,7 @@ inputs:
     # description of the first input
     description: the input image
     parameters: # type parameters
-      dimensions: [3, 227, 227]
+      dimensions: [3, 1135, 1135]
       mean: [123, 117, 104]
 output:
   # the type of the output
@@ -47,7 +47,7 @@ output:
     features_url: http://data.dmlc.ml/mxnet/models/imagenet/synset.txt
     features_checksum: 4d234b5833aca44928065a180db3016a
 model: # specifies model graph and weights resources
-  base_url: http://s3.amazonaws.com/store.carml.org/models/mxnet/large_models/large_alexnet_1362x1362
+  base_url: http://s3.amazonaws.com/store.carml.org/models/mxnet/large_models/large_alexnet_1135x1135
   graph_path: alexnet.json
   weights_path: alexnet.params
   is_archive: false # if set, then the base_url is a url to an archive

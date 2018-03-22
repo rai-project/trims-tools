@@ -35,7 +35,7 @@ inputs:
     # description of the first input
     description: the input image
     parameters: # type parameters
-      dimensions: [3, 227, 227]
+      dimensions: [3, 1362, 1362]
       mean: [123, 117, 104]
 output:
   # the type of the output
