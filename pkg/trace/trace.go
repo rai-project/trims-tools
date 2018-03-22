@@ -126,6 +126,7 @@ type TraceSummaryEvents struct {
 	GRPCOpen              *TraceSummaryEvent `json:"grpc_open,omitempty"`
 	NDArrayConvert        *TraceSummaryEvent `json:"ndarray_convert,omitempty"`
 	Predict               *TraceSummaryEvent `json:"predict,omitempty"`
+	LoadParams            *TraceSummaryEvent `json:"load_params,omitempty"`
 	ReadParams            *TraceSummaryEvent `json:"read_params,omitempty"`
 	SetPredictInput       *TraceSummaryEvent `json:"set_predict_input,omitempty"`
 	ForwardPredict        *TraceSummaryEvent `json:"forward_predict,omitempty"`
@@ -410,7 +411,7 @@ func (x *TraceSummary) fillEvents(tr Trace) {
 		case "prediction":
 			switch event.Name {
 			case "load_params":
-				se.ReadParams = event.Summarize()
+				se.LoadParams = event.Summarize()
 				continue
 			case "create":
 				se.CreatePrediction = event.Summarize()
@@ -448,6 +449,14 @@ func (x *TraceSummary) fillEvents(tr Trace) {
 			switch event.Name {
 			case "open":
 				se.GRPCOpen = event.Summarize()
+				continue
+			default:
+				continue
+			}
+		case "io":
+			switch event.Name {
+			case "read_params":
+				se.ReadParams = event.Summarize()
 				continue
 			default:
 				continue
