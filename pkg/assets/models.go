@@ -49,6 +49,7 @@ type ModelManifest struct {
 	Model                ModelAssets           `protobuf:"bytes,16,opt,name=model" json:"model,omitempty" yaml:"model,omitempty"`
 	Attributes           map[string]string     `protobuf:"bytes,17,rep,name=attributes" json:"attributes,omitempty" yaml:"attributes,omitempty" protobuf_key:"bytes,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value,proto3"`
 	Hidden               bool                  `protobuf:"varint,18,opt,name=hidden,proto3" json:"hidden,omitempty" yaml:"hidden,omitempty"`
+	LargeModel           bool                  `json:"large_model,omitempty" yaml:"large_model,omitempty"`
 	InputImageDimensions *[]uint32             `json:"-" yaml:"-"`
 	InputMean            *[]float32            `json:"-" yaml:"-"`
 }
@@ -56,7 +57,8 @@ type ModelManifest struct {
 type ModelManifests []ModelManifest
 
 var (
-	Models = ModelManifests{}
+	Models      = ModelManifests{}
+	LargeModels = ModelManifests{}
 )
 
 func (model ModelManifest) baseURL() string {
@@ -286,17 +288,18 @@ func (ms ModelManifests) Download(ctx context.Context) error {
 }
 
 func DownloadModels(ctx context.Context) error {
-	return Models.Download(ctx)
+	models := append(Models, LargeModels...)
+	return models.Download(ctx)
 }
 
-func FilterModels(filter string) (ModelManifests, error) {
+func filterModels(all ModelManifests, filter string) (ModelManifests, error) {
 	if strings.ToLower(filter) == "all" {
-		return Models, nil
+		return all, nil
 	}
 	models := ModelManifests{}
 	modelsNames := strings.Split(strings.ToLower(filter), ",")
 	for _, modelName := range modelsNames {
-		for _, m := range Models {
+		for _, m := range all {
 			if strings.ToLower(m.MustCanonicalName()) == modelName {
 				models = ModelManifests{m}
 				break
@@ -307,6 +310,14 @@ func FilterModels(filter string) (ModelManifests, error) {
 		return models, errors.Errorf("the model %s was not found in the asset list", filter)
 	}
 	return models, nil
+}
+
+func FilterModels(filter string) (ModelManifests, error) {
+	return filterModels(Models, filter)
+}
+
+func FilterLargeModels(filter string) (ModelManifests, error) {
+	return filterModels(LargeModels, filter)
 }
 
 func init() {
@@ -350,7 +361,11 @@ func init() {
 
 			mut.Lock()
 			defer mut.Unlock()
-			Models = append(Models, model)
+			if model.LargeModel {
+				LargeModels = append(LargeModels, model)
+			} else {
+				Models = append(Models, model)
+			}
 		}()
 	}
 
@@ -358,5 +373,9 @@ func init() {
 
 	sort.Slice(Models, func(ii, jj int) bool {
 		return Models[ii].Name < Models[jj].Name
+	})
+
+	sort.Slice(LargeModels, func(ii, jj int) bool {
+		return LargeModels[ii].Name < LargeModels[jj].Name
 	})
 }
