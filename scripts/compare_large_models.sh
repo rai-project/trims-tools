@@ -1,7 +1,7 @@
 #!/bin/sh
 
 # run the server using
-# go run main.go client compare --monitor_memory=false --concurrent=1  --profile_output=large_model_compare_first_iteration --experiment_description="large model comparison" --large_models=true --models=large_vgg16_896x896_1.0
+# go run main.go server run -d --memory_percentage=0.9 --estimate_with_internal_memory=false
 
 go run main.go client compare --monitor_memory=false --concurrent=1  --profile_output=large_model_compare_second_iteration --experiment_description="large model comparison" --large_models=true --models=large_vgg16_896x896_1.0
 go run main.go client compare --monitor_memory=false --concurrent=1  --profile_output=large_model_compare_third_iteration --experiment_description="large model comparison" --large_models=true --models=large_vgg16_896x896_1.0
