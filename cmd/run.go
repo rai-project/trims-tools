@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"context"
+	"time"
 
 	mconfig "github.com/rai-project/micro18-tools/pkg/config"
 	"github.com/spf13/cobra"
@@ -92,6 +93,8 @@ var runCmd = &cobra.Command{
 				panic(err)
 			}
 		}()
+
+		time.Sleep(time.Second)
 
 		if runCompare {
 			err = clientCompare(ctx)
