@@ -24,6 +24,10 @@ import mxnet as mx
 import numpy as np
 import os
 
+ker = 1
+fil = 1
+hid = 1
+
 def get_symbol(num_classes, dtype='float32', **kwargs):
     input_data = mx.sym.Variable(name="data")
     if dtype == 'float16':
@@ -68,12 +72,20 @@ def get_symbol(num_classes, dtype='float32', **kwargs):
     softmax = mx.sym.SoftmaxOutput(data=fc3, name='softmax')
     return softmax
 
-ker = 1
-fil = 1
-hid = 1
-input_mult = 1
+for dim in [(640,480), (800,600), (960,720), (1024,768), (1280 , 720), (1920 , 1080), (2560, 1440)]:
+    input_x_dim, input_y_dim = dim[0], dim[1]
+    sym = get_symbol(1000)
+    mod = mx.mod.Module(sym)
+    mod.bind(data_shapes=[('data', (1,3,input_y_dim,input_x_dim))], label_shapes=[('softmax_label', (1,))])
+    mod.init_params()
 
-for ii in range(1, 6):
+    os.mkdir('/models/large_alexnet_%dx%d' %(input_y_dim, input_x_dim))
+    prefix = '/models/large_alexnet_%dx%d/alexnet.' %(input_y_dim, input_x_dim)
+    mod.save_params(prefix+"params")
+    sym.save(prefix+"json")
+    print("saved " + prefix)
+
+for ii in range(1, 7):
     input_mult = ii
     sym = get_symbol(1000)
     mod = mx.mod.Module(sym)
@@ -84,3 +96,5 @@ for ii in range(1, 6):
     prefix = '/models/large_alexnet_%dx%d/alexnet.' %(input_mult*227, input_mult*227)
     mod.save_params(prefix+"params")
     sym.save(prefix+"json")
+    print("saved " + prefix)
+
