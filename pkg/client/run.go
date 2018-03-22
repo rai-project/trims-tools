@@ -57,7 +57,14 @@ func (c Client) Run(logInfo bool) ([]*trace.Trace, error) {
 func (c Client) run() ([]*trace.Trace, error) {
 	options := c.options
 
-	models, err := assets.FilterModels(options.modelName)
+	var models assets.ModelManifests
+	var err error
+	if options.largeModels {
+		models, err = assets.FilterLargeModels(options.modelName)
+	} else {
+		models, err = assets.FilterModels(options.modelName)
+	}
+
 	if err != nil {
 		return nil, err
 	}
@@ -180,7 +187,14 @@ func (c Client) run() ([]*trace.Trace, error) {
 func (c Client) runWorkload() ([]*trace.Trace, error) {
 	options := c.options
 
-	models, err := assets.FilterModels(options.modelName)
+	var models assets.ModelManifests
+	var err error
+	if options.largeModels {
+		models, err = assets.FilterLargeModels(options.modelName)
+	} else {
+		models, err = assets.FilterModels(options.modelName)
+	}
+
 	if err != nil {
 		return nil, err
 	}

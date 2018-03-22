@@ -29,6 +29,7 @@ var (
 	runMemoryPercentage            float32
 	runPersistCPU                  bool
 	runWriteProfile                bool
+	runLargeModels                 bool
 )
 
 // runCmd represents the run command
@@ -51,6 +52,7 @@ var runCmd = &cobra.Command{
 		runClientProfileMemory = runProfileMemory
 		runClientProfileMemory = runProfileMemory
 		runClientCombinedAll = runCombinedAll
+		runClientLargeModels = runLargeModels
 
 		runServerDebug = runDebug
 		runServerEvictionPolicy = runEvictionPolicy
@@ -124,6 +126,7 @@ func init() {
 	runCmd.Flags().BoolVar(&runUploadTraces, "trace_upload", false, "upload the traces to AWS S3 once complete")
 	runCmd.Flags().BoolVar(&runOriginal, "original", false, "Run an unmodified version of the inference (without persistent storage)")
 	runCmd.Flags().BoolVar(&runCombinedAll, "combined_all", true, "Combine all results into a single trace")
+	runCmd.Flags().BoolVar(&runLargeModels, "large_models", false, "run the large models")
 
 	rootCmd.AddCommand(runCmd)
 }

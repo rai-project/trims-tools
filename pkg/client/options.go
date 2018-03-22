@@ -29,6 +29,7 @@ type Options struct {
 	modelIterationCount     int
 	profileMemory           bool
 	showProgress            bool
+	largeModels             bool
 	stderr                  io.Writer
 	stdout                  io.Writer
 }
@@ -53,6 +54,7 @@ var (
 		modelIterationCount:     -1,
 		profileMemory:           false,
 		showProgress:            true,
+		largeModels:             false,
 		stderr:                  os.Stderr,
 		stdout:                  os.Stdout,
 	}
@@ -73,6 +75,12 @@ func ConcurrentRunCount(ii int) Option {
 func UploadProfile(b bool) Option {
 	return func(o *Options) {
 		o.uploadProfile = b
+	}
+}
+
+func LargeModels(b bool) Option {
+	return func(o *Options) {
+		o.largeModels = b
 	}
 }
 
