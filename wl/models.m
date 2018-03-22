@@ -9,6 +9,7 @@ prettyNameMapping = <|
      "inception_3.0"->"Inception-v3",
      "inception_4.0"->"Inception-v4",
      "inceptionbn_21k_2.0"->"InceptionBN-21K-v2",
+     "InceptionBN-21K" -> "InceptionBN-21K-v2",
      "inception_bn_3.0"->"Inception-BN-v3",
      "inception_resnet_2.0"->"Inception-ResNet-v2",
      "locationnet_1.0"->"LocationNet",
@@ -17,9 +18,11 @@ prettyNameMapping = <|
      "o_resnet152_2.0"->"ResNet152-v2",
      "o_vgg16_1.0"->"o-VGG16",
      "o_vgg19_1.0"->"o-VGG19",
+     "ResNet101" -> "ResNet101-v1",
      "resnet101_1.0"->"ResNet101-v1",
      "resnet101_2.0"->"ResNet101-v2",
-     "resnet152_1.0"->"ResNet152-11k-v1",
+     "resnet152_1.0"->"ResNet152-v1",
+     "ResNet152" -> "ResNet152-v1",
      "resnet152_11k_1.0"->"ResNet152-11k",
      "resnet152_2.0"->"ResNet152-v2",
      "resnet18_2.0"->"ResNet18-v2",
@@ -35,6 +38,7 @@ prettyNameMapping = <|
      "resnext50_32x4d_1.0"->"ResNeXt50-32x4d",
      "squeezenet_1.0"->"SqueezeNet-v1.0",
      "squeezenet_1.1"->"SqueezeNet-v1.1",
+     "VGG16" ->"VGG16-v1",
      "vgg16_1.0"->"VGG16-v1",
      "vgg16_sod_1.0"->"VGG16_SOD",
      "vgg16_sos_1.0"->"VGG16_SOS",
@@ -43,7 +47,23 @@ prettyNameMapping = <|
      "xception_1.0"->"Xception"
 |>;
 
-prettyNameMapping = Join[prettyNameMapping, KeyValueMap[#2 -> #1 &, prettyNameMapping]];
+prettyNameMapping = Join[prettyNameMapping, AssociationThread[Values[prettyNameMapping] -> Values[prettyNameMapping]]];
 
 prettyName[model_] := Lookup[prettyNameMapping, model];
 
+modelIndecies =
+<|"BVLC-AlexNet" -> 1, "BVLC-GoogLeNet" -> 2,
+ "BVLC-Reference-CaffeNet" -> 3, "BVLC-Reference-RCNN-ILSVRC13" -> 4,
+ "DPN68" -> 5, "DPN92" -> 6, "Inception-v3" -> 7, "Inception-v4" -> 8,
+  "InceptionBN-21K-v2" -> 9, "Inception-BN-v3" -> 10,
+ "Inception-ResNet-v2" -> 11, "LocationNet" -> 12, "NIN-v1" -> 13,
+ "ResNet101-v1" -> 14, "ResNet101-v2" -> 15, "ResNet152-v1" -> 16,
+  "ResNet152-11k" -> 17, "ResNet152-v2" -> 18, "ResNet18-v2" -> 19,
+ "ResNet200-v2" -> 20, "ResNet269-v2" -> 21, "ResNet34-v2" -> 22,
+ "ResNet50-v2" -> 24, "ResNeXt101-v1" -> 25, "ResNeXt101-32x4d" -> 26,
+  "ResNeXt26-32x4d" -> 27, "ResNeXt50" -> 28, "ResNeXt50-32x4d" -> 29,
+  "SqueezeNet-v1.0" -> 30, "SqueezeNet-v1.1" -> 31, "VGG16-v1" -> 32,
+ "VGG16_SOD" -> 33, "VGG16_SOS" -> 34, "VGG19" -> 35, "WRN50-2" -> 36,
+  "Xception" -> 37|>;
+
+modelIndex[m0_] := With[{m = prettyName[m0]}, Lookup[modelIndecies, m]];
