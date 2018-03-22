@@ -22,6 +22,7 @@ Krizhevsky, Alex, Ilya Sutskever, and Geoffrey E. Hinton. "Imagenet classificati
 """
 import mxnet as mx
 import numpy as np
+import os
 
 def get_symbol(num_classes, dtype='float32', **kwargs):
     input_data = mx.sym.Variable(name="data")
@@ -70,13 +71,16 @@ def get_symbol(num_classes, dtype='float32', **kwargs):
 ker = 1
 fil = 1
 hid = 1
-input_mult = 6
+input_mult = 1
 
-sym = get_symbol(1000)
-mod = mx.mod.Module(sym)
-mod.bind(data_shapes=[('data', (1,3,input_mult*224,input_mult*224))], label_shapes=[('softmax_label', (1,))])
-mod.init_params()
+for ii in range(1, 6):
+    input_mult = ii
+    sym = get_symbol(1000)
+    mod = mx.mod.Module(sym)
+    mod.bind(data_shapes=[('data', (1,3,input_mult*227,input_mult*227))], label_shapes=[('softmax_label', (1,))])
+    mod.init_params()
 
-prefix = '/models/alexnet_%d.' %(input_mult)
-mod.save_params(prefix+"params")
-sym.save(prefix+"json")
+    os.mkdir('/models/large_alexnet_%dx%d' %(input_mult*227, input_mult*227))
+    prefix = '/models/large_alexnet_%dx%d/alexnet.' %(input_mult*227, input_mult*227)
+    mod.save_params(prefix+"params")
+    sym.save(prefix+"json")
