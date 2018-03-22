@@ -19,14 +19,15 @@ import (
 )
 
 var (
-	runServerID                  string
-	runServerDebug               bool
-	runServerEvictionPolicy      string
-	runServerModelEstimationRate float32
-	runServerMemoryPercentage    float32
-	runServerPersistCPU          bool
-	runServerWriteProfile        bool
-	serverInfoPath               string
+	runServerID                         string
+	runServerDebug                      bool
+	runServerEvictionPolicy             string
+	runServerModelEstimationRate        float32
+	runServerMemoryPercentage           float32
+	runServerPersistCPU                 bool
+	runServerWriteProfile               bool
+	serverInfoPath                      string
+	runServerEstimateWithInternalMemory bool
 )
 
 func makeServerRun(ctx context.Context) *server.Server {
@@ -38,6 +39,7 @@ func makeServerRun(ctx context.Context) *server.Server {
 		server.ModelEstimationRate(runServerModelEstimationRate),
 		server.MemoryPercentage(runServerMemoryPercentage),
 		server.PersistCPU(runServerPersistCPU),
+		server.EstimateWithInternalMemory(runServerEstimateWithInternalMemory),
 	)
 }
 
@@ -91,6 +93,7 @@ func init() {
 	serverRunCmd.Flags().Float32Var(&runServerModelEstimationRate, "model_estimation_rate", 1.0, "File size multiplier used to determine how much memory would be used by a model")
 	serverRunCmd.Flags().Float32Var(&runServerMemoryPercentage, "memory_percentage", 0.8, "Percentage of GPU memory that can be used to persist models")
 	serverRunCmd.Flags().BoolVar(&runServerPersistCPU, "persist_cpu", true, "Persist memory on CPU to avoid rereading the data from disk after eviction")
+	serverRunCmd.Flags().BoolVar(&runServerEstimateWithInternalMemory, "estimate_with_internal_memory", true, "Use internal memory information when estimating model size")
 
 	serverCmd.AddCommand(serverRunCmd)
 }

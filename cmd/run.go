@@ -31,6 +31,7 @@ var (
 	runPersistCPU                  bool
 	runWriteProfile                bool
 	runLargeModels                 bool
+	runEstimateWithInternalMemory  bool
 )
 
 // runCmd represents the run command
@@ -61,6 +62,7 @@ var runCmd = &cobra.Command{
 		runServerMemoryPercentage = runMemoryPercentage
 		runServerPersistCPU = runPersistCPU
 		runServerWriteProfile = runWriteProfile
+		runServerEstimateWithInternalMemory = runEstimateWithInternalMemory
 
 		if err := serverRunCmd.PreRunE(cmd, args); err != nil {
 			return err
@@ -130,6 +132,7 @@ func init() {
 	runCmd.Flags().BoolVar(&runOriginal, "original", false, "Run an unmodified version of the inference (without persistent storage)")
 	runCmd.Flags().BoolVar(&runCombinedAll, "combined_all", true, "Combine all results into a single trace")
 	runCmd.Flags().BoolVar(&runLargeModels, "large_models", false, "run the large models")
+	runCmd.Flags().BoolVar(&runEstimateWithInternalMemory, "estimate_with_internal_memory", true, "Use internal memory information when estimating model size")
 
 	rootCmd.AddCommand(runCmd)
 }

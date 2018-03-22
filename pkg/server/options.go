@@ -7,34 +7,36 @@ import (
 )
 
 type Options struct {
-	ctx                 context.Context
-	id                  string
-	debug               bool
-	evictionPolicy      string
-	modelEstimationRate float32
-	memoryPercentage    float32
-	uploadProfile       bool
-	stderr              io.Writer
-	stdout              io.Writer
-	persistCPU          bool
-	writeProfile        bool
+	ctx                        context.Context
+	id                         string
+	debug                      bool
+	evictionPolicy             string
+	modelEstimationRate        float32
+	memoryPercentage           float32
+	uploadProfile              bool
+	stderr                     io.Writer
+	stdout                     io.Writer
+	persistCPU                 bool
+	writeProfile               bool
+	estimateWithInternalMemory bool
 }
 
 type Option func(*Options)
 
 var (
 	DefaultOptions = Options{
-		ctx:                 context.Background(),
-		id:                  "",
-		debug:               false,
-		evictionPolicy:      "lru",
-		modelEstimationRate: 1.0,
-		memoryPercentage:    0.8,
-		uploadProfile:       true,
-		stderr:              os.Stderr,
-		stdout:              os.Stdout,
-		persistCPU:          true,
-		writeProfile:        false,
+		ctx:                        context.Background(),
+		id:                         "",
+		debug:                      false,
+		evictionPolicy:             "lru",
+		modelEstimationRate:        1.0,
+		memoryPercentage:           0.8,
+		uploadProfile:              true,
+		stderr:                     os.Stderr,
+		stdout:                     os.Stdout,
+		persistCPU:                 true,
+		writeProfile:               false,
+		estimateWithInternalMemory: true,
 	}
 )
 
@@ -71,6 +73,12 @@ func DebugMode(b bool) Option {
 func EvictionPolicy(n string) Option {
 	return func(o *Options) {
 		o.evictionPolicy = n
+	}
+}
+
+func EstimateWithInternalMemory(b bool) Option {
+	return func(o *Options) {
+		o.estimateWithInternalMemory = b
 	}
 }
 
