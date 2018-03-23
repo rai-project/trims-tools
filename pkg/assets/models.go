@@ -14,6 +14,7 @@ import (
 
 	"github.com/rai-project/downloadmanager"
 	"github.com/rai-project/micro18-tools/pkg/config"
+	"github.com/rai-project/micro18-tools/pkg/utils"
 	yaml "gopkg.in/yaml.v2"
 )
 
@@ -276,12 +277,10 @@ func filterModels(all ModelManifests, filter string) (ModelManifests, error) {
 	}
 	models := ModelManifests{}
 	modelsNames := strings.Split(strings.ToLower(filter), ",")
-	for _, modelName := range modelsNames {
-		for _, m := range all {
-			if strings.ToLower(m.MustCanonicalName()) == modelName {
-				models = ModelManifests{m}
-				break
-			}
+	for _, m := range all {
+		if utils.MatchOneOf(m.MustCanonicalName(), modelsNames) {
+			models = ModelManifests{m}
+			break
 		}
 	}
 	if len(models) == 0 {
