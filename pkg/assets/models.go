@@ -278,7 +278,7 @@ func filterModels(all ModelManifests, filter string) (ModelManifests, error) {
 	models := ModelManifests{}
 	modelsNames := strings.Split(strings.ToLower(filter), ",")
 	for _, m := range all {
-		if utils.MatchOneOf(m.MustCanonicalName(), modelsNames) {
+		if utils.MatchOneOf(m.MustCanonicalName(), modelsNames...) {
 			models = ModelManifests{m}
 			break
 		}
