@@ -79,7 +79,7 @@ func clientCompare(ctx context.Context) error {
 
 	for _, model := range models {
 		progress.Increment()
-		println("running ", model.MustCanonicalName(), " in original mode")
+		//println("running ", model.MustCanonicalName(), " in original mode")
 		orig := makeClientRun(ctx, client.OriginalMode(true), client.ModelName(model.MustCanonicalName()))
 		origTraces, err := orig.Run(false)
 		if err != nil {
@@ -87,7 +87,7 @@ func clientCompare(ctx context.Context) error {
 			continue
 		}
 
-		println("running ", model.MustCanonicalName(), " in upr mode")
+		//println("running ", model.MustCanonicalName(), " in upr mode")
 		mod := makeClientRun(ctx, client.OriginalMode(false), client.ModelName(model.MustCanonicalName()))
 		modTraces, err := mod.Run(false)
 		if err != nil {
