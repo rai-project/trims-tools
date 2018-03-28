@@ -17,6 +17,7 @@ type Options struct {
 	stderr                     io.Writer
 	stdout                     io.Writer
 	persistCPU                 bool
+	persistCPUOnly             bool
 	writeProfile               bool
 	estimateWithInternalMemory bool
 }
@@ -35,6 +36,7 @@ var (
 		stderr:                     os.Stderr,
 		stdout:                     os.Stdout,
 		persistCPU:                 true,
+		persistCPUOnly:             false,
 		writeProfile:               false,
 		estimateWithInternalMemory: true,
 	}
@@ -85,6 +87,12 @@ func EstimateWithInternalMemory(b bool) Option {
 func PersistCPU(b bool) Option {
 	return func(o *Options) {
 		o.persistCPU = b
+	}
+}
+
+func PersistCPUOnly(b bool) Option {
+	return func(o *Options) {
+		o.persistCPUOnly = b
 	}
 }
 

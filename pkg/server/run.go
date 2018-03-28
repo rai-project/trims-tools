@@ -87,6 +87,11 @@ func (s *Server) Run() (*trace.Trace, error) {
 	} else {
 		env["UPRD_WRITE_PROFILE"] = "false"
 	}
+	if options.persistCPUOnly {
+		env["UPRD_PERSIST_ONLY_CPU"] = "true"
+	} else {
+		env["UPRD_PERSIST_ONLY_CPU"] = "false"
+	}
 
 	// log.WithField("server_path", config.Config.ServerPath).WithField("run_cmd", config.Config.ServerRunCmd).Debug("running server")
 	ran, err := utils.ExecCmd(
