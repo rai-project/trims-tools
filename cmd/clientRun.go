@@ -74,8 +74,11 @@ func clientCompare(ctx context.Context) error {
 		return err
 	}
 
-	progress := utils.NewProgress("comparing models", len(models))
+	progress := utils.NewProgress("comparing models", 2*len(models))
 	defer progress.FinishPrint("finished comparing models")
+
+	originalTracesMap := map[string][]*trace.Trace{}
+	modTracesMap := map[string][]*trace.Trace{}
 
 	for _, model := range models {
 		progress.Increment()
@@ -86,7 +89,11 @@ func clientCompare(ctx context.Context) error {
 			log.WithError(err).Error("failed to run client with upr enabled")
 			continue
 		}
+		originalTracesMap[model.MustCanonicalName()] = origTraces
+	}
 
+	for _, model := range models {
+		progress.Increment()
 		//println("running ", model.MustCanonicalName(), " in upr mode")
 		mod := makeClientRun(ctx, client.OriginalMode(false), client.ModelName(model.MustCanonicalName()))
 		modTraces, err := mod.Run(false)
@@ -94,7 +101,19 @@ func clientCompare(ctx context.Context) error {
 			log.WithError(err).Error("failed to run client with upr disabled")
 			continue
 		}
+		modTracesMap[model.MustCanonicalName()] = modTraces
+	}
 
+	for _, model := range models {
+		name := model.MustCanonicalName()
+		origTraces, ok := originalTracesMap[name]
+		if !ok {
+			continue
+		}
+		modTraces, ok := modTracesMap[name]
+		if !ok {
+			continue
+		}
 		if len(modTraces) == 0 {
 			log.WithField("model_name", model.MustCanonicalName()).Error("no traces captured")
 			continue
