@@ -69,6 +69,8 @@ func (c Client) run() ([]*trace.Trace, error) {
 		return nil, err
 	}
 
+	//log.WithField("models", models).Info("running using the provided models")
+
 	if options.showProgress && len(models) <= 1 {
 		options.showProgress = false
 	}
