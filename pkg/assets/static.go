@@ -138,7 +138,7 @@ func pkgAssetsBuiltin_modelsBvlcAlexnetYml() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "pkg/assets/builtin_models/BVLC-AlexNet.yml", size: 2856, mode: os.FileMode(420), modTime: time.Unix(1519725520, 0)}
+	info := bindataFileInfo{name: "pkg/assets/builtin_models/BVLC-AlexNet.yml", size: 2856, mode: os.FileMode(436), modTime: time.Unix(1520208866, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -158,7 +158,7 @@ func pkgAssetsBuiltin_modelsBvlcGooglenetYml() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "pkg/assets/builtin_models/BVLC-GoogLeNet.yml", size: 3129, mode: os.FileMode(420), modTime: time.Unix(1519725520, 0)}
+	info := bindataFileInfo{name: "pkg/assets/builtin_models/BVLC-GoogLeNet.yml", size: 3129, mode: os.FileMode(436), modTime: time.Unix(1520208866, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -178,7 +178,7 @@ func pkgAssetsBuiltin_modelsBvlcReferenceCaffenetYml() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "pkg/assets/builtin_models/BVLC-Reference-CaffeNet.yml", size: 2434, mode: os.FileMode(420), modTime: time.Unix(1519725520, 0)}
+	info := bindataFileInfo{name: "pkg/assets/builtin_models/BVLC-Reference-CaffeNet.yml", size: 2434, mode: os.FileMode(436), modTime: time.Unix(1520208866, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -198,7 +198,7 @@ func pkgAssetsBuiltin_modelsBvlcReferenceRcnnIlsvrc13Yml() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "pkg/assets/builtin_models/BVLC-Reference-RCNN-ILSVRC13.yml", size: 2591, mode: os.FileMode(420), modTime: time.Unix(1519725520, 0)}
+	info := bindataFileInfo{name: "pkg/assets/builtin_models/BVLC-Reference-RCNN-ILSVRC13.yml", size: 2591, mode: os.FileMode(436), modTime: time.Unix(1520208866, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -218,7 +218,7 @@ func pkgAssetsBuiltin_modelsDpn68Yml() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "pkg/assets/builtin_models/DPN68.yml", size: 2328, mode: os.FileMode(420), modTime: time.Unix(1519725520, 0)}
+	info := bindataFileInfo{name: "pkg/assets/builtin_models/DPN68.yml", size: 2328, mode: os.FileMode(436), modTime: time.Unix(1520208866, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -238,7 +238,7 @@ func pkgAssetsBuiltin_modelsDpn92Yml() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "pkg/assets/builtin_models/DPN92.yml", size: 2328, mode: os.FileMode(420), modTime: time.Unix(1519725520, 0)}
+	info := bindataFileInfo{name: "pkg/assets/builtin_models/DPN92.yml", size: 2328, mode: os.FileMode(436), modTime: time.Unix(1520208866, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -258,7 +258,7 @@ func pkgAssetsBuiltin_modelsInceptionBnYml() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "pkg/assets/builtin_models/Inception-BN.yml", size: 2330, mode: os.FileMode(420), modTime: time.Unix(1519725520, 0)}
+	info := bindataFileInfo{name: "pkg/assets/builtin_models/Inception-BN.yml", size: 2330, mode: os.FileMode(436), modTime: time.Unix(1520208866, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -278,7 +278,7 @@ func pkgAssetsBuiltin_modelsInceptionResnetV2Yml() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "pkg/assets/builtin_models/Inception-ResNet-v2.yml", size: 2639, mode: os.FileMode(420), modTime: time.Unix(1519725520, 0)}
+	info := bindataFileInfo{name: "pkg/assets/builtin_models/Inception-ResNet-v2.yml", size: 2639, mode: os.FileMode(436), modTime: time.Unix(1520208866, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -298,7 +298,7 @@ func pkgAssetsBuiltin_modelsInceptionV3Yml() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "pkg/assets/builtin_models/Inception-v3.yml", size: 2481, mode: os.FileMode(420), modTime: time.Unix(1519725520, 0)}
+	info := bindataFileInfo{name: "pkg/assets/builtin_models/Inception-v3.yml", size: 2481, mode: os.FileMode(436), modTime: time.Unix(1520208866, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -318,7 +318,7 @@ func pkgAssetsBuiltin_modelsInceptionV4Yml() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "pkg/assets/builtin_models/Inception-v4.yml", size: 2502, mode: os.FileMode(420), modTime: time.Unix(1519725520, 0)}
+	info := bindataFileInfo{name: "pkg/assets/builtin_models/Inception-v4.yml", size: 2502, mode: os.FileMode(436), modTime: time.Unix(1520208866, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -338,7 +338,7 @@ func pkgAssetsBuiltin_modelsInceptionbn21kYml() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "pkg/assets/builtin_models/InceptionBN-21K.yml", size: 2381, mode: os.FileMode(420), modTime: time.Unix(1519725520, 0)}
+	info := bindataFileInfo{name: "pkg/assets/builtin_models/InceptionBN-21K.yml", size: 2381, mode: os.FileMode(436), modTime: time.Unix(1520208866, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -358,7 +358,7 @@ func pkgAssetsBuiltin_modelsResnext10132x4dYml() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "pkg/assets/builtin_models/ResNeXt101-32x4d.yml", size: 3055, mode: os.FileMode(420), modTime: time.Unix(1519725520, 0)}
+	info := bindataFileInfo{name: "pkg/assets/builtin_models/ResNeXt101-32x4d.yml", size: 3055, mode: os.FileMode(436), modTime: time.Unix(1520208866, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -378,7 +378,7 @@ func pkgAssetsBuiltin_modelsResnext101Yml() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "pkg/assets/builtin_models/ResNeXt101.yml", size: 2199, mode: os.FileMode(420), modTime: time.Unix(1519725520, 0)}
+	info := bindataFileInfo{name: "pkg/assets/builtin_models/ResNeXt101.yml", size: 2199, mode: os.FileMode(436), modTime: time.Unix(1520208866, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -398,7 +398,7 @@ func pkgAssetsBuiltin_modelsResnext2632x4dPrivYml() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "pkg/assets/builtin_models/ResNeXt26-32x4d-priv.yml", size: 2997, mode: os.FileMode(420), modTime: time.Unix(1519725520, 0)}
+	info := bindataFileInfo{name: "pkg/assets/builtin_models/ResNeXt26-32x4d-priv.yml", size: 2997, mode: os.FileMode(436), modTime: time.Unix(1520208866, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -418,7 +418,7 @@ func pkgAssetsBuiltin_modelsResnext5032x4dYml() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "pkg/assets/builtin_models/ResNeXt50-32x4d.yml", size: 3050, mode: os.FileMode(420), modTime: time.Unix(1519725520, 0)}
+	info := bindataFileInfo{name: "pkg/assets/builtin_models/ResNeXt50-32x4d.yml", size: 3050, mode: os.FileMode(436), modTime: time.Unix(1520208866, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -438,7 +438,7 @@ func pkgAssetsBuiltin_modelsResnext50Yml() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "pkg/assets/builtin_models/ResNeXt50.yml", size: 2194, mode: os.FileMode(420), modTime: time.Unix(1519725520, 0)}
+	info := bindataFileInfo{name: "pkg/assets/builtin_models/ResNeXt50.yml", size: 2194, mode: os.FileMode(436), modTime: time.Unix(1520208866, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -458,7 +458,7 @@ func pkgAssetsBuiltin_modelsResnet101V2Yml() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "pkg/assets/builtin_models/ResNet101-v2.yml", size: 2834, mode: os.FileMode(420), modTime: time.Unix(1519725520, 0)}
+	info := bindataFileInfo{name: "pkg/assets/builtin_models/ResNet101-v2.yml", size: 2834, mode: os.FileMode(436), modTime: time.Unix(1520208866, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -478,7 +478,7 @@ func pkgAssetsBuiltin_modelsResnet101Yml() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "pkg/assets/builtin_models/ResNet101.yml", size: 2778, mode: os.FileMode(420), modTime: time.Unix(1519725520, 0)}
+	info := bindataFileInfo{name: "pkg/assets/builtin_models/ResNet101.yml", size: 2778, mode: os.FileMode(436), modTime: time.Unix(1520208866, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -498,7 +498,7 @@ func pkgAssetsBuiltin_modelsResnet15211kYml() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "pkg/assets/builtin_models/ResNet152-11k.yml", size: 2416, mode: os.FileMode(420), modTime: time.Unix(1519725520, 0)}
+	info := bindataFileInfo{name: "pkg/assets/builtin_models/ResNet152-11k.yml", size: 2416, mode: os.FileMode(436), modTime: time.Unix(1520208866, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -518,7 +518,7 @@ func pkgAssetsBuiltin_modelsResnet152V2Yml() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "pkg/assets/builtin_models/ResNet152-v2.yml", size: 2284, mode: os.FileMode(420), modTime: time.Unix(1519725520, 0)}
+	info := bindataFileInfo{name: "pkg/assets/builtin_models/ResNet152-v2.yml", size: 2284, mode: os.FileMode(436), modTime: time.Unix(1520208866, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -538,7 +538,7 @@ func pkgAssetsBuiltin_modelsResnet152Yml() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "pkg/assets/builtin_models/ResNet152.yml", size: 2778, mode: os.FileMode(420), modTime: time.Unix(1519725520, 0)}
+	info := bindataFileInfo{name: "pkg/assets/builtin_models/ResNet152.yml", size: 2778, mode: os.FileMode(436), modTime: time.Unix(1520208866, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -558,7 +558,7 @@ func pkgAssetsBuiltin_modelsResnet18V2Yml() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "pkg/assets/builtin_models/ResNet18-v2.yml", size: 2207, mode: os.FileMode(420), modTime: time.Unix(1519725520, 0)}
+	info := bindataFileInfo{name: "pkg/assets/builtin_models/ResNet18-v2.yml", size: 2207, mode: os.FileMode(436), modTime: time.Unix(1520208866, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -578,7 +578,7 @@ func pkgAssetsBuiltin_modelsResnet200V2Yml() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "pkg/assets/builtin_models/ResNet200-v2.yml", size: 2211, mode: os.FileMode(420), modTime: time.Unix(1519725520, 0)}
+	info := bindataFileInfo{name: "pkg/assets/builtin_models/ResNet200-v2.yml", size: 2211, mode: os.FileMode(436), modTime: time.Unix(1520208866, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -598,7 +598,7 @@ func pkgAssetsBuiltin_modelsResnet269V2Yml() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "pkg/assets/builtin_models/ResNet269-v2.yml", size: 2833, mode: os.FileMode(420), modTime: time.Unix(1519725520, 0)}
+	info := bindataFileInfo{name: "pkg/assets/builtin_models/ResNet269-v2.yml", size: 2833, mode: os.FileMode(436), modTime: time.Unix(1520208866, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -618,7 +618,7 @@ func pkgAssetsBuiltin_modelsResnet34V2Yml() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "pkg/assets/builtin_models/ResNet34-v2.yml", size: 2206, mode: os.FileMode(420), modTime: time.Unix(1519725520, 0)}
+	info := bindataFileInfo{name: "pkg/assets/builtin_models/ResNet34-v2.yml", size: 2206, mode: os.FileMode(436), modTime: time.Unix(1520208866, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -638,7 +638,7 @@ func pkgAssetsBuiltin_modelsResnet50V2Yml() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "pkg/assets/builtin_models/ResNet50-v2.yml", size: 2206, mode: os.FileMode(420), modTime: time.Unix(1519725520, 0)}
+	info := bindataFileInfo{name: "pkg/assets/builtin_models/ResNet50-v2.yml", size: 2206, mode: os.FileMode(436), modTime: time.Unix(1520208866, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -658,7 +658,7 @@ func pkgAssetsBuiltin_modelsResnet50Yml() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "pkg/assets/builtin_models/ResNet50.yml", size: 2774, mode: os.FileMode(420), modTime: time.Unix(1519725520, 0)}
+	info := bindataFileInfo{name: "pkg/assets/builtin_models/ResNet50.yml", size: 2774, mode: os.FileMode(436), modTime: time.Unix(1520208866, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -678,7 +678,7 @@ func pkgAssetsBuiltin_modelsSqueezenetV10Yml() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "pkg/assets/builtin_models/SqueezeNet-v1.0.yml", size: 2202, mode: os.FileMode(420), modTime: time.Unix(1519725520, 0)}
+	info := bindataFileInfo{name: "pkg/assets/builtin_models/SqueezeNet-v1.0.yml", size: 2202, mode: os.FileMode(436), modTime: time.Unix(1520208866, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -698,7 +698,7 @@ func pkgAssetsBuiltin_modelsSqueezenetV11Yml() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "pkg/assets/builtin_models/SqueezeNet-v1.1.yml", size: 1989, mode: os.FileMode(420), modTime: time.Unix(1519725520, 0)}
+	info := bindataFileInfo{name: "pkg/assets/builtin_models/SqueezeNet-v1.1.yml", size: 1989, mode: os.FileMode(436), modTime: time.Unix(1520208866, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -718,7 +718,7 @@ func pkgAssetsBuiltin_modelsVgg16_sodYml() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "pkg/assets/builtin_models/VGG16_SOD.yml", size: 2507, mode: os.FileMode(420), modTime: time.Unix(1519725520, 0)}
+	info := bindataFileInfo{name: "pkg/assets/builtin_models/VGG16_SOD.yml", size: 2507, mode: os.FileMode(436), modTime: time.Unix(1520208866, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -738,7 +738,7 @@ func pkgAssetsBuiltin_modelsVgg16_sosYml() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "pkg/assets/builtin_models/VGG16_SOS.yml", size: 2305, mode: os.FileMode(420), modTime: time.Unix(1519725520, 0)}
+	info := bindataFileInfo{name: "pkg/assets/builtin_models/VGG16_SOS.yml", size: 2305, mode: os.FileMode(436), modTime: time.Unix(1520208866, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -758,7 +758,7 @@ func pkgAssetsBuiltin_modelsWrn502Yml() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "pkg/assets/builtin_models/WRN50-2.yml", size: 3107, mode: os.FileMode(420), modTime: time.Unix(1519725520, 0)}
+	info := bindataFileInfo{name: "pkg/assets/builtin_models/WRN50-2.yml", size: 3107, mode: os.FileMode(436), modTime: time.Unix(1520208866, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -778,7 +778,7 @@ func pkgAssetsBuiltin_modelsXceptionYml() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "pkg/assets/builtin_models/Xception.yml", size: 3235, mode: os.FileMode(420), modTime: time.Unix(1519725520, 0)}
+	info := bindataFileInfo{name: "pkg/assets/builtin_models/Xception.yml", size: 3235, mode: os.FileMode(436), modTime: time.Unix(1520208866, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -798,7 +798,7 @@ func pkgAssetsBuiltin_modelsLarge_alexnet_1135x1135Yml() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "pkg/assets/builtin_models/large_alexnet_1135x1135.yml", size: 2798, mode: os.FileMode(420), modTime: time.Unix(1521689067, 0)}
+	info := bindataFileInfo{name: "pkg/assets/builtin_models/large_alexnet_1135x1135.yml", size: 2798, mode: os.FileMode(436), modTime: time.Unix(1521689149, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -818,7 +818,7 @@ func pkgAssetsBuiltin_modelsLarge_alexnet_227x227Yml() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "pkg/assets/builtin_models/large_alexnet_227x227.yml", size: 2779, mode: os.FileMode(420), modTime: time.Unix(1521680024, 0)}
+	info := bindataFileInfo{name: "pkg/assets/builtin_models/large_alexnet_227x227.yml", size: 2779, mode: os.FileMode(436), modTime: time.Unix(1521684147, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -838,7 +838,7 @@ func pkgAssetsBuiltin_modelsLarge_alexnet_454x454Yml() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "pkg/assets/builtin_models/large_alexnet_454x454.yml", size: 2779, mode: os.FileMode(420), modTime: time.Unix(1521680029, 0)}
+	info := bindataFileInfo{name: "pkg/assets/builtin_models/large_alexnet_454x454.yml", size: 2779, mode: os.FileMode(436), modTime: time.Unix(1521684147, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -858,7 +858,7 @@ func pkgAssetsBuiltin_modelsLarge_alexnet_480x640Yml() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "pkg/assets/builtin_models/large_alexnet_480x640.yml", size: 2792, mode: os.FileMode(420), modTime: time.Unix(1521689105, 0)}
+	info := bindataFileInfo{name: "pkg/assets/builtin_models/large_alexnet_480x640.yml", size: 2792, mode: os.FileMode(436), modTime: time.Unix(1521689149, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -878,7 +878,7 @@ func pkgAssetsBuiltin_modelsLarge_alexnet_600x800Yml() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "pkg/assets/builtin_models/large_alexnet_600x800.yml", size: 2792, mode: os.FileMode(420), modTime: time.Unix(1521689100, 0)}
+	info := bindataFileInfo{name: "pkg/assets/builtin_models/large_alexnet_600x800.yml", size: 2792, mode: os.FileMode(436), modTime: time.Unix(1521689149, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -898,7 +898,7 @@ func pkgAssetsBuiltin_modelsLarge_alexnet_681x681Yml() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "pkg/assets/builtin_models/large_alexnet_681x681.yml", size: 2779, mode: os.FileMode(420), modTime: time.Unix(1521680078, 0)}
+	info := bindataFileInfo{name: "pkg/assets/builtin_models/large_alexnet_681x681.yml", size: 2779, mode: os.FileMode(436), modTime: time.Unix(1521684147, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -918,7 +918,7 @@ func pkgAssetsBuiltin_modelsLarge_alexnet_720x960Yml() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "pkg/assets/builtin_models/large_alexnet_720x960.yml", size: 2792, mode: os.FileMode(420), modTime: time.Unix(1521689088, 0)}
+	info := bindataFileInfo{name: "pkg/assets/builtin_models/large_alexnet_720x960.yml", size: 2792, mode: os.FileMode(436), modTime: time.Unix(1521689149, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -938,7 +938,7 @@ func pkgAssetsBuiltin_modelsLarge_alexnet_768x1024Yml() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "pkg/assets/builtin_models/large_alexnet_768x1024.yml", size: 2794, mode: os.FileMode(420), modTime: time.Unix(1521689083, 0)}
+	info := bindataFileInfo{name: "pkg/assets/builtin_models/large_alexnet_768x1024.yml", size: 2794, mode: os.FileMode(436), modTime: time.Unix(1521689149, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -958,7 +958,7 @@ func pkgAssetsBuiltin_modelsLarge_alexnet_768x1280Yml() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "pkg/assets/builtin_models/large_alexnet_768x1280.yml", size: 2794, mode: os.FileMode(420), modTime: time.Unix(1521689075, 0)}
+	info := bindataFileInfo{name: "pkg/assets/builtin_models/large_alexnet_768x1280.yml", size: 2794, mode: os.FileMode(436), modTime: time.Unix(1521689149, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -978,7 +978,7 @@ func pkgAssetsBuiltin_modelsLarge_alexnet_908x908Yml() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "pkg/assets/builtin_models/large_alexnet_908x908.yml", size: 2779, mode: os.FileMode(420), modTime: time.Unix(1521680065, 0)}
+	info := bindataFileInfo{name: "pkg/assets/builtin_models/large_alexnet_908x908.yml", size: 2779, mode: os.FileMode(436), modTime: time.Unix(1521684147, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -998,7 +998,7 @@ func pkgAssetsBuiltin_modelsLarge_vgg16_224x224Yml() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "pkg/assets/builtin_models/large_vgg16_224x224.yml", size: 2126, mode: os.FileMode(420), modTime: time.Unix(1521683501, 0)}
+	info := bindataFileInfo{name: "pkg/assets/builtin_models/large_vgg16_224x224.yml", size: 2126, mode: os.FileMode(436), modTime: time.Unix(1521684147, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -1018,7 +1018,7 @@ func pkgAssetsBuiltin_modelsLarge_vgg16_448x448Yml() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "pkg/assets/builtin_models/large_vgg16_448x448.yml", size: 1908, mode: os.FileMode(420), modTime: time.Unix(1521683505, 0)}
+	info := bindataFileInfo{name: "pkg/assets/builtin_models/large_vgg16_448x448.yml", size: 1908, mode: os.FileMode(436), modTime: time.Unix(1521684147, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -1038,7 +1038,7 @@ func pkgAssetsBuiltin_modelsLarge_vgg16_672x672Yml() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "pkg/assets/builtin_models/large_vgg16_672x672.yml", size: 2126, mode: os.FileMode(420), modTime: time.Unix(1521683509, 0)}
+	info := bindataFileInfo{name: "pkg/assets/builtin_models/large_vgg16_672x672.yml", size: 2126, mode: os.FileMode(436), modTime: time.Unix(1521684147, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -1058,7 +1058,7 @@ func pkgAssetsBuiltin_modelsLarge_vgg16_896x896Yml() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "pkg/assets/builtin_models/large_vgg16_896x896.yml", size: 2126, mode: os.FileMode(420), modTime: time.Unix(1521689051, 0)}
+	info := bindataFileInfo{name: "pkg/assets/builtin_models/large_vgg16_896x896.yml", size: 2126, mode: os.FileMode(436), modTime: time.Unix(1521684147, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -1078,7 +1078,7 @@ func pkgAssetsBuiltin_modelsLocationnetYml() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "pkg/assets/builtin_models/locationnet.yml", size: 2274, mode: os.FileMode(420), modTime: time.Unix(1519725520, 0)}
+	info := bindataFileInfo{name: "pkg/assets/builtin_models/locationnet.yml", size: 2274, mode: os.FileMode(436), modTime: time.Unix(1520208866, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -1098,7 +1098,7 @@ func pkgAssetsBuiltin_modelsNinYml() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "pkg/assets/builtin_models/nin.yml", size: 2157, mode: os.FileMode(420), modTime: time.Unix(1519725520, 0)}
+	info := bindataFileInfo{name: "pkg/assets/builtin_models/nin.yml", size: 2157, mode: os.FileMode(436), modTime: time.Unix(1520208866, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -1118,7 +1118,7 @@ func pkgAssetsBuiltin_modelsOResnet101V2Yml() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "pkg/assets/builtin_models/o-ResNet101-v2.yml", size: 2226, mode: os.FileMode(420), modTime: time.Unix(1521679963, 0)}
+	info := bindataFileInfo{name: "pkg/assets/builtin_models/o-ResNet101-v2.yml", size: 2226, mode: os.FileMode(436), modTime: time.Unix(1521684147, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -1138,7 +1138,7 @@ func pkgAssetsBuiltin_modelsOResnet152V2Yml() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "pkg/assets/builtin_models/o-ResNet152-v2.yml", size: 2226, mode: os.FileMode(420), modTime: time.Unix(1521679963, 0)}
+	info := bindataFileInfo{name: "pkg/assets/builtin_models/o-ResNet152-v2.yml", size: 2226, mode: os.FileMode(436), modTime: time.Unix(1521684147, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -1158,7 +1158,7 @@ func pkgAssetsBuiltin_modelsOVgg16Yml() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "pkg/assets/builtin_models/o-vgg16.yml", size: 2252, mode: os.FileMode(420), modTime: time.Unix(1521679963, 0)}
+	info := bindataFileInfo{name: "pkg/assets/builtin_models/o-vgg16.yml", size: 2252, mode: os.FileMode(436), modTime: time.Unix(1521684147, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -1178,7 +1178,7 @@ func pkgAssetsBuiltin_modelsOVgg19Yml() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "pkg/assets/builtin_models/o-vgg19.yml", size: 2252, mode: os.FileMode(420), modTime: time.Unix(1521679963, 0)}
+	info := bindataFileInfo{name: "pkg/assets/builtin_models/o-vgg19.yml", size: 2252, mode: os.FileMode(436), modTime: time.Unix(1521684147, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -1198,7 +1198,7 @@ func pkgAssetsBuiltin_modelsVgg16Yml() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "pkg/assets/builtin_models/vgg16.yml", size: 2234, mode: os.FileMode(420), modTime: time.Unix(1519725520, 0)}
+	info := bindataFileInfo{name: "pkg/assets/builtin_models/vgg16.yml", size: 2234, mode: os.FileMode(436), modTime: time.Unix(1520208866, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -1218,7 +1218,7 @@ func pkgAssetsBuiltin_modelsVgg19Yml() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "pkg/assets/builtin_models/vgg19.yml", size: 2234, mode: os.FileMode(420), modTime: time.Unix(1519725520, 0)}
+	info := bindataFileInfo{name: "pkg/assets/builtin_models/vgg19.yml", size: 2234, mode: os.FileMode(436), modTime: time.Unix(1520208866, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -1238,7 +1238,7 @@ func pkgAssetsBuiltin_featuresSynsetTxt() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "pkg/assets/builtin_features/synset.txt", size: 31675, mode: os.FileMode(420), modTime: time.Unix(1519727685, 0)}
+	info := bindataFileInfo{name: "pkg/assets/builtin_features/synset.txt", size: 31675, mode: os.FileMode(436), modTime: time.Unix(1520208866, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
