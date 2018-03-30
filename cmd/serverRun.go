@@ -36,6 +36,7 @@ func makeServerRun(ctx context.Context) *server.Server {
 		server.Context(ctx),
 		server.ID(runServerID),
 		server.DebugMode(runServerDebug),
+		server.WriteProfile(runServerWriteProfile),
 		server.EvictionPolicy(runServerEvictionPolicy),
 		server.ModelEstimationRate(runServerModelEstimationRate),
 		server.MemoryPercentage(runServerMemoryPercentage),
