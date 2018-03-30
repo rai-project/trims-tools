@@ -30,6 +30,7 @@ type Options struct {
 	profileMemory           bool
 	showProgress            bool
 	largeModels             bool
+	simulateRun             bool
 	stderr                  io.Writer
 	stdout                  io.Writer
 }
@@ -55,6 +56,7 @@ var (
 		profileMemory:           false,
 		showProgress:            true,
 		largeModels:             false,
+		simulateRun:             false,
 		stderr:                  os.Stderr,
 		stdout:                  os.Stdout,
 	}
@@ -75,6 +77,12 @@ func ConcurrentRunCount(ii int) Option {
 func UploadProfile(b bool) Option {
 	return func(o *Options) {
 		o.uploadProfile = b
+	}
+}
+
+func SimulateRun(b bool) Option {
+	return func(o *Options) {
+		o.simulateRun = b
 	}
 }
 

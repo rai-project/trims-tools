@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
+	"math/rand"
 	"path/filepath"
 	"sync"
 	"time"
@@ -186,6 +187,14 @@ func (c Client) run() ([]*trace.Trace, error) {
 	return res, nil
 }
 
+func shuffleModels(src assets.ModelManifests) assets.ModelManifests {
+	dest := make([]assets.ModelManifest, len(src))
+	perm := rand.Perm(len(src))
+	for i, v := range perm {
+		dest[v] = src[i]
+	}
+}
+
 func (c Client) runWorkload() ([]*trace.Trace, error) {
 	options := c.options
 
@@ -200,6 +209,8 @@ func (c Client) runWorkload() ([]*trace.Trace, error) {
 	if err != nil {
 		return nil, err
 	}
+
+	models = shuffleModels(models)
 
 	if options.showProgress && len(models) <= 1 {
 		options.showProgress = false
@@ -409,6 +420,9 @@ func (c Client) RunOnce(model assets.ModelManifest) (string, time.Duration, erro
 	}
 	if false {
 		pp.Println(env)
+	}
+	if options.simulateRun {
+		return nil, nil, errors.New("run simulated")
 	}
 	tic := time.Now()
 	ran, err := utils.ExecCmd(

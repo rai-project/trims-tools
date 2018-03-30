@@ -117,6 +117,7 @@ func (g *Generator) Next(arry []interface{}) interface{} {
 	for idx >= arryLen {
 		idx = idx - arryLen
 	}
+	println(idx)
 	return arry[idx]
 }
 
@@ -137,7 +138,7 @@ func (g *Generator) Generator(arry []interface{}) <-chan interface{} {
 }
 
 func (g *Generator) ModelGenerator(models assets.ModelManifests) <-chan assets.ModelManifest {
-	gen := make(chan assets.ModelManifest, 2)
+	gen := make(chan assets.ModelManifest, 10)
 	arry := make([]interface{}, len(models))
 	for ii, m := range models {
 		arry[ii] = m
