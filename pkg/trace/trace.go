@@ -416,6 +416,9 @@ func (x *TraceSummary) fillEvents(tr Trace) {
 			case "create":
 				se.CreatePrediction = event.Summarize()
 				continue
+        case "create_predictor":
+				se.CreatePrediction = event.Summarize()
+				continue
 			case "set_input":
 				se.SetPredictInput = event.Summarize()
 				continue
