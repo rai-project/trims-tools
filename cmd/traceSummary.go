@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"encoding/json"
+	"fmt"
 	"io/ioutil"
 	"os"
 	"path/filepath"
@@ -25,6 +26,20 @@ var (
 )
 
 func traceSummarize(cmd *cobra.Command, args []string) error {
+	outputFile := traceSummarizeOutputFile
+	if outputFile == "" {
+		fst := args[0]
+		if com.IsDir(fst) {
+			outputFile = filepath.Join(fst, "summary.json")
+		} else {
+			if cwd, err := os.Getwd(); err != nil {
+				outputFile = filepath.Join(cwd, "summary.json")
+			} else {
+				outputFile = "summary.json"
+			}
+		}
+	}
+
 	var res []*trace.TraceSummary
 	files := []string{}
 	for _, path := range args {
@@ -32,7 +47,7 @@ func traceSummarize(cmd *cobra.Command, args []string) error {
 			matches, err := zglob.Glob(filepath.Join(path, "**", "*.json"))
 			if err == nil {
 				for _, m := range matches {
-					if m == traceSummarizeOutputFile {
+					if m == outputFile {
 						continue
 					}
 					files = append(files, m)
@@ -42,7 +57,7 @@ func traceSummarize(cmd *cobra.Command, args []string) error {
 			// if err == nil {
 			// 	files = append(files, matches...)
 			// }
-		} else if path != traceSummarizeOutputFile {
+		} else if path != outputFile {
 			files = append(files, path)
 		}
 	}
@@ -51,7 +66,7 @@ func traceSummarize(cmd *cobra.Command, args []string) error {
 	var wg sync.WaitGroup
 
 	progress := utils.NewProgress("summarizing traces", len(files))
-	defer progress.FinishPrint("finished summarizing traces and places the result in " + traceSummarizeOutputFile)
+	defer progress.FinishPrint("finished summarizing traces and places the result in " + outputFile)
 
 	processFile := func(path0 interface{}) interface{} {
 		defer wg.Done()
@@ -101,11 +116,11 @@ func traceSummarize(cmd *cobra.Command, args []string) error {
 	if err != nil {
 		return errors.Wrap(err, "unable to marshal query results")
 	}
-	if !com.IsDir(filepath.Dir(traceSummarizeOutputFile)) {
-		os.MkdirAll(filepath.Dir(traceSummarizeOutputFile), os.ModePerm)
+	if !com.IsDir(filepath.Dir(outputFile)) {
+		os.MkdirAll(filepath.Dir(outputFile), os.ModePerm)
 	}
-	if err := ioutil.WriteFile(traceSummarizeOutputFile, bts, 0644); err != nil {
-		return errors.Wrapf(err, "unable to write query results to %s", traceSummarizeOutputFile)
+	if err := ioutil.WriteFile(outputFile, bts, 0644); err != nil {
+		return errors.Wrapf(err, "unable to write query results to %s", outputFile)
 	}
 	return nil
 }
@@ -114,20 +129,12 @@ func traceSummarize(cmd *cobra.Command, args []string) error {
 var traceSummarizeCmd = &cobra.Command{
 	Use:   "summarize",
 	Short: "Summarizes the traces within a directory or list of files",
-	Args:  cobra.MinimumNArgs(1),
+	Long: `example usage
+
+  trace summarize ~/micro18_profiles/minsky1/Exponential_rt* ~/micro18_profiles/minsky1/Pareto_xm1_l* ~/micro18_profiles/minsky1/Weibull_k* ~/micro18_profiles/minsky1/Poisson_l* ~/micro18_profiles/minsky1/Uniform_min0_max1*
+  `,
+	Args: cobra.MinimumNArgs(1),
 	PreRunE: func(cmd *cobra.Command, args []string) error {
-		if traceSummarizeOutputFile == "" {
-			fst := args[0]
-			if com.IsDir(fst) {
-				traceSummarizeOutputFile = filepath.Join(fst, "summary.json")
-			} else {
-				if cwd, err := os.Getwd(); err != nil {
-					traceSummarizeOutputFile = filepath.Join(cwd, "summary.json")
-				} else {
-					traceSummarizeOutputFile = "summary.json"
-				}
-			}
-		}
 		return nil
 	},
 	RunE: func(cmd *cobra.Command, args []string) error {
@@ -141,6 +148,7 @@ var traceSummarizeCmd = &cobra.Command{
 		}
 
 		for _, a := range args {
+			fmt.Println("summarizing ", a)
 			err := traceSummarize(cmd, []string{a})
 			if err != nil {
 				log.WithError(err).WithField("directory", a).Error("failed to summarize trace")
