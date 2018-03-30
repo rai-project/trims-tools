@@ -10,6 +10,6 @@ Weibull_k0.5_l1_cncur5,Weibull distribution k=0.5 lamda=1 concurrent=5 iter=100 
 Weibull_k1_l1_cncur5,Weibull distribution k=1 lamda=1 concurrent=5 iter=100 GPUmem=80%,5,100,Weibull,1,1
 Weibull_k1.5_l1_cncur5,Weibull distribution k=1.5 lamda=1 concurrent=5 iter=100 GPUmem=80%,5,100,Weibull,1.5,1
 Weibull_k5_l1_cncur5,Weibull distribution k=5 lamda=1 concurrent=5 iter=100 GPUmem=80%,5,100,Weibull,5,1
-Poisson_l1_cncur5,Poisson distribution lamda=1 concurrent=5 iter=100 GPUmem=80%,5,100,Poisson,1
-Poisson_l4_cncur5,Poisson distribution lamda=4 concurrent=5 iter=100 GPUmem=80%,5,100,Poisson,4
-Poisson_l10_cncur5,Poisson distribution lamda=10 concurrent=5 iter=100 GPUmem=80%,5,100,Poisson,10
+//Poisson_l1_cncur5,Poisson distribution lamda=1 concurrent=5 iter=100 GPUmem=80%,5,100,Poisson,1
+//Poisson_l4_cncur5,Poisson distribution lamda=4 concurrent=5 iter=100 GPUmem=80%,5,100,Poisson,4
+//Poisson_l10_cncur5,Poisson distribution lamda=10 concurrent=5 iter=100 GPUmem=80%,5,100,Poisson,10
