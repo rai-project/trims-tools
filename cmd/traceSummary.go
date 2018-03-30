@@ -21,7 +21,94 @@ import (
 var (
 	traceSummarizeOutputFile string
 	traceSummarizeDetailed   bool
+	traceSummarizeDeep       bool
 )
+
+func traceSummarize(cmd *cobra.Command, args []string) error {
+	var res []*trace.TraceSummary
+	files := []string{}
+	for _, path := range args {
+		if com.IsDir(path) {
+			matches, err := zglob.Glob(filepath.Join(path, "**", "*.json"))
+			if err == nil {
+				for _, m := range matches {
+					if m == traceSummarizeOutputFile {
+						continue
+					}
+					files = append(files, m)
+				}
+			}
+			// matches, err = zglob.Glob(filepath.Join(path, "*.json"))
+			// if err == nil {
+			// 	files = append(files, matches...)
+			// }
+		} else if path != traceSummarizeOutputFile {
+			files = append(files, path)
+		}
+	}
+
+	var mut sync.Mutex
+	var wg sync.WaitGroup
+
+	progress := utils.NewProgress("summarizing traces", len(files))
+	defer progress.FinishPrint("finished summarizing traces and places the result in " + traceSummarizeOutputFile)
+
+	processFile := func(path0 interface{}) interface{} {
+		defer wg.Done()
+		path := path0.(string)
+		bts, err := ioutil.ReadFile(path)
+		if err != nil {
+			return errors.Wrapf(err, "unable to read the profile file from %s", path)
+		}
+		var tr trace.Trace
+		if err := json.Unmarshal(bts, &tr); err != nil {
+			return errors.Wrapf(err, "unable to unmarshal the profile file from %s", path)
+		}
+		ts, err := tr.Summarize(traceSummarizeDetailed)
+		if err != nil {
+			return err
+		}
+		mut.Lock()
+		defer mut.Unlock()
+		progress.Increment()
+		res = append(res, ts)
+		return err
+	}
+
+	processPool := tunny.NewFunc(2*runtime.NumCPU(), processFile)
+	defer processPool.Close()
+
+	for _, path := range files {
+		if !com.IsFile(path) {
+			return errors.Errorf("the profile file %s was not found", path)
+		}
+		if strings.Contains(path, "combined-") {
+			continue
+		}
+		if strings.Contains(path, "compared-") {
+			continue
+		}
+		if strings.Contains(path, "summary-") {
+			continue
+		}
+		wg.Add(1)
+		go func(path string) {
+			processPool.Process(path)
+		}(path)
+	}
+	wg.Wait()
+	bts, err := json.Marshal(res)
+	if err != nil {
+		return errors.Wrap(err, "unable to marshal query results")
+	}
+	if !com.IsDir(filepath.Dir(traceSummarizeOutputFile)) {
+		os.MkdirAll(filepath.Dir(traceSummarizeOutputFile), os.ModePerm)
+	}
+	if err := ioutil.WriteFile(traceSummarizeOutputFile, bts, 0644); err != nil {
+		return errors.Wrapf(err, "unable to write query results to %s", traceSummarizeOutputFile)
+	}
+	return nil
+}
 
 // traceSummarizeCmd represents the traceSummarize command
 var traceSummarizeCmd = &cobra.Command{
@@ -44,87 +131,20 @@ var traceSummarizeCmd = &cobra.Command{
 		return nil
 	},
 	RunE: func(cmd *cobra.Command, args []string) error {
-		var res []*trace.TraceSummary
-		files := []string{}
-		for _, path := range args {
-			if com.IsDir(path) {
-				matches, err := zglob.Glob(filepath.Join(path, "**", "*.json"))
-				if err == nil {
-					for _, m := range matches {
-						if m == traceSummarizeOutputFile {
-							continue
-						}
-						files = append(files, m)
-					}
-				}
-				// matches, err = zglob.Glob(filepath.Join(path, "*.json"))
-				// if err == nil {
-				// 	files = append(files, matches...)
-				// }
-			} else if path != traceSummarizeOutputFile {
-				files = append(files, path)
+		if traceSummarizeDeep {
+			return traceSummarize(cmd, args)
+		}
+		for _, a := range args {
+			if !com.IsDir(a) {
+				return errors.New("expected a set of directories if the option --deep=true is passed in")
 			}
 		}
 
-		var mut sync.Mutex
-		var wg sync.WaitGroup
-
-		progress := utils.NewProgress("summarizing traces", len(files))
-		defer progress.FinishPrint("finished summarizing traces and places the result in " + traceSummarizeOutputFile)
-
-		processFile := func(path0 interface{}) interface{} {
-			defer wg.Done()
-			path := path0.(string)
-			bts, err := ioutil.ReadFile(path)
+		for _, a := range args {
+			err := traceSummarize(cmd, []string{a})
 			if err != nil {
-				return errors.Wrapf(err, "unable to read the profile file from %s", path)
+				log.WithError(err).WithField("directory", a).Error("failed to summarize trace")
 			}
-			var tr trace.Trace
-			if err := json.Unmarshal(bts, &tr); err != nil {
-				return errors.Wrapf(err, "unable to unmarshal the profile file from %s", path)
-			}
-			ts, err := tr.Summarize(traceSummarizeDetailed)
-			if err != nil {
-				return err
-			}
-			mut.Lock()
-			defer mut.Unlock()
-			progress.Increment()
-			res = append(res, ts)
-			return err
-		}
-
-		processPool := tunny.NewFunc(2*runtime.NumCPU(), processFile)
-		defer processPool.Close()
-
-		for _, path := range files {
-			if !com.IsFile(path) {
-				return errors.Errorf("the profile file %s was not found", path)
-			}
-			if strings.Contains(path, "combined-") {
-				continue
-			}
-			if strings.Contains(path, "compared-") {
-				continue
-			}
-			if strings.Contains(path, "summary-") {
-				continue
-			}
-			wg.Add(1)
-			go func(path string) {
-				processPool.Process(path)
-			}(path)
-		}
-		wg.Wait()
-		bts, err := json.Marshal(res)
-		if err != nil {
-			return errors.Wrap(err, "unable to marshal query results")
-		}
-		if !com.IsDir(filepath.Dir(traceSummarizeOutputFile)) {
-			os.MkdirAll(filepath.Dir(traceSummarizeOutputFile), os.ModePerm)
-		}
-		if err := ioutil.WriteFile(traceSummarizeOutputFile, bts, 0644); err != nil {
-			return errors.Wrapf(err, "unable to write query results to %s", traceSummarizeOutputFile)
 		}
 		return nil
 	},
@@ -134,4 +154,5 @@ func init() {
 	traceCmd.AddCommand(traceSummarizeCmd)
 	traceSummarizeCmd.Flags().StringVarP(&traceSummarizeOutputFile, "output", "o", "", "The output path to the trace summary")
 	traceSummarizeCmd.Flags().BoolVar(&traceSummarizeDetailed, "detailed", true, "The output should contain more detailed event information")
+	traceSummarizeCmd.Flags().BoolVar(&traceSummarizeDeep, "deep", false, "If enabled and the input is a set of directories, then the summary.json is for all the json files for all directory. Otherwise a summary.json is generated for each directory")
 }
