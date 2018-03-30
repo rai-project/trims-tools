@@ -129,10 +129,9 @@ func traceSummarize(cmd *cobra.Command, args []string) error {
 var traceSummarizeCmd = &cobra.Command{
 	Use:   "summarize",
 	Short: "Summarizes the traces within a directory or list of files",
-	Long: `example usage
-
-  trace summarize ~/micro18_profiles/minsky1/Exponential_rt* ~/micro18_profiles/minsky1/Pareto_xm1_l* ~/micro18_profiles/minsky1/Weibull_k* ~/micro18_profiles/minsky1/Poisson_l* ~/micro18_profiles/minsky1/Uniform_min0_max1*
-  `,
+	Long: "example usage\n" +
+		"go run main.go trace summarize ~/micro18_profiles/`hostname`/Exponential_rt* ~/micro18_profiles/`hostname`/Pareto_xm1_l* ~/micro18_profiles/`hostname`/Weibull_k* ~/micro18_profiles/minsky1/Poisson_l* ~/micro18_profiles/`hostname`/Uniform_min0_max1*\n" +
+		"",
 	Args: cobra.MinimumNArgs(1),
 	PreRunE: func(cmd *cobra.Command, args []string) error {
 		return nil
@@ -143,7 +142,7 @@ var traceSummarizeCmd = &cobra.Command{
 		}
 		for _, a := range args {
 			if !com.IsDir(a) {
-				return errors.New("expected a set of directories if the option --deep=true is passed in")
+				return errors.New("the directory " + a + " was not found. expected a set of directories if the option --deep=true is passed in")
 			}
 		}
 
