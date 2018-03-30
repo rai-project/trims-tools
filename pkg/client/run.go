@@ -193,6 +193,7 @@ func shuffleModels(src assets.ModelManifests) assets.ModelManifests {
 	for i, v := range perm {
 		dest[v] = src[i]
 	}
+	return dest
 }
 
 func (c Client) runWorkload() ([]*trace.Trace, error) {
@@ -422,7 +423,7 @@ func (c Client) RunOnce(model assets.ModelManifest) (string, time.Duration, erro
 		pp.Println(env)
 	}
 	if options.simulateRun {
-		return nil, nil, errors.New("run simulated")
+		return "", 0, errors.New("run simulated")
 	}
 	tic := time.Now()
 	ran, err := utils.ExecCmd(

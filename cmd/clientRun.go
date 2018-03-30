@@ -34,6 +34,7 @@ var (
 	runClientUploadTraces                bool
 	runClientCombinedAll                 bool
 	runClientLargeModels                 bool
+	runClientSimulateRun                 bool
 )
 
 func makeClientRun(ctx context.Context, extraOpts ...client.Option) *client.Client {
@@ -54,6 +55,7 @@ func makeClientRun(ctx context.Context, extraOpts ...client.Option) *client.Clie
 			client.ProfileMemory(runClientProfileMemory),
 			client.UploadProfile(runClientUploadTraces),
 			client.LargeModels(runClientLargeModels),
+			client.SimulateRun(runClientSimulateRun),
 		},
 		extraOpts...,
 	)
@@ -232,6 +234,7 @@ func init() {
 		cmd.Flags().BoolVar(&runClientProfileMemory, "profile_memory", true, "track the cudaMalloc and cudaFree calls")
 		cmd.Flags().BoolVar(&runClientUploadTraces, "trace_upload", false, "upload the traces to AWS S3 once complete")
 		cmd.Flags().BoolVar(&runClientLargeModels, "large_models", false, "run the large models")
+		cmd.Flags().BoolVar(&runClientSimulateRun, "simulate_run", false, "do not run the command, just simulate the process of running it")
 	}
 	clientRunCmd.Flags().BoolVar(&runClientOriginal, "original", false, "Run an unmodified version of the inference (without persistent storage)")
 	clientRunCompare.Flags().BoolVar(&runClientCombinedAll, "combined_all", false, "Combine all results into a single trace")

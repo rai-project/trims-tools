@@ -33,6 +33,7 @@ var (
 	runLargeModels                 bool
 	persistCPUOnly                 bool
 	runEstimateWithInternalMemory  bool
+	runSimulateRun                 bool
 )
 
 // runCmd represents the run command
@@ -56,6 +57,7 @@ var runCmd = &cobra.Command{
 		runClientProfileMemory = runProfileMemory
 		runClientCombinedAll = runCombinedAll
 		runClientLargeModels = runLargeModels
+		runClientSimulateRun = runSimulateRun
 
 		runServerDebug = runDebug
 		runServerEvictionPolicy = runEvictionPolicy
@@ -136,6 +138,7 @@ func init() {
 	runCmd.Flags().BoolVar(&runLargeModels, "large_models", false, "run the large models")
 	runCmd.Flags().BoolVar(&persistCPUOnly, "persist_cpu_only", false, "Persist memory only on the CPU. i.e. GPU persistence is disabled")
 	runCmd.Flags().BoolVar(&runEstimateWithInternalMemory, "estimate_with_internal_memory", true, "Use internal memory information when estimating model size")
+	runCmd.Flags().BoolVar(&runSimulateRun, "simulate_run", false, "Do not run the client, just simulate it")
 
 	rootCmd.AddCommand(runCmd)
 }

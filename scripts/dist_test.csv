@@ -1,0 +1,2 @@
+outputfile,description,concurrent,iterations,distribution,P1,P2
+Pareto_xm1_l1,Pareto distribution xm=1 lamda=1 concurrent=1 iter=100 GPUmem=80%,1,100,Pareto,1,1
