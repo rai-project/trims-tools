@@ -20,7 +20,7 @@ def ParsingArguments(row):
 	return NewClientCommand
 
 def StartServer(eviction_policy):
-	ServerCommand = "./main server run --eviction=" + eviction_policy + "&"
+	ServerCommand = "./main server run --eviction=" + eviction_policy + " &"
 	server_process = sp.Popen(ServerCommand.split())
 	print "Starting server"
 	tm.sleep(10)
