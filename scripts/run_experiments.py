@@ -1,5 +1,5 @@
 import subprocess as sp
-import pandas as pd
+import csv
 import time as tm
 import psutil
 import sys
@@ -19,8 +19,8 @@ def ParsingArguments(row):
 	NewClientCommand = NewClientCommand + " --profile_output=" + str(row['outputfile']) + " --experiment_description=\"" + str(row['description']) +"\""
 	return NewClientCommand
 
-def StartServer():
-	ServerCommand = "./main server run &"
+def StartServer(eviction_policy):
+	ServerCommand = "./main server run --eviction=" + eviction_policy + "&"
 	server_process = sp.Popen(ServerCommand.split())
 	print "Starting server"
 	tm.sleep(10)
@@ -47,23 +47,29 @@ def StartClient(ClientCommand):
 
 def main():
 
-	if(len(sys.argv) != 2):
-		print "Usage: python run_experiments.py experiments.csv"
-	else:
-                build_proc = sp.Popen("go build main.go".split())
-                build_proc.communicate()
+	if len(sys.argv) != 2 and len(sys.argv) != 3:
+		print "Usage: python run_experiments.py experiments.csv [server_policy]"
+  	sys.exit()
 
-		experiments = pd.read_csv(str(sys.argv[1]))
+  server_policy = "lru"
+  if len(sys.argv) == 3:
+    server_policy = str(sys.argv[2])
 
-		for index, row in experiments.iterrows():
+  build_proc = sp.Popen("go build main.go".split())
+  build_proc.communicate()
 
-			s_handle = StartServer()
+  with open(str(sys.argv[1]), 'r') as csvfile:
+    experiments = csv.DictReader(csvfile)
 
-			ClientCommand = ParsingArguments(row)
+    for row in experiments:
 
-			StartClient(ClientCommand)
+      s_handle = StartServer(server_policy)
 
-			EndServer(s_handle)
+      ClientCommand = ParsingArguments(row)
+
+      StartClient(ClientCommand)
+
+      EndServer(s_handle)
 
 
 if __name__== "__main__":
