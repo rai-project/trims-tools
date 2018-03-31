@@ -50,7 +50,7 @@ def main():
 	if(len(sys.argv) != 2):
 		print "Usage: python run_experiments.py experiments.csv"
 	else:
-                build_proc = sp.Popen("go build main.go")
+                build_proc = sp.Popen("go build main.go".split())
                 build_proc.communicate()
 
 		experiments = pd.read_csv(str(sys.argv[1]))
