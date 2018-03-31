@@ -131,6 +131,8 @@ var traceSummarizeCmd = &cobra.Command{
 	Short: "Summarizes the traces within a directory or list of files",
 	Long: "example usage\n" +
 		"go run main.go trace summarize ~/micro18_profiles/`hostname`/Exponential* ~/micro18_profiles/`hostname`/Pareto* ~/micro18_profiles/`hostname`/Weibull* ~/micro18_profiles/`hostname`/Poisson* ~/micro18_profiles/`hostname`/Uniform*\n" +
+		"or\n" +
+		"go run main.go trace summarize ~/micro18_profiles/`hostname`/*Exponential_rt* ~/micro18_profiles/`hostname`/*Pareto_xm1_l* ~/micro18_profiles/`hostname`/*Weibull_k* ~/micro18_profiles/`hostname`/*Poisson_l* ~/micro18_profiles/`hostname`/*Uniform_min0_max1*\n" +
 		"",
 	Args: cobra.MinimumNArgs(1),
 	PreRunE: func(cmd *cobra.Command, args []string) error {
