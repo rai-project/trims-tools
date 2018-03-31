@@ -1,7 +1,6 @@
 package workload
 
 import (
-	"fmt"
 	"math/rand"
 	"strings"
 
@@ -9,7 +8,6 @@ import (
 	"github.com/rai-project/micro18-tools/pkg/assets"
 
 	"gonum.org/v1/gonum/stat/distuv"
-	"gonum.org/v1/gonum/stat/sampleuv"
 )
 
 // Pareto
@@ -130,79 +128,9 @@ func NewPareto(xm float64, alpha float64) *Generator {
 	}
 }
 
-type ProposalDist struct {
-	Dist
-}
-
-func (p ProposalDist) ConditionalRand(y float64) float64 {
-	return p.Rand()
-}
-
-func (p ProposalDist) ConditionalLogProb(x, y float64) float64 {
-	return p.LogProb(x)
-}
-
 func (g *Generator) Next(at AliasTable, arry []interface{}) interface{} {
 	idx := at.Next()
 	return arry[idx]
-}
-
-func (g *Generator) Next_0(arry []interface{}) interface{} {
-
-	target := g.Dist
-	proposal := ProposalDist{distuv.Uniform{Min: 0, Max: float64(len(arry))}}
-
-	imp := sampleuv.Importance{Target: target, Proposal: proposal}
-
-	nSamples := len(arry)
-	x := make([]float64, nSamples)
-	weights := make([]float64, nSamples)
-
-	imp.SampleWeighted(x, weights)
-
-	fmt.Println(int(x[0]))
-
-	return int(x[0])
-}
-
-func (g *Generator) NextMH(arry []interface{}) interface{} {
-	if g.name == "uniform" {
-		dist := distuv.Uniform{Min: 0, Max: float64(len(arry))}
-		idx := int(dist.Rand())
-		fmt.Println(idx)
-		return arry[idx]
-	}
-	n := 1
-	burnin := 100
-	var initial float64
-	// target is the distribution from which we would like to sample.
-	target := g.Dist
-
-	// proposal is the proposal distribution. Here, we are choosing
-	// a tight Gaussian distribution around the current location. In
-	// typical problems, if Sigma is too small, it takes a lot of samples
-	// to move around the distribution. If Sigma is too large, it can be hard
-	// to find acceptable samples.
-	proposal := ProposalDist{distuv.Uniform{Min: 0, Max: float64(len(arry))}}
-
-	samples := make([]float64, n+burnin)
-
-	mh := sampleuv.MetropolisHastings{Initial: initial, Target: target, Proposal: proposal, BurnIn: burnin, Rate: 1}
-	mh.Sample(samples)
-
-	samples = samples[burnin:]
-
-	idx := int(samples[0])
-	fmt.Println(idx)
-	return arry[idx]
-}
-
-func makeRange(len int) []float64 {
-	res := make([]float64, len)
-	for ii := range res {
-		res[ii] = float64(ii)
-	}
-	return res
 }
 
 func (g *Generator) Generator(arry []interface{}) <-chan interface{} {
@@ -221,48 +149,6 @@ func (g *Generator) Generator(arry []interface{}) <-chan interface{} {
 		}
 	}()
 	return gen
-}
-
-func (g *Generator) probs0(len int) []float64 {
-	dist := g.Dist
-	pmin := 1.0
-	switch g.name {
-	case "unifrom":
-		pmin = 1.0
-	case "pareto":
-		pmin = 7.0
-	case "zipf":
-		pmin = 1.0
-	case "exp", "exponential":
-		pmin = 3.0
-	case "weibull":
-		pmin = 4.0
-	case "poisson":
-		pmin = 4.0
-	}
-	pmax := pmin
-	for ii := pmax; ii < 1000; ii += 0.1 {
-		e := dist.CDF(ii)
-		if 1-e < 0.001 {
-			pmax = ii
-			break
-		}
-	}
-	res := make([]float64, len)
-	for ii := range res {
-		res[ii] = dist.Rand() //float64(ii) * pmax / float64(len))
-	}
-	total := 0.0
-	for _, r := range res {
-		total = total + r
-	}
-	for ii := range res {
-		res[ii] = res[ii] / total
-	}
-
-	fmt.Println(pmax)
-	fmt.Println(res)
-	return res
 }
 
 func (g *Generator) probs(len int) []float64 {
