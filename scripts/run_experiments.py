@@ -49,27 +49,26 @@ def main():
 
 	if len(sys.argv) != 2 and len(sys.argv) != 3:
 		print "Usage: python run_experiments.py experiments.csv [server_policy]"
-  	sys.exit()
+		sys.exit()
 
-  server_policy = "lru"
-  if len(sys.argv) == 3:
-    server_policy = str(sys.argv[2])
+	server_policy = "lru"
+	if len(sys.argv) == 3:
+		server_policy = str(sys.argv[2])
 
-  build_proc = sp.Popen("go build main.go".split())
-  build_proc.communicate()
+	build_proc = sp.Popen("go build main.go".split())
+	build_proc.communicate()
 
-  with open(str(sys.argv[1]), 'r') as csvfile:
-    experiments = csv.DictReader(csvfile)
+	with open(str(sys.argv[1]), 'r') as csvfile:
+		experiments = csv.DictReader(csvfile)
 
-    for row in experiments:
+		for row in experiments:
+			s_handle = StartServer(server_policy)
 
-      s_handle = StartServer(server_policy)
+			ClientCommand = ParsingArguments(row)
 
-      ClientCommand = ParsingArguments(row)
+			StartClient(ClientCommand)
 
-      StartClient(ClientCommand)
-
-      EndServer(s_handle)
+			EndServer(s_handle)
 
 
 if __name__== "__main__":
