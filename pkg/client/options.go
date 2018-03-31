@@ -6,6 +6,7 @@ import (
 	"os"
 	"runtime"
 	"strings"
+	"time"
 
 	"github.com/rai-project/micro18-tools/pkg/workload"
 
@@ -31,6 +32,7 @@ type Options struct {
 	showProgress            bool
 	largeModels             bool
 	simulateRun             bool
+	timeLimit               time.Duration
 	stderr                  io.Writer
 	stdout                  io.Writer
 }
@@ -57,6 +59,7 @@ var (
 		showProgress:            true,
 		largeModels:             false,
 		simulateRun:             false,
+		timeLimit:               time.Minute,
 		stderr:                  os.Stderr,
 		stdout:                  os.Stdout,
 	}
@@ -167,6 +170,12 @@ func Stdout(w io.Writer) Option {
 func Stderr(w io.Writer) Option {
 	return func(o *Options) {
 		o.stderr = w
+	}
+}
+
+func TimeLimit(w time.Duration) Option {
+	return func(o *Options) {
+		o.timeLimit = w
 	}
 }
 

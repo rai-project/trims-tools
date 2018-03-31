@@ -1,6 +1,7 @@
 package utils
 
 import (
+	"context"
 	"fmt"
 	"io"
 	"os"
@@ -20,7 +21,7 @@ import (
 // Ran reports if the command ran (rather than was not found or not executable).
 // Code reports the exit code the command returned if it ran. If err == nil, ran
 // is always true and code is always 0.
-func ExecCmd(r **exec.Cmd, cwd string, env map[string]string, stdout, stderr io.Writer, cmd string, args ...string) (ran bool, err error) {
+func ExecCmd(ctx context.Context, r **exec.Cmd, cwd string, env map[string]string, stdout, stderr io.Writer, cmd string, args ...string) (ran bool, err error) {
 	expand := func(s string) string {
 		s2, ok := env[s]
 		if ok {
@@ -32,7 +33,7 @@ func ExecCmd(r **exec.Cmd, cwd string, env map[string]string, stdout, stderr io.
 	for i := range args {
 		args[i] = os.Expand(args[i], expand)
 	}
-	ran, code, err := run(r, cwd, env, stdout, stderr, cmd, args...)
+	ran, code, err := run(ctx, r, cwd, env, stdout, stderr, cmd, args...)
 	if err == nil {
 		return true, nil
 	}
@@ -42,8 +43,11 @@ func ExecCmd(r **exec.Cmd, cwd string, env map[string]string, stdout, stderr io.
 	return ran, fmt.Errorf(`failed to run "%s %s: %v"`, cmd, strings.Join(args, " "), err)
 }
 
-func run(r **exec.Cmd, cwd string, env map[string]string, stdout, stderr io.Writer, cmd string, args ...string) (ran bool, code int, err error) {
-	c := exec.Command(cmd, args...)
+func run(ctx context.Context, r **exec.Cmd, cwd string, env map[string]string, stdout, stderr io.Writer, cmd string, args ...string) (ran bool, code int, err error) {
+	if ctx == nil {
+		ctx = context.Background()
+	}
+	c := exec.CommandContext(ctx, cmd, args...)
 	if r != nil {
 		*r = c
 	}

@@ -95,6 +95,7 @@ func (s *Server) Run() (*trace.Trace, error) {
 
 	// log.WithField("server_path", config.Config.ServerPath).WithField("run_cmd", config.Config.ServerRunCmd).Debug("running server")
 	ran, err := utils.ExecCmd(
+		options.ctx,
 		&s.cmd,
 		config.Config.ServerPath,
 		env,

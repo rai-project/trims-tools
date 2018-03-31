@@ -1,6 +1,7 @@
 package client
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
@@ -425,8 +426,15 @@ func (c Client) RunOnce(model assets.ModelManifest) (string, time.Duration, erro
 	if options.simulateRun {
 		return "", 0, errors.New("run simulated")
 	}
+	ctx := options.ctx
+	if options.timeLimit != 0 {
+		newctx, cancel := context.WithTimeout(ctx, options.timeLimit)
+		ctx = newctx
+		defer cancel()
+	}
 	tic := time.Now()
 	ran, err := utils.ExecCmd(
+		ctx,
 		nil,
 		config.Config.ClientPath,
 		env,
