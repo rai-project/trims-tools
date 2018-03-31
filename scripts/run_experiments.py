@@ -9,7 +9,7 @@ def ParsingArguments(row):
 	ClientCommand = "./main client run "
 	SimpleDistributions = ["exponential", "poisson"]
 
-	NewClientCommand = ClientCommand + " --iterations=" + str(row['iterations']) + " --concurrent=" + str(row['concurrent']) + " --distribution=" + str(row['distribution'])
+	NewClientCommand = ClientCommand + " --profile_output_overwrite=true" + " --iterations=" + str(row['iterations']) + " --concurrent=" + str(row['concurrent']) + " --distribution=" + str(row['distribution'])
 
 	if str(row['distribution']).lower() in SimpleDistributions:
 		NewClientCommand = NewClientCommand + " --distribution_params=" + str(row['P1'])
@@ -51,6 +51,9 @@ def main():
 		print "Usage: python run_experiments.py experiments.csv"
 	else:
 
+	  build_proc = sp.Popen("go build main.go")
+	  build_proc.communicate()
+
 		experiments = pd.read_csv(str(sys.argv[1]))
 
 		for index, row in experiments.iterrows():
@@ -60,9 +63,9 @@ def main():
 			ClientCommand = ParsingArguments(row)
 
 			StartClient(ClientCommand)
-		
+
 			EndServer(s_handle)
-		
+
 
 if __name__== "__main__":
 	main()
