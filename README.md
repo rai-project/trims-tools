@@ -250,3 +250,10 @@ This will download it to the directory specified by `micro18.base_path` in the c
 ```
 docker run -it -v `pwd`/large_models:/models mxnet/python:0.11.0 python /models/alexnet.py
 ```
+
+
+### Disable Write Cashing
+
+```
+sudo hdparm -W 0 /dev/sda1
+```
