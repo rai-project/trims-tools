@@ -35,6 +35,7 @@ var (
 	runClientCombinedAll                 bool
 	runClientLargeModels                 bool
 	runClientSimulateRun                 bool
+	runClientCompareCombineTraces        bool
 )
 
 func makeClientRun(ctx context.Context, extraOpts ...client.Option) *client.Client {
@@ -82,16 +83,18 @@ func clientCompare(ctx context.Context) error {
 	originalTracesMap := map[string][]*trace.Trace{}
 	modTracesMap := map[string][]*trace.Trace{}
 
-	for _, model := range models {
-		progress.Increment()
-		//println("running ", model.MustCanonicalName(), " in original mode")
-		orig := makeClientRun(ctx, client.OriginalMode(true), client.ModelName(model.MustCanonicalName()))
-		origTraces, err := orig.Run(false)
-		if err != nil {
-			log.WithError(err).Error("failed to run client with upr enabled")
-			continue
+	if runClientOriginal {
+		for _, model := range models {
+			progress.Increment()
+			//println("running ", model.MustCanonicalName(), " in original mode")
+			orig := makeClientRun(ctx, client.OriginalMode(true), client.ModelName(model.MustCanonicalName()))
+			origTraces, err := orig.Run(false)
+			if err != nil {
+				log.WithError(err).Error("failed to run client with upr enabled")
+				continue
+			}
+			originalTracesMap[model.MustCanonicalName()] = origTraces
 		}
-		originalTracesMap[model.MustCanonicalName()] = origTraces
 	}
 
 	for _, model := range models {
@@ -136,36 +139,38 @@ func clientCompare(ctx context.Context) error {
 			combinedTraces[name] = append(combinedTraces[name], modTraces...)
 		}
 	}
-	progress.Prefix("combining traces")
-	for name, traces := range combinedTraces {
-		if len(traces) == 0 {
-			continue
-		}
-
-		firstTrace := *traces[0]
-		if tr, err := firstTrace.Adjust(); err == nil {
-			firstTrace = tr
-		}
-
-		restTraces := []trace.Trace{}
-		for _, tr := range traces[1:] {
-			if tr == nil {
+	if runClientCompareCombineTraces {
+		progress.Prefix("combining traces")
+		for name, traces := range combinedTraces {
+			if len(traces) == 0 {
 				continue
 			}
-			if adjustedTrace, err := tr.Adjust(); err == nil {
-				restTraces = append(restTraces, adjustedTrace)
-				continue
-			}
-			restTraces = append(restTraces, *tr)
-		}
-		combined := trace.Combine(firstTrace, restTraces...)
 
-		if combined != nil {
-			id := uuid.NewV4()
-			path := filepath.Join(mconfig.Config.ProfileOutputDirectory, "compared-"+name+"-"+id+".json")
-			bts, err := json.Marshal(combined)
-			if err == nil {
-				ioutil.WriteFile(path, bts, 0644)
+			firstTrace := *traces[0]
+			if tr, err := firstTrace.Adjust(); err == nil {
+				firstTrace = tr
+			}
+
+			restTraces := []trace.Trace{}
+			for _, tr := range traces[1:] {
+				if tr == nil {
+					continue
+				}
+				if adjustedTrace, err := tr.Adjust(); err == nil {
+					restTraces = append(restTraces, adjustedTrace)
+					continue
+				}
+				restTraces = append(restTraces, *tr)
+			}
+			combined := trace.Combine(firstTrace, restTraces...)
+
+			if combined != nil {
+				id := uuid.NewV4()
+				path := filepath.Join(mconfig.Config.ProfileOutputDirectory, "compared-"+name+"-"+id+".json")
+				bts, err := json.Marshal(combined)
+				if err == nil {
+					ioutil.WriteFile(path, bts, 0644)
+				}
 			}
 		}
 	}
@@ -238,4 +243,6 @@ func init() {
 	}
 	clientRunCmd.Flags().BoolVar(&runClientOriginal, "original", false, "Run an unmodified version of the inference (without persistent storage)")
 	clientRunCompare.Flags().BoolVar(&runClientCombinedAll, "combined_all", false, "Combine all results into a single trace")
+	clientRunCompare.Flags().BoolVar(&runClientOriginal, "run_original", true, "Run the original code when comparing")
+	clientRunCompare.Flags().BoolVar(&runClientCompareCombineTraces, "combine", false, "Combine the comparison traces into one timeline")
 }
