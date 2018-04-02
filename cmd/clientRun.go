@@ -20,6 +20,7 @@ import (
 var (
 	runClientModels                      string
 	runClientOriginal                    bool
+	runClientCompareOriginal                    bool
 	runClientProfileIO                   bool
 	runClientNTimes                      int
 	runClientEager                       bool
@@ -78,7 +79,7 @@ func clientCompare(ctx context.Context) error {
 	}
 
 	progressCount := len(models)
-	if runClientOriginal {
+	if runClientCompareOriginal {
 		progressCount *= 2
 	}
 	progress := utils.NewProgress("comparing models", progressCount)
@@ -87,7 +88,7 @@ func clientCompare(ctx context.Context) error {
 	originalTracesMap := map[string][]*trace.Trace{}
 	modTracesMap := map[string][]*trace.Trace{}
 
-	if runClientOriginal {
+	if runClientCompareOriginal {
 		for _, model := range models {
 			progress.Increment()
 			//println("running ", model.MustCanonicalName(), " in original mode")
@@ -247,6 +248,6 @@ func init() {
 	}
 	clientRunCmd.Flags().BoolVar(&runClientOriginal, "original", false, "Run an unmodified version of the inference (without persistent storage)")
 	clientRunCompare.Flags().BoolVar(&runClientCombinedAll, "combined_all", false, "Combine all results into a single trace")
-	clientRunCompare.Flags().BoolVar(&runClientOriginal, "run_original", true, "Run the original code when comparing")
+	clientRunCompare.Flags().BoolVar(&runClientCompareOriginal, "run_original", true, "Run the original code when comparing")
 	clientRunCompare.Flags().BoolVar(&runClientCompareCombineTraces, "combine", false, "Combine the comparison traces into one timeline")
 }
