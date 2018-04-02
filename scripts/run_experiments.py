@@ -62,6 +62,8 @@ def main():
 		experiments = csv.DictReader(csvfile)
 
 		for row in experiments:
+			if row["outputfile"].startswith("//"):
+				continue
 			s_handle = StartServer(server_policy)
 
 			ClientCommand = ParsingArguments(row)
