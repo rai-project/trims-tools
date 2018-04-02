@@ -77,7 +77,11 @@ func clientCompare(ctx context.Context) error {
 		return err
 	}
 
-	progress := utils.NewProgress("comparing models", 2*len(models))
+	progressCount := len(models)
+	if runClientOriginal {
+		progressCount *= 2
+	}
+	progress := utils.NewProgress("comparing models", progressCount)
 	defer progress.FinishPrint("finished comparing models")
 
 	originalTracesMap := map[string][]*trace.Trace{}
