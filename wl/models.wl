@@ -65,6 +65,12 @@ modelIndecies = <|
    "SqueezeNet-v1.1" -> 32, "VGG16" -> 33, "VGG16_SOD" -> 34,
    "VGG16_SOS" -> 35, "VGG19" -> 36, "WRN50-2" -> 37,
    "WRN50-v2" -> 37, "Xception" -> 38|>;
+enabled = <|"BVLC-AlexNet" -> True, "BVLC-GoogLeNet" -> True, "DPN92" -> True,
+ "Inception-v4" -> True, "LocationNet" -> True, "NIN" -> True,
+ "ResNet101" -> True, "ResNet152" -> True, "ResNet18-v2" -> True,
+ "ResNet200-v2" -> True, "ResNet269-v2" -> True,
+ "ResNet34-v2" -> True, "ResNet50" -> True, "ResNeXt26-32x4d" -> True,
+  "SqueezeNet-v1.0" -> True, "VGG16" -> True, "VGG19" -> True|>;
 enabledQ[e_] := With[{m = prettyName[e]}, Lookup[enabled, m, False]]
 modelIndex[m0_] :=
   With[{m = prettyName[m0]}, Lookup[modelIndecies, m]];
@@ -72,3 +78,5 @@ modelName[m0_] :=
   With[{e =
      AssociationThread[Values[modelIndecies] -> Keys[modelIndecies]]},
     prettyName[e[m0]]];
+
+colors = {RGBColor["#D51745"], RGBColor["#465362"], RGBColor["#94C595"]};

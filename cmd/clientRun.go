@@ -19,8 +19,9 @@ import (
 
 var (
 	runClientModels                      string
+	runClientPercentageModels            float64
 	runClientOriginal                    bool
-	runClientCompareOriginal                    bool
+	runClientCompareOriginal             bool
 	runClientProfileIO                   bool
 	runClientNTimes                      int
 	runClientEager                       bool
@@ -58,6 +59,7 @@ func makeClientRun(ctx context.Context, extraOpts ...client.Option) *client.Clie
 			client.UploadProfile(runClientUploadTraces),
 			client.LargeModels(runClientLargeModels),
 			client.SimulateRun(runClientSimulateRun),
+			client.PercentageModels(runClientPercentageModels),
 		},
 		extraOpts...,
 	)
@@ -231,6 +233,7 @@ func init() {
 	for _, cmd := range runCmds {
 		clientCmd.AddCommand(cmd)
 		cmd.Flags().StringVar(&runClientModels, "models", "all", "List of models to use (comma seperated)")
+		cmd.Flags().Float64Var(&runClientPercentageModels, "models_percentage", 1.0, "percentage of models to run")
 		cmd.Flags().BoolVar(&runClientProfileIO, "profile_io", true, "Profile I/O model read (this only makes sense when evaluating the original mxnet implementation)")
 		cmd.Flags().IntVar(&runClientModelIterations, "model_iterations", -1, "Maximum number of iterations to run each model")
 		cmd.Flags().IntVarP(&runClientNTimes, "iterations", "n", 1, "Number of iterations to run the client")

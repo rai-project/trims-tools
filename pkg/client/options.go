@@ -27,6 +27,7 @@ type Options struct {
 	modelDistribution       string
 	modelDistributionParams []float64
 	concurrentRunCount      int
+	modelRunPercentage      float64
 	modelIterationCount     int
 	profileMemory           bool
 	showProgress            bool
@@ -49,6 +50,7 @@ var (
 		eagerInitialize:         true,
 		eagerInitializeAsync:    false,
 		postprocess:             true,
+		modelRunPercentage:      100.0,
 		modelName:               "all",
 		uploadProfile:           true,
 		modelDistribution:       "none",
@@ -80,6 +82,15 @@ func ConcurrentRunCount(ii int) Option {
 func UploadProfile(b bool) Option {
 	return func(o *Options) {
 		o.uploadProfile = b
+	}
+}
+
+func PercentageModels(f float64) Option {
+	return func(o *Options) {
+		if f <= 1.0 {
+			f = f * 100.0
+		}
+		o.modelRunPercentage = f
 	}
 }
 

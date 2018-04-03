@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
+	"math"
 	"math/rand"
 	"path/filepath"
 	"sync"
@@ -212,7 +213,16 @@ func (c Client) runWorkload() ([]*trace.Trace, error) {
 		return nil, err
 	}
 
-	models = shuffleModels(models)
+	if options.modelRunPercentage < 100.0 {
+		modelsLen := len(models)
+		modelsCount := int(math.Ceil(float64(modelsLen) * (options.modelRunPercentage / 100.0)))
+		if modelsCount > modelsLen {
+			modelsCount = modelsLen
+		}
+		models = models[:modelsCount]
+	}
+
+	// models = shuffleModels(models)
 
 	if options.showProgress && len(models) <= 1 {
 		options.showProgress = false
