@@ -17,7 +17,7 @@ def ParsingArguments(row):
 	else:
 		NewClientCommand = NewClientCommand + " --distribution_params=" + str(row['P1']) + "," + str(row['P2'])
 
-	NewClientCommand = NewClientCommand + " --profile_output=" + str(row['outputfile']) + " --experiment_description='" + str(row['description']) +"'"
+	NewClientCommand = NewClientCommand + " --profile_output=" + str(row['outputfile']) + " --experiment_description=\"" + str(row['description']) +"\""
 	return NewClientCommand
 
 def StartServer(eviction_policy):
