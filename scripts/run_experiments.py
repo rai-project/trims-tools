@@ -10,8 +10,8 @@ def ParsingArguments(row):
 	SimpleDistributions = ["exponential", "poisson"]
 
 	NewClientCommand = ClientCommand + " --profile_output_overwrite=true" + " --iterations=" + str(row['iterations']) + " --concurrent=" + str(row['concurrent']) + " --distribution=" + str(row['distribution'])
-  if row['model_percentage'] is not None:
-    NewClientCommand = NewClientCommand + " --model_percentage=" + str(row['model_percentage'])
+        if row['model_percentage'] is not None:
+            NewClientCommand = NewClientCommand + " --model_percentage=" + str(row['model_percentage'])
 	if str(row['distribution']).lower() in SimpleDistributions:
 		NewClientCommand = NewClientCommand + " --distribution_params=" + str(row['P1'])
 	else:
