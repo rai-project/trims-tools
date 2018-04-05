@@ -1,5 +1,7 @@
 #!/bin/sh
 
+set -e
+
 # run the server using
 # ./main server run -d --memory_percentage=0.9 --estimate_with_internal_memory=false
 
@@ -12,6 +14,7 @@ sleep 10
 go build main.go
 
 echo "##########################################################"
+echo "##### VGG 896"
 echo "##########################################################"
 
 ./main server run --memory_percentage=0.9 --estimate_with_internal_memory=false &
@@ -35,6 +38,7 @@ sleep 10
 ##########################################################
 
 echo "##########################################################"
+echo "##### ALEXNET 681"
 echo "##########################################################"
 
 ./main server run --memory_percentage=0.9 --estimate_with_internal_memory=false &
@@ -58,6 +62,7 @@ sleep 10
 ##########################################################
 
 echo "##########################################################"
+echo "##### VGG 672"
 echo "##########################################################"
 
 ./main server run --memory_percentage=0.9 --estimate_with_internal_memory=false &
@@ -82,6 +87,7 @@ sleep 10
 ##########################################################
 
 echo "##########################################################"
+echo "##### ALEXNET 908"
 echo "##########################################################"
 
 ./main server run --memory_percentage=0.9 --estimate_with_internal_memory=false &
@@ -107,6 +113,7 @@ sleep 10
 ##########################################################
 
 echo "##########################################################"
+echo "##### VGG 448"
 echo "##########################################################"
 
 ./main server run --memory_percentage=0.9 --estimate_with_internal_memory=false &
@@ -131,6 +138,7 @@ sleep 10
 ##########################################################
 
 echo "##########################################################"
+echo "##### ALEXNET 454"
 echo "##########################################################"
 
 ./main server run --memory_percentage=0.9 --estimate_with_internal_memory=false &
@@ -155,6 +163,7 @@ sleep 10
 ##########################################################
 
 echo "##########################################################"
+echo "##### ALEXNET 227"
 echo "##########################################################"
 
 ./main server run --memory_percentage=0.9 --estimate_with_internal_memory=false &
@@ -179,6 +188,7 @@ sleep 10
 ##########################################################
 
 echo "##########################################################"
+echo "##### VGG 224"
 echo "##########################################################"
 
 ./main server run --memory_percentage=0.9 --estimate_with_internal_memory=false &
