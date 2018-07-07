@@ -15,9 +15,9 @@ import (
 	"github.com/fatih/color"
 	"github.com/k0kubun/pp"
 	"github.com/spf13/cast"
+	"gopkg.in/cheggaaa/pb.v1"
 
 	"github.com/Jeffail/tunny"
-	"github.com/cheggaaa/pb"
 	"github.com/rai-project/micro18-tools/pkg/workload"
 
 	"github.com/rai-project/uuid"
@@ -216,10 +216,9 @@ func (c Client) runWorkload() ([]*trace.Trace, error) {
 	if options.modelRunPercentage < 100.0 {
 		modelsLen := len(models)
 		modelsCount := int(math.Ceil(float64(modelsLen) * (options.modelRunPercentage / 100.0)))
-		if modelsCount > modelsLen {
-			modelsCount = modelsLen
+		if modelsCount < modelsLen {
+			models = models[:modelsCount]
 		}
-		models = models[:modelsCount]
 	}
 
 	// models = shuffleModels(models)

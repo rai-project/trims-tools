@@ -4,7 +4,7 @@ import (
 	"runtime"
 	"time"
 
-	"github.com/cheggaaa/pb"
+	"gopkg.in/cheggaaa/pb.v1"
 )
 
 func NewProgress(prefix string, count int) *pb.ProgressBar {

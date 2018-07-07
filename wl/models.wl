@@ -36,7 +36,17 @@ prettyNameMapping = <|"bvlc_alexnet_1.0" -> "AlexNet",
    "squeezenet_1.1" -> "SqueezeNet-v1.1", "VGG16" -> "VGG16",
    "vgg16_1.0" -> "VGG16", "vgg16_sod_1.0" -> "VGG16_SOD",
    "vgg16_sos_1.0" -> "VGG16_SOS", "vgg19_1.0" -> "VGG19",
-   "wrn50_2.0" -> "WRN50-v2", "xception_1.0" -> "Xception"|>;
+   "wrn50_2.0" -> "WRN50-v2", "xception_1.0" -> "Xception",
+
+"large_alexnet_227x227_1.0" -> "AlexNet_227x227",
+"large_alexnet_454x454_1.0" -> "AlexNet_454x454",
+"large_alexnet_681x681_1.0" -> "AlexNet_681x681",
+"large_alexnet_908x908_1.0" -> "AlexNet_908x908",
+"large_vgg16_224x224_1.0" -> "VGG16_224x224",
+"large_vgg16_448x448_1.0" -> "VGG16_448x448",
+"large_vgg16_672x672_1.0" -> "VGG16_672x672",
+"large_vgg16_896x896_1.0" -> "VGG16_896x896"
+   |>;
 
 prettyNameMapping =
   Join[prettyNameMapping,
@@ -64,7 +74,16 @@ modelIndecies = <|
    "ResNeXt50-32x4d" -> 30, "SqueezeNet-v1.0" -> 31,
    "SqueezeNet-v1.1" -> 32, "VGG16" -> 33, "VGG16_SOD" -> 34,
    "VGG16_SOS" -> 35, "VGG19" -> 36, "WRN50-2" -> 37,
-   "WRN50-v2" -> 37, "Xception" -> 38|>;
+   "WRN50-v2" -> 37, "Xception" -> 38,
+   "AlexNet_227x227" -> 1,
+"AlexNet_454x454" -> 2,
+"AlexNet_681x681" -> 3,
+"AlexNet_908x908" -> 4,
+"VGG16_224x224" -> 5,
+"VGG16_448x448" -> 6,
+"VGG16_672x672" -> 7,
+"VGG16_896x896" -> 8
+   |>;
 enabled = <|"BVLC-AlexNet" -> True, "BVLC-GoogLeNet" -> True, "DPN92" -> True,
  "Inception-v4" -> True, "LocationNet" -> True, "NIN" -> True,
  "ResNet101" -> True, "ResNet152" -> True, "ResNet18-v2" -> True,
