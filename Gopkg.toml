@@ -1,0 +1,174 @@
+# Gopkg.toml example
+#
+# Refer to https://golang.github.io/dep/docs/Gopkg.toml.html
+# for detailed Gopkg.toml documentation.
+#
+# required = ["github.com/user/thing/cmd/thing"]
+# ignored = ["github.com/user/project/pkgX", "bitbucket.org/user/project/pkgA/pkgY"]
+#
+# [[constraint]]
+#   name = "github.com/user/project"
+#   version = "1.0.0"
+#
+# [[constraint]]
+#   name = "github.com/user/project2"
+#   branch = "dev"
+#   source = "github.com/myfork/project2"
+#
+# [[override]]
+#   name = "github.com/x/y"
+#   version = "2.4.0"
+#
+# [prune]
+#   non-go = false
+#   go-tests = true
+#   unused-packages = true
+
+
+[[constraint]]
+  name = "github.com/Jeffail/tunny"
+  version = "0.1.1"
+
+[[constraint]]
+  name = "github.com/Unknwon/com"
+  version = "1.0.0"
+
+[[constraint]]
+  name = "github.com/Workiva/go-datastructures"
+  version = "1.0.48"
+
+[[constraint]]
+  name = "github.com/dc0d/dirwatch"
+  version = "0.4.3"
+
+[[constraint]]
+  branch = "master"
+  name = "github.com/dustin/go-humanize"
+
+[[constraint]]
+  name = "github.com/fatih/color"
+  version = "1.7.0"
+
+[[constraint]]
+  name = "github.com/fatih/structs"
+  version = "1.0.0"
+
+[[constraint]]
+  name = "github.com/fsnotify/fsnotify"
+  version = "1.4.7"
+
+[[constraint]]
+  name = "github.com/k0kubun/pp"
+  version = "2.3.0"
+
+[[constraint]]
+  name = "github.com/marcusolsson/tui-go"
+  version = "0.3.0"
+
+[[constraint]]
+  name = "github.com/mattn/go-shellwords"
+  version = "1.0.3"
+
+[[constraint]]
+  branch = "master"
+  name = "github.com/mattn/go-zglob"
+
+[[constraint]]
+  branch = "master"
+  name = "github.com/mitchellh/go-homedir"
+
+[[constraint]]
+  branch = "master"
+  name = "github.com/mitchellh/go-ps"
+
+[[constraint]]
+  branch = "master"
+  name = "github.com/olekukonko/tablewriter"
+
+[[constraint]]
+  name = "github.com/pkg/errors"
+  version = "0.8.0"
+
+[[constraint]]
+  branch = "master"
+  name = "github.com/rai-project/aws"
+
+[[constraint]]
+  branch = "master"
+  name = "github.com/rai-project/config"
+
+[[constraint]]
+  branch = "master"
+  name = "github.com/rai-project/cudainfo"
+
+[[constraint]]
+  branch = "master"
+  name = "github.com/rai-project/downloadmanager"
+
+[[constraint]]
+  branch = "master"
+  name = "github.com/rai-project/logger"
+
+[[constraint]]
+  branch = "master"
+  name = "github.com/rai-project/nvml-go"
+
+[[constraint]]
+  branch = "master"
+  name = "github.com/rai-project/store"
+
+[[constraint]]
+  branch = "master"
+  name = "github.com/rai-project/uuid"
+
+[[constraint]]
+  branch = "master"
+  name = "github.com/rai-project/vipertags"
+
+[[constraint]]
+  name = "github.com/sensepost/gowitness"
+  version = "1.0.7"
+
+[[constraint]]
+  name = "github.com/sirupsen/logrus"
+  version = "1.0.5"
+
+[[constraint]]
+  name = "github.com/spf13/cast"
+  version = "1.2.0"
+
+[[constraint]]
+  name = "github.com/spf13/cobra"
+  version = "0.0.3"
+
+[[constraint]]
+  name = "github.com/stretchr/testify"
+  version = "1.2.2"
+
+[[constraint]]
+  branch = "master"
+  name = "github.com/ulule/deepcopier"
+
+[[constraint]]
+  branch = "master"
+  name = "github.com/xo/dburl"
+
+[[constraint]]
+  branch = "master"
+  name = "gonum.org/v1/gonum"
+
+[[constraint]]
+  name = "gopkg.in/cheggaaa/pb.v1"
+  version = "1.0.25"
+
+[[constraint]]
+  name = "gopkg.in/src-d/go-git.v4"
+  version = "4.4.1"
+
+[[constraint]]
+  name = "gopkg.in/yaml.v2"
+  version = "2.2.1"
+
+[prune]
+  go-tests = true
+  unused-packages = true
