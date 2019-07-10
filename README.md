@@ -158,13 +158,13 @@ go run main.go client run --model_iterations=100 --iterations=100 --concurrent=1
 ### Basic Run
 
 ```
-micro18-tools client run opts...
+trims-tools client run opts...
 ```
 
 ### Comparing UPR vs Original
 
 ```
-micro18-tools client compare opts...
+trims-tools client compare opts...
 ```
 
 ### Client Options
@@ -214,7 +214,7 @@ The following distributions are supported by the tool:
 Both the distribution as well as the distribution parameters can be specified using
 
 ```
-micro18-tools client ... --distribution=<<dist_name>> --distribution_params=<<<param1,param2,...>>>
+trims-tools client ... --distribution=<<dist_name>> --distribution_params=<<<param1,param2,...>>>
 ```
 
 If neither the distribution is not specified then the client is run across all models in sequence multiple times (the number of times is specified by the `--iterations` option).
@@ -230,7 +230,7 @@ By default this is set to 1.
 ## Server
 
 ```
-micro18-tools server run -d
+trims-tools server run -d
 ```
 
 ...
@@ -240,7 +240,7 @@ micro18-tools server run -d
 ### Downloading Models
 
 ```
-micro18-tools download assets
+trims-tools download assets
 ```
 
 This will download it to the directory specified by `micro18.base_path` in the config file.
