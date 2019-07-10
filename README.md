@@ -1,6 +1,6 @@
-# Micro 18 Tools
+# TRIMS Tools
 
-This repository includes a set of tools that are useful for performing experiments for the Micro18 papers.
+This repository includes a set of tools that are useful for performing experiments for the TRIMS papers.
 The tools may be applicable for other types of projects which perform workload characterization and/or use the Chrome trace format.
 
 ## Installing
